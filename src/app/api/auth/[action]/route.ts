@@ -154,7 +154,10 @@ export async function GET(request: NextRequest, context: Context) {
     let upstream = token
       ? await backend("me", { headers: { Authorization: `Bearer ${token}` } })
       : null;
-    if ((!upstream || upstream.status === 401) && refresh) {
+    // A deployed backend can return 503 while validating an old access token
+    // (for example, during a JWKS/provider hiccup). A refresh token is the
+    // safe recovery path before showing an unavailable error to the user.
+    if ((!upstream || [401, 503].includes(upstream.status)) && refresh) {
       const refreshed = await backend("refresh", {
         method: "POST",
         body: JSON.stringify({ refresh_token: refresh }),
