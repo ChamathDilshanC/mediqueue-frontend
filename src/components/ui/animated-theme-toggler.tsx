@@ -14,6 +14,8 @@ export default function ThemeToggler({
       className="theme-toggler"
       type="button"
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+      aria-pressed={theme === "dark"}
+      title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
       onClick={onToggle}
     >
       <span className="theme-toggler-thumb">
