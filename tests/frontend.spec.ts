@@ -23,7 +23,9 @@ test("Sinhala is the default; language, font and metadata persist across routes"
   );
   await page.evaluate(() => document.fonts.ready);
   expect(
-    await page.evaluate(() => document.fonts.check("16px Mahee", "සිංහල")),
+    await page.evaluate(() =>
+      document.fonts.check("16px AFSandarenu", "සිංහල"),
+    ),
   ).toBe(true);
   await expect(page.locator("link[rel=icon]")).toHaveAttribute(
     "href",

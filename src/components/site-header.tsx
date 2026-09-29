@@ -2,8 +2,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowUpRight, ChevronDown, Globe2, Menu, X } from "lucide-react";
+import {
+  ArrowUpRight,
+  CircleHelp,
+  Globe2,
+  HeartPulse,
+  Sparkles,
+} from "lucide-react";
 import { useLanguage } from "./providers";
+import DashboardSidebar from "./ui/dashboard-sidebar";
 import MorphSelect, {
   MorphSelectContent,
   MorphSelectItem,
@@ -43,15 +50,40 @@ export function LanguageSelect() {
 export function SiteHeader({ simple = false }: { simple?: boolean }) {
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
+  const navigation = [
+    {
+      title: t.how,
+      href: "/#how-it-works",
+      icon: <HeartPulse size={17} />,
+      gradientFrom: "#a955ff",
+      gradientTo: "#ea51ff",
+    },
+    {
+      title: t.features,
+      href: "/#features",
+      icon: <Sparkles size={17} />,
+      gradientFrom: "#56CCF2",
+      gradientTo: "#2F80ED",
+    },
+    {
+      title: t.faq,
+      href: "/#faq",
+      icon: <CircleHelp size={17} />,
+      gradientFrom: "#FF9966",
+      gradientTo: "#FF5E62",
+    },
+  ];
   return (
     <header className="site-header">
       <div className="header-inner">
         <Brand />
         {!simple && (
-          <nav className="desktop-nav" aria-label={t.menu}>
-            <a href="/#how-it-works">{t.how}</a>
-            <a href="/#features">{t.features}</a>
-            <a href="/#faq">{t.faq}</a>
+          <nav className="site-header-nav" aria-label="Primary navigation">
+            {navigation.map(({ title, href }) => (
+              <Link key={href} href={href}>
+                {title}
+              </Link>
+            ))}
           </nav>
         )}
         <div className="header-actions">
@@ -66,31 +98,32 @@ export function SiteHeader({ simple = false }: { simple?: boolean }) {
                 <ArrowUpRight size={16} />
               </Link>
               <button
-                className="icon-button mobile-menu"
+                className="mobile-menu"
                 aria-label={open ? t.close : t.menu}
                 aria-expanded={open}
                 aria-controls="mobile-navigation"
                 onClick={() => setOpen(!open)}
               >
-                {open ? <X /> : <Menu />}
+                {open ? t.close : t.menu}
               </button>
             </>
           )}
         </div>
       </div>
-      {open && (
-        <nav
-          id="mobile-navigation"
-          className="mobile-nav"
-          aria-label={t.menu}
-          onClick={() => setOpen(false)}
-        >
-          <a href="/#how-it-works">{t.how}</a>
-          <a href="/#features">{t.features}</a>
-          <a href="/#faq">{t.faq}</a>
-          <Link href="/login">{t.login}</Link>
-          <Link href="/register">{t.create}</Link>
-        </nav>
+      {!simple && (
+        <DashboardSidebar
+          open={open}
+          onClose={() => setOpen(false)}
+          items={navigation.map(({ title, href, icon }) => ({
+            title,
+            href,
+            icon,
+          }))}
+          loginHref="/login"
+          loginLabel={t.login}
+          actionHref="/register"
+          actionLabel={t.create}
+        />
       )}
     </header>
   );

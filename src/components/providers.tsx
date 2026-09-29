@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { MotionConfig } from "framer-motion";
 import { GooeyToaster } from "goey-toast";
 import { en, si, type Language, type Messages } from "@/lib/translations";
+import ThemeToggler from "./ui/animated-theme-toggler";
 const LanguageContext = createContext<{
   language: Language;
   t: Messages;
@@ -16,9 +17,27 @@ export function Providers({
   initialLanguage: Language;
 }) {
   const [language, updateLanguage] = useState<Language>(initialLanguage);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
   useEffect(() => {
     document.documentElement.lang = language;
   }, [language]);
+  useEffect(() => {
+    const saved = window.localStorage.getItem("mq_theme");
+    const next =
+      saved === "dark" || saved === "light"
+        ? saved
+        : window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light";
+    setTheme(next);
+    document.documentElement.dataset.theme = next;
+  }, []);
+  function toggleTheme() {
+    const next = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    document.documentElement.dataset.theme = next;
+    window.localStorage.setItem("mq_theme", next);
+  }
   useEffect(() => {
     const fragment = new URLSearchParams(window.location.hash.slice(1));
     // Supabase's email links return an implicit session in a URL fragment.
@@ -45,6 +64,7 @@ export function Providers({
       value={{ language, t: language === "si" ? si : en, setLanguage }}
     >
       <MotionConfig reducedMotion="user">
+        <ThemeToggler theme={theme} onToggle={toggleTheme} />
         {children}
         <GooeyToaster
           position="bottom-right"

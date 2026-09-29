@@ -58,11 +58,16 @@ const menuItems: GradientMenuItem[] = [
 
 export default function GradientMenu({
   items = menuItems,
+  className,
 }: {
   items?: GradientMenuItem[];
+  className?: string;
 }) {
   return (
-    <nav aria-label="Dashboard navigation" className="gradient-menu">
+    <nav
+      aria-label="Dashboard navigation"
+      className={`gradient-menu${className ? ` ${className}` : ""}`}
+    >
       <ul>
         {items.map(({ title, href, icon, gradientFrom, gradientTo }) => (
           <li
