@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { MotionConfig } from "framer-motion";
 import { GooeyToaster } from "goey-toast";
 import { en, si, type Language, type Messages } from "@/lib/translations";
-import ThemeToggler from "./ui/animated-theme-toggler";
+import ThemeSwitcher from "./ui/theme-switcher-1";
 const LanguageContext = createContext<{
   language: Language;
   t: Messages;
@@ -64,7 +64,7 @@ export function Providers({
       value={{ language, t: language === "si" ? si : en, setLanguage }}
     >
       <MotionConfig reducedMotion="user">
-        <ThemeToggler theme={theme} onToggle={toggleTheme} />
+        <ThemeSwitcher theme={theme} onToggle={toggleTheme} />
         {children}
         <GooeyToaster
           position="bottom-right"
