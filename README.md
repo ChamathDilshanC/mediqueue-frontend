@@ -133,6 +133,19 @@ authentication still requires backend/Supabase configuration and valid credentia
 
 ## Component source
 
+Navigation uses starc007's Animated Sidebar for the dashboard/account desktop
+rail and the mobile menu on every page, including authentication pages. All 13
+resource links point to the existing dashboard API views. The 21st.dev install
+endpoint required authentication; the component and its motion dependencies were
+sourced from the same author's [public repository](https://github.com/starc007/ui-components/tree/main/components/motion).
+Local adaptations cover MediQueue styling, labels, routes and mobile panel width.
+
+The theme control is installed with `pnpm dlx shadcn@latest add
+@magicui/animated-theme-toggler`. The shared provider preserves `mq_theme`,
+synchronizes the Tailwind dark class and existing theme tokens, and initializes
+before paint. Reduced motion and browsers without View Transitions switch themes
+immediately. Third-party MIT notices are retained in `THIRD_PARTY_LICENSES.md`.
+
 The [Animated Shiny Text component on 21st.dev](https://21st.dev/community/components/dillionverma/animated-shiny-text)
 is sourced from the author's [official registry](https://magicui.design/r/animated-shiny-text.json).
 The 21st.dev direct registry requires authentication, so the official open-source

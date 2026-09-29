@@ -1,3 +1,4 @@
+import { selectLanguage } from "./helpers";
 import { test, expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 async function revealPage(page: Page) {
@@ -36,7 +37,7 @@ test("Sinhala is the default; language, font and metadata persist across routes"
     path: "test-results/landing-si-desktop.png",
     fullPage: true,
   });
-  await page.getByRole("combobox").selectOption("en");
+  await selectLanguage(page, "en");
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
     "Your time matters.",
   );
@@ -66,7 +67,7 @@ test("mobile navigation, FAQ disclosure and both languages fit the viewport", as
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   for (const lang of ["si", "en"]) {
-    await page.getByRole("combobox").selectOption(lang);
+    await selectLanguage(page, lang);
     await revealPage(page);
     expect(
       await page.evaluate(
@@ -103,7 +104,7 @@ test("sign in displays the requested loader, verifies profile and signs out", as
   context,
 }) => {
   await page.goto("/login");
-  await page.getByRole("combobox").selectOption("en");
+  await selectLanguage(page, "en");
   await page.getByLabel("Email address").fill("person@example.com");
   await page.getByLabel("Password", { exact: true }).fill("valid-password");
   await page.getByRole("button", { name: "Show password" }).click();
@@ -137,7 +138,7 @@ test("registration and recovery display honest confirmation; invalid login stays
   page,
 }) => {
   await page.goto("/register");
-  await page.getByRole("combobox").selectOption("en");
+  await selectLanguage(page, "en");
   await page.getByLabel("Full name").fill("Test User");
   await page.getByLabel("Email address").fill("new@example.com");
   await page.getByLabel("Password", { exact: true }).fill("valid-password");
@@ -161,7 +162,7 @@ test("registration and recovery display honest confirmation; invalid login stays
     "Check your email and password",
   );
   await expect(page).toHaveURL("/login");
-  await page.getByRole("combobox").selectOption("si");
+  await selectLanguage(page, "si");
   await expect(page.locator(".form-error")).toContainText("ඊමේල් ලිපිනය");
 });
 
@@ -219,7 +220,7 @@ test("email recovery clears the fragment, validates the session and sets a new p
   await page.goto(
     "/reset-password#type=recovery&access_token=fixture-access&refresh_token=fixture-refresh",
   );
-  await page.getByRole("combobox").selectOption("en");
+  await selectLanguage(page, "en");
   await expect(page.getByLabel("New password", { exact: true })).toBeVisible();
   expect(new URL(page.url()).hash).toBe("");
   await page

@@ -10,7 +10,7 @@ import "./globals.css";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -40,7 +40,18 @@ export default async function RootLayout({
   const language =
     (await cookies()).get("mq_language")?.value === "en" ? "en" : "si";
   return (
-    <html lang={language} className={cn("font-sans", geist.variable)}>
+    <html
+      lang={language}
+      className={cn("font-sans", geist.variable)}
+      suppressHydrationWarning
+    >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var s;try{s=localStorage.getItem('mq_theme')}catch(e){}var t=s==='light'||s==='dark'?s:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';var r=document.documentElement;r.dataset.theme=t;r.classList.toggle('dark',t==='dark');r.style.colorScheme=t})()`,
+          }}
+        />
+      </head>
       <body>
         <Providers initialLanguage={language}>{children}</Providers>
       </body>

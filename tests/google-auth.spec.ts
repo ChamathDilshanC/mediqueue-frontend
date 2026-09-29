@@ -1,3 +1,4 @@
+import { selectLanguage } from "./helpers";
 import { test, expect } from "@playwright/test";
 
 for (const route of ["/login", "/register"]) {
@@ -9,7 +10,7 @@ for (const route of ["/login", "/register"]) {
     await expect(
       page.getByRole("button", { name: "Google සමඟ ඉදිරියට යන්න" }),
     ).toBeVisible();
-    await page.getByRole("combobox").selectOption("en");
+    await selectLanguage(page, "en");
     let challenge = "";
     page.on("request", (request) => {
       const url = new URL(request.url());
@@ -33,7 +34,7 @@ test("OAuth cancellation, missing verifier and failed exchanges return helpful e
   context,
 }) => {
   await page.goto("/login");
-  await page.getByRole("combobox").selectOption("en");
+  await selectLanguage(page, "en");
   await page.goto(
     "/auth/callback?error=access_denied&error_description=PRIVATE_PROVIDER_DETAIL",
   );
@@ -95,7 +96,7 @@ test("email quota feedback honours Retry-After while Google remains available", 
   page,
 }) => {
   await page.goto("/register");
-  await page.getByRole("combobox").selectOption("en");
+  await selectLanguage(page, "en");
   await page.getByLabel("Full name").fill("Example");
   await page.getByLabel("Email address").fill("limited@example.com");
   await page.getByLabel("Password", { exact: true }).fill("test-password");

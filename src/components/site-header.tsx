@@ -1,16 +1,21 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
 import {
   ArrowUpRight,
   CircleHelp,
   Globe2,
   HeartPulse,
   Sparkles,
+  PanelLeft,
 } from "lucide-react";
 import { useLanguage } from "./providers";
-import DashboardSidebar from "./ui/dashboard-sidebar";
+import {
+  AnimatedSidebarTrigger,
+  useAnimatedSidebar,
+} from "./motion/animated-sidebar";
+import { ThemeToggle } from "./theme-provider";
 import MorphSelect, {
   MorphSelectContent,
   MorphSelectItem,
@@ -48,8 +53,10 @@ export function LanguageSelect() {
   );
 }
 export function SiteHeader({ simple = false }: { simple?: boolean }) {
-  const { t } = useLanguage();
-  const [open, setOpen] = useState(false);
+  const { t, language } = useLanguage();
+  const { openMobile, isMobile, state } = useAnimatedSidebar();
+  const pathname = usePathname();
+  const workspace = pathname === "/dashboard" || pathname === "/account";
   const navigation = [
     {
       title: t.how,
@@ -76,7 +83,28 @@ export function SiteHeader({ simple = false }: { simple?: boolean }) {
   return (
     <header className="site-header">
       <div className="header-inner">
-        <Brand />
+        <div className="header-brand-group">
+          <AnimatedSidebarTrigger
+            className={
+              workspace
+                ? "navigation-trigger"
+                : "navigation-trigger public-trigger"
+            }
+            aria-label={
+              isMobile
+                ? openMobile
+                  ? t.close
+                  : t.menu
+                : state === "expanded"
+                  ? "Collapse navigation"
+                  : "Expand navigation"
+            }
+            aria-controls="mobile-navigation"
+          >
+            <PanelLeft size={20} />
+          </AnimatedSidebarTrigger>
+          <Brand />
+        </div>
         {!simple && (
           <nav className="site-header-nav" aria-label="Primary navigation">
             {navigation.map(({ title, href }) => (
@@ -88,6 +116,7 @@ export function SiteHeader({ simple = false }: { simple?: boolean }) {
         )}
         <div className="header-actions">
           <LanguageSelect />
+          <ThemeToggle language={language} />
           {!simple && (
             <>
               <Link className="header-login" href="/login">
@@ -97,34 +126,10 @@ export function SiteHeader({ simple = false }: { simple?: boolean }) {
                 {t.start}
                 <ArrowUpRight size={16} />
               </Link>
-              <button
-                className="mobile-menu"
-                aria-label={open ? t.close : t.menu}
-                aria-expanded={open}
-                aria-controls="mobile-navigation"
-                onClick={() => setOpen(!open)}
-              >
-                {open ? t.close : t.menu}
-              </button>
             </>
           )}
         </div>
       </div>
-      {!simple && (
-        <DashboardSidebar
-          open={open}
-          onClose={() => setOpen(false)}
-          items={navigation.map(({ title, href, icon }) => ({
-            title,
-            href,
-            icon,
-          }))}
-          loginHref="/login"
-          loginLabel={t.login}
-          actionHref="/register"
-          actionLabel={t.create}
-        />
-      )}
     </header>
   );
 }

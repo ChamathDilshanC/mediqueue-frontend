@@ -3,18 +3,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
-  Activity,
-  BarChart3,
-  CalendarDays,
   ChevronLeft,
   ChevronRight,
-  ClipboardList,
-  Home,
-  LogOut,
   RefreshCw,
   Search,
   ShieldCheck,
-  UsersRound,
 } from "lucide-react";
 import { useLanguage } from "./providers";
 import { SiteHeader } from "./site-header";
@@ -25,38 +18,9 @@ import MorphSelect, {
   MorphSelectValue,
 } from "./ui/select-morph";
 
-type ResourceKey =
-  | "hospitals"
-  | "branches"
-  | "users"
-  | "memberships"
-  | "departments"
-  | "rooms"
-  | "doctors"
-  | "schedules"
-  | "patients"
-  | "queues"
-  | "visits"
-  | "appointments"
-  | "audit-events";
+import { resources, type ResourceKey } from "@/lib/dashboard-resources";
 
 type Row = Record<string, unknown>;
-
-const resources: { key: ResourceKey; label: string }[] = [
-  { key: "hospitals", label: "Hospitals" },
-  { key: "branches", label: "Branches" },
-  { key: "users", label: "Users" },
-  { key: "memberships", label: "Memberships" },
-  { key: "departments", label: "Departments" },
-  { key: "rooms", label: "Rooms" },
-  { key: "doctors", label: "Doctors" },
-  { key: "schedules", label: "Schedules" },
-  { key: "patients", label: "Patients" },
-  { key: "queues", label: "Queues" },
-  { key: "visits", label: "Visits" },
-  { key: "appointments", label: "Appointments" },
-  { key: "audit-events", label: "Audit events" },
-];
 
 const pageSize = 10;
 
@@ -137,58 +101,14 @@ export function Dashboard() {
     <>
       <SiteHeader simple />
       <main className="dashboard-page dashboard-shell container">
-        <aside className="dashboard-rail" aria-label="Dashboard navigation">
-          <div className="dashboard-rail-brand">
-            <ShieldCheck size={24} />
-            <span>MediQueue</span>
-          </div>
-          <p className="dashboard-rail-label">Workspace</p>
-          <nav>
-            <a className="active" href="#overview">
-              <Home size={17} />
-              Overview
-            </a>
-            <a href="#records">
-              <ClipboardList size={17} />
-              Records
-            </a>
-            <a href="#appointments">
-              <CalendarDays size={17} />
-              Appointments
-            </a>
-            <a href="#patients">
-              <UsersRound size={17} />
-              Patients
-            </a>
-          </nav>
-          <p className="dashboard-rail-label">Insights</p>
-          <nav>
-            <a href="#analytics">
-              <BarChart3 size={17} />
-              Analytics
-            </a>
-            <a href="#activity">
-              <Activity size={17} />
-              Activity
-            </a>
-          </nav>
-          <div className="dashboard-rail-footer">
-            <a href="/account">
-              <ShieldCheck size={17} />
-              Account
-            </a>
-            <a href="/login">
-              <LogOut size={17} />
-              Sign out
-            </a>
-          </div>
-        </aside>
         <div className="dashboard-content">
           <div className="dashboard-searchbar">
             <Search size={18} aria-hidden />
             <input
               aria-label="Search workspace"
-              placeholder="Search your workspace"
+              placeholder="Search this page"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
             />
           </div>
           <div className="dashboard-topbar">
@@ -222,8 +142,12 @@ export function Dashboard() {
             </div>
             <div>
               <span>System status</span>
-              <strong className="status-good">Healthy</strong>
-              <small>All services operational</small>
+              <strong className={error ? "" : "status-good"}>
+                {loading ? "Checking…" : error ? "Unavailable" : "Connected"}
+              </strong>
+              <small>
+                {error ? "Could not load records" : "Selected resource"}
+              </small>
             </div>
           </div>
 

@@ -1,9 +1,17 @@
 "use client";
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  Suspense,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { MotionConfig } from "framer-motion";
 import { GooeyToaster } from "goey-toast";
 import { en, si, type Language, type Messages } from "@/lib/translations";
-import { AnimatedThemeToggler } from "@/registry/magicui/animated-theme-toggler";
+import { ThemeProvider } from "./theme-provider";
+import { AnimatedSidebarProvider } from "./motion/animated-sidebar";
+import { AppSidebar } from "./app-sidebar";
 const LanguageContext = createContext<{
   language: Language;
   t: Messages;
@@ -46,8 +54,14 @@ export function Providers({
       value={{ language, t: language === "si" ? si : en, setLanguage }}
     >
       <MotionConfig reducedMotion="user">
-        <AnimatedThemeToggler />
-        {children}
+        <ThemeProvider>
+          <AnimatedSidebarProvider className="app-shell">
+            <Suspense fallback={null}>
+              <AppSidebar />
+            </Suspense>
+            <div className="app-main">{children}</div>
+          </AnimatedSidebarProvider>
+        </ThemeProvider>
         <GooeyToaster
           position="bottom-right"
           preset="subtle"
