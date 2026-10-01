@@ -24,10 +24,32 @@ type Row = Record<string, unknown>;
 
 const pageSize = 10;
 
-function displayValue(value: unknown) {
-  if (value === null || value === undefined) return "—";
-  if (typeof value === "object") return JSON.stringify(value);
-  return String(value);
+function displayValue(key: string, value: unknown) {
+  if (value === null || value === undefined || value === "") return <span className="muted">—</span>;
+  if (typeof value === "boolean") {
+    return (
+      <span className={`status-badge ${value ? 'verified' : 'rejected'}`} style={{ display: 'inline-flex', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 500, background: value ? 'var(--soft)' : '#fef2f2', color: value ? 'var(--green-dark)' : '#991b1b', border: `1px solid ${value ? '#cfe6a8' : '#fecaca'}` }}>
+        {value ? "Active" : "Inactive"}
+      </span>
+    );
+  }
+  if (typeof value === "object") return <span className="latin text-xs">{JSON.stringify(value)}</span>;
+  const str = String(value);
+  if (str.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)) {
+    return <span className="latin text-xs text-muted-foreground">{new Date(str).toLocaleString()}</span>;
+  }
+  if (key === 'status') {
+    return (
+      <span className="status-badge" style={{ display: 'inline-flex', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 500, textTransform: 'capitalize', background: '#f3f4f6', border: '1px solid #e5e7eb' }}>
+        {str.replace(/_/g, ' ')}
+      </span>
+    );
+  }
+  return <span style={{ fontWeight: key.includes('name') || key.includes('title') ? 500 : 400 }}>{str}</span>;
+}
+
+function formatColumnName(key: string) {
+  return key.replaceAll("_", " ").replace(/\b\w/g, (l) => l.toUpperCase());
 }
 
 export function Dashboard() {
@@ -93,12 +115,14 @@ export function Dashboard() {
   const columns = useMemo(() => {
     const keys = new Set<string>();
     rows.forEach((row) => Object.keys(row).forEach((key) => keys.add(key)));
-    return Array.from(keys).slice(0, 6);
+    const allKeys = Array.from(keys);
+    const visibleKeys = allKeys.filter((key) => key !== "id" && !key.endsWith("_id"));
+    return visibleKeys.length > 0 ? visibleKeys : allKeys;
   }, [rows]);
   const filteredRows = rows.filter((row) =>
     query
-      ? Object.values(row).some((value) =>
-          displayValue(value).toLowerCase().includes(query.toLowerCase()),
+      ? Object.entries(row).some(([key, value]) =>
+          String(value).toLowerCase().includes(query.toLowerCase()),
         )
       : true,
   );
@@ -215,7 +239,7 @@ export function Dashboard() {
                     <thead>
                       <tr>
                         {columns.map((column) => (
-                          <th key={column}>{column.replaceAll("_", " ")}</th>
+                          <th key={column}>{formatColumnName(column)}</th>
                         ))}
                       </tr>
                     </thead>
@@ -236,7 +260,7 @@ export function Dashboard() {
                         filteredRows.map((row, index) => (
                           <tr key={String(row.id ?? index)}>
                             {columns.map((column) => (
-                              <td key={column}>{displayValue(row[column])}</td>
+                              <td key={column}>{displayValue(column, row[column])}</td>
                             ))}
                           </tr>
                         ))
