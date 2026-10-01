@@ -9,6 +9,7 @@ import {
   Check,
   HeartPulse,
   LogOut,
+  LayoutGrid,
   UserRound,
 } from "lucide-react";
 import { gooeyToast } from "goey-toast";
@@ -74,9 +75,9 @@ export function Account() {
       <SiteHeader simple />
       <main className="account-page container">
         <div className="account-toolbar">
-          <Link href="/" className="back-link">
-            <ArrowLeft size={15} />
-            {t.back}
+          <Link href="/dashboard" className="button primary">
+            <LayoutGrid size={16} />
+            {t.backToDashboard}
           </Link>
           <button onClick={logout} disabled={busy} className="button secondary">
             <LogOut size={16} />
