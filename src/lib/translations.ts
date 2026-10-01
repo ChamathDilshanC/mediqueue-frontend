@@ -167,6 +167,7 @@ export const en = {
   organizationSubmittedBody:
     "Your organization is now Pending Review. We will verify the submitted details before activating access.",
   backToDashboard: "Back to dashboard",
+  dashboard: "Dashboard",
   validation: "Please check the form and try again.",
   sessionExpired: "Your session has expired. Please sign in again.",
   account: "My account",
@@ -357,7 +358,8 @@ export const si: Messages = {
   organizationSubmitted: "අයදුම්පත ඉදිරිපත් කළා",
   organizationSubmittedBody:
     "ඔබේ ආයතනය දැන් සමාලෝචනය අපේක්ෂාවෙන් ඇත. ප්‍රවේශය සක්‍රිය කිරීමට පෙර තොරතුරු සත්‍යාපනය කරනු ලැබේ.",
-  backToDashboard: "Dashboard වෙත ආපසු",
+  backToDashboard: "ප්‍රධාන පුවරුව වෙත ආපසු",
+  dashboard: "ප්‍රධාන පුවරුව",
   validation: "ඇතුළත් කළ තොරතුරු පරීක්ෂා කරන්න.",
   sessionExpired: "ඔබේ සැසිය අවසන් වී ඇත. නැවත පිවිසෙන්න.",
   account: "මගේ ගිණුම",
