@@ -34,10 +34,15 @@ export type ComboboxFilter = (
 ) => boolean;
 
 const defaultFilter: ComboboxFilter = (value, query, keywords) => {
-  const needle = query.trim().toLocaleLowerCase();
+  const needle = String(query ?? "")
+    .trim()
+    .toLocaleLowerCase();
   if (!needle) return true;
 
-  const haystack = [value, ...keywords].join(" ").toLocaleLowerCase();
+  const haystack = [value, ...keywords]
+    .filter((part): part is string => typeof part === "string")
+    .join(" ")
+    .toLocaleLowerCase();
   let queryIndex = 0;
   for (const character of haystack) {
     if (character === needle[queryIndex]) queryIndex += 1;
