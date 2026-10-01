@@ -138,91 +138,123 @@ export function Dashboard() {
       <SiteHeader simple />
       <main className="dashboard-page dashboard-shell container">
         <div className="dashboard-content">
-          <div className="dashboard-searchbar">
-            <Search size={18} aria-hidden />
-            <input
-              aria-label="Search workspace"
-              placeholder="Search this page"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-            />
-          </div>
-          <div className="dashboard-topbar">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 mt-4">
             <div>
-              <span className="eyebrow-pill">
-                <ShieldCheck size={14} />
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-[#e2ead8] rounded-full text-xs font-medium text-[#61714d] mb-4 shadow-sm">
+                <ShieldCheck size={14} className="text-[#76aa32]" />
                 {t.account}
-              </span>
-              <h1>Operations dashboard</h1>
-              <p>Manage every MediQueue backend resource from one place.</p>
+              </div>
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 mb-2">Operations dashboard</h1>
+              <p className="text-gray-500 text-sm md:text-base">Manage every MediQueue backend resource from one place.</p>
             </div>
             <button
-              className="button secondary"
+              className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium rounded-xl text-sm transition-all shadow-sm"
               onClick={() => void loadRows()}
             >
-              <RefreshCw size={16} />
-              Refresh
+              <RefreshCw size={16} className="text-gray-500" />
+              Refresh data
             </button>
           </div>
 
-          <div className="dashboard-stats" aria-label="Workspace summary">
-            <div>
-              <span>Total resources</span>
-              <strong>{resources.length}</strong>
-              <small>Connected endpoints</small>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8" aria-label="Workspace summary">
+            <div className="flex flex-col p-5 bg-white rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-medium text-gray-500">Total resources</span>
+                <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><Search size={16} /></div>
+              </div>
+              <strong className="text-3xl font-semibold text-gray-900 mb-1">{resources.length}</strong>
+              <small className="text-xs text-gray-400 font-medium">Connected endpoints</small>
+              <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-gradient-to-br from-blue-50 to-transparent rounded-full opacity-50 pointer-events-none"></div>
             </div>
-            <div>
-              <span>Records this page</span>
-              <strong>{rows.length}</strong>
-              <small>Live API response</small>
+            <div className="flex flex-col p-5 bg-white rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-medium text-gray-500">Records this page</span>
+                <div className="p-2 bg-green-50 text-green-600 rounded-lg"><RefreshCw size={16} /></div>
+              </div>
+              <strong className="text-3xl font-semibold text-gray-900 mb-1">{rows.length}</strong>
+              <small className="text-xs text-gray-400 font-medium">Live API response</small>
+              <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-gradient-to-br from-green-50 to-transparent rounded-full opacity-50 pointer-events-none"></div>
             </div>
-            <div>
-              <span>System status</span>
-              <strong className={error ? "" : "status-good"}>
+            <div className="flex flex-col p-5 bg-white rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-medium text-gray-500">System status</span>
+                <div className={`p-2 rounded-lg ${error ? 'bg-red-50 text-red-600' : 'bg-[#f4f7f0] text-[#76aa32]'}`}><ShieldCheck size={16} /></div>
+              </div>
+              <strong className={`text-xl font-semibold mb-1 ${error ? "text-red-600" : "text-gray-900"}`}>
                 {loading ? "Checking…" : error ? "Unavailable" : "Connected"}
               </strong>
-              <small>
+              <small className="text-xs text-gray-400 font-medium">
                 {error ? "Could not load records" : "Selected resource"}
               </small>
+              <div className={`absolute -bottom-6 -right-6 w-24 h-24 bg-gradient-to-br rounded-full opacity-50 pointer-events-none ${error ? 'from-red-50' : 'from-[#f4f7f0]'}`}></div>
             </div>
           </div>
 
-          <div className="dashboard-layout">
-            <aside className="resource-nav" aria-label="Resources">
-              <p className="eyebrow">Resources</p>
-              <MorphSelect
-                value={resource}
-                onValueChange={(value) => selectResource(value as ResourceKey)}
-                className="resource-select"
-              >
-                <MorphSelectTrigger>
-                  <MorphSelectValue placeholder="Select resource" />
-                </MorphSelectTrigger>
-                <MorphSelectContent>
-                  {resources.map(({ key, label }) => (
-                    <MorphSelectItem key={key} value={key}>
-                      {label}
-                    </MorphSelectItem>
-                  ))}
-                </MorphSelectContent>
-              </MorphSelect>
-            </aside>
-            <section className="resource-panel">
-              <div className="resource-heading">
-                <div>
-                  <p className="eyebrow">Live API records</p>
-                  <h2>{title}</h2>
-                </div>
-                <label className="table-search">
-                  <Search size={16} aria-hidden />
-                  <span className="sr-only">Search {title}</span>
-                  <input
-                    value={query}
-                    onChange={(event) => setQuery(event.target.value)}
-                    placeholder="Search this page"
-                  />
-                </label>
+          <div className="flex flex-col md:flex-row gap-6">
+            <aside className="md:w-64 flex-shrink-0 flex flex-col gap-1" aria-label="Resources">
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3 px-3 hidden md:block">Database Resources</p>
+              
+              <div className="md:hidden mb-4">
+                <MorphSelect
+                  value={resource}
+                  onValueChange={(value) => selectResource(value as ResourceKey)}
+                  className="w-full"
+                >
+                  <MorphSelectTrigger>
+                    <MorphSelectValue placeholder="Select resource" />
+                  </MorphSelectTrigger>
+                  <MorphSelectContent>
+                    {resources.map(({ key, label }) => (
+                      <MorphSelectItem key={key} value={key}>
+                        {label}
+                      </MorphSelectItem>
+                    ))}
+                  </MorphSelectContent>
+                </MorphSelect>
               </div>
+
+              <div className="hidden md:flex flex-col gap-1">
+                {resources.map(({ key, label }) => (
+                  <button
+                    key={key}
+                    onClick={() => selectResource(key)}
+                    className={`text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                      resource === key
+                        ? "bg-[#f4f7f0] text-[#76aa32] shadow-sm ring-1 ring-inset ring-[#76aa32]/20"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </aside>
+            <section className="flex-1 bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+              <div className="flex items-center justify-between p-6 border-b border-gray-50 bg-[#fafcfa]">
+                <div className="flex items-center gap-4">
+                  <div className="flex flex-col">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-[#76aa32] mb-1">Live API records</p>
+                    <h2 className="text-xl font-bold text-gray-900">{title}</h2>
+                  </div>
+                  <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-bold">{rows.length} records</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                    <input
+                      value={query}
+                      onChange={(event) => setQuery(event.target.value)}
+                      placeholder="Search records"
+                      className="pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#76aa32]/20 focus:border-[#76aa32] w-64 transition-all"
+                    />
+                  </div>
+                  <button className="flex items-center gap-2 px-4 py-2 bg-[#76aa32] hover:bg-[#68982a] text-white font-medium rounded-xl text-sm transition-colors shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    New {title.endsWith('s') ? title.slice(0, -1) : title}
+                  </button>
+                </div>
+              </div>
+              <div className="p-6 bg-gray-50/30 flex-1">
               {error ? (
                 <div className="account-error" role="alert">
                   <p>{error}</p>
@@ -234,42 +266,72 @@ export function Dashboard() {
                   </button>
                 </div>
               ) : (
-                <div className="data-table-wrap">
-                  <table className="data-table">
-                    <thead>
-                      <tr>
-                        {columns.map((column) => (
-                          <th key={column}>{formatColumnName(column)}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {loading ? (
-                        <tr>
-                          <td colSpan={Math.max(columns.length, 1)}>
-                            Loading records…
-                          </td>
-                        </tr>
-                      ) : filteredRows.length === 0 ? (
-                        <tr>
-                          <td colSpan={Math.max(columns.length, 1)}>
-                            No records found.
-                          </td>
-                        </tr>
-                      ) : (
-                        filteredRows.map((row, index) => (
-                          <tr key={String(row.id ?? index)}>
-                            {columns.map((column) => (
-                              <td key={column}>{displayValue(column, row[column])}</td>
-                            ))}
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
+                <div className="flex flex-col gap-3 mt-4">
+                  {loading ? (
+                    <div className="p-12 text-center text-gray-400">Loading records…</div>
+                  ) : filteredRows.length === 0 ? (
+                    <div className="p-12 text-center text-gray-400">No records found.</div>
+                  ) : (
+                    filteredRows.map((row, index) => {
+                      // Find best columns for modern display
+                      const titleCol = columns.find(c => c.toLowerCase().includes('name') || c.toLowerCase().includes('title')) || columns[0];
+                      const subtitleCol = columns.find(c => c !== titleCol && (c.toLowerCase().includes('email') || c.toLowerCase().includes('phone') || typeof row[c] === 'string')) || columns[1];
+                      const badgeCols = columns.filter(c => typeof row[c] === 'boolean' || c === 'status' || c === 'role');
+                      
+                      const title = row[titleCol] ? String(row[titleCol]) : "Untitled";
+                      const subtitle = subtitleCol && row[subtitleCol] ? String(row[subtitleCol]) : "";
+                      const initials = title.substring(0, 2).toUpperCase();
+                      
+                      return (
+                        <div key={String(row.id ?? index)} className="group flex items-center justify-between p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200">
+                          <div className="flex items-center gap-4">
+                            <div className="flex-shrink-0 w-11 h-11 rounded-full bg-gradient-to-br from-[#f4f7f0] to-[#e6eed9] flex items-center justify-center text-[#5c7a31] font-semibold text-sm border border-[#d6e3c5]">
+                              {initials}
+                            </div>
+                            <div className="flex flex-col">
+                              <div className="flex items-center gap-2">
+                                <h3 className="font-semibold text-gray-900 text-[15px] leading-tight">{title}</h3>
+                                {badgeCols.map(c => (
+                                  <span key={c} className="px-2 py-0.5 bg-gray-50 text-gray-500 text-[10px] uppercase font-bold rounded-full border border-gray-100">
+                                    {String(row[c])}
+                                  </span>
+                                ))}
+                              </div>
+                              {subtitle && <p className="text-sm text-gray-500 mt-0.5">{subtitle}</p>}
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3">
+                            {/* Render other important columns if any */}
+                            <div className="hidden md:flex gap-4 mr-4">
+                              {columns.filter(c => c !== titleCol && c !== subtitleCol && !badgeCols.includes(c)).slice(0, 2).map(c => (
+                                <div key={c} className="flex flex-col text-right">
+                                  <span className="text-[10px] uppercase text-gray-400 font-semibold">{formatColumnName(c)}</span>
+                                  <span className="text-[13px] text-gray-700 font-medium">{String(row[c] ?? "—")}</span>
+                                </div>
+                              ))}
+                            </div>
+
+                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                               <button className="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors" title="Edit record">
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                               </button>
+                               <button className="p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors" title="Delete record">
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                               </button>
+                               <button className="cursor-grab p-2 text-gray-300 hover:text-gray-500 rounded-lg transition-colors" title="Drag to reorder">
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="12" r="1"></circle><circle cx="9" cy="5" r="1"></circle><circle cx="9" cy="19" r="1"></circle><circle cx="15" cy="12" r="1"></circle><circle cx="15" cy="5" r="1"></circle><circle cx="15" cy="19" r="1"></circle></svg>
+                               </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
               )}
-              <div className="table-footer">
+              </div>
+              <div className="flex items-center justify-between p-4 border-t border-gray-100 bg-[#fafcfa] text-sm text-gray-500">
                 <span>
                   Page {page + 1} · {rows.length} records loaded
                 </span>
