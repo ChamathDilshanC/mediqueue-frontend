@@ -12,7 +12,7 @@ type Context = { params: Promise<{ path: string[] }> };
 async function proxy(request: NextRequest, context: Context) {
   const token = request.cookies.get(ACCESS_COOKIE)?.value;
   const refresh = request.cookies.get(REFRESH_COOKIE)?.value;
-  if (!token) {
+  if (!token && !refresh) {
     return NextResponse.json({ error: "sessionExpired" }, { status: 401 });
   }
 
@@ -22,20 +22,22 @@ async function proxy(request: NextRequest, context: Context) {
   const body = request.method === "POST" ? await request.text() : undefined;
 
   try {
-    let upstream = await fetch(
-      `${base.replace(/\/$/, "")}/v1/${path.join("/")}${request.nextUrl.search}`,
-      {
-        method: request.method,
-        headers: {
-          Authorization: `******`,
-          "Content-Type":
-            request.headers.get("content-type") ?? "application/json",
-        },
-        body,
-        cache: "no-store",
-        signal: AbortSignal.timeout(15000),
-      },
-    );
+    let upstream = token
+      ? await fetch(
+          `${base.replace(/\/$/, "")}/v1/${path.join("/")}${request.nextUrl.search}`,
+          {
+            method: request.method,
+            headers: {
+              Authorization: `******`,
+              "Content-Type":
+                request.headers.get("content-type") ?? "application/json",
+            },
+            body,
+            cache: "no-store",
+            signal: AbortSignal.timeout(15000),
+          },
+        )
+      : new Response(null, { status: 401 });
 
     if (upstream.status === 401 && refresh) {
       const refreshed = await fetch(
