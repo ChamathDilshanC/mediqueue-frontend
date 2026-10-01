@@ -70,7 +70,7 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
       { key: "tenant_id", en: "Hospital", si: "රෝහල", type: "readonly", showInTable: false },
     ],
     inputFields: ["name", "timezone"],
-    canCreate: false, canEdit: false, canDelete: false,
+    canCreate: false, canEdit: true, canDelete: true,
   },
 
   departments: {
@@ -213,7 +213,7 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
       { key: "active", en: "Active", si: "සක්‍රිය", type: "boolean", showInTable: true },
     ],
     inputFields: ["user_id", "role"],
-    canCreate: true, canEdit: true, canDelete: false,
+    canCreate: true, canEdit: true, canDelete: true,
   },
 
   "audit-events": {
