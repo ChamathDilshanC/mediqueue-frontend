@@ -4,6 +4,20 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "./providers";
 import { SiteHeader } from "./site-header";
+import {
+  AttachmentUpload,
+  type AttachmentUploadItem,
+} from "./motion/attachment-upload";
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxTrigger,
+  ComboboxValue,
+} from "./motion/combobox";
+import { Input } from "./motion/input";
 
 const initialForm = {
   organization_type: "hospital",
@@ -26,6 +40,7 @@ export function OrganizationRegistration() {
   const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [attachments, setAttachments] = useState<AttachmentUploadItem[]>([]);
 
   function update(name: keyof typeof initialForm, value: string) {
     setForm((current) => ({ ...current, [name]: value }));
@@ -75,17 +90,49 @@ export function OrganizationRegistration() {
     );
   }
 
-  const fields: Array<[keyof typeof initialForm, string, string]> = [
-    ["official_name", t.officialName, "text"],
-    ["address", t.organizationAddress, "text"],
-    ["phone", t.officialPhone, "tel"],
-    ["official_email", t.officialEmail, "email"],
-    ["registration_number", t.registrationNumber, "text"],
-    ["license_number", t.licenseNumber, "text"],
-    ["supporting_document_url", t.supportingDocument, "url"],
-    ["website_url", t.website, "url"],
-    ["administrator_name", t.administratorName, "text"],
-    ["administrator_role", t.administratorRole, "text"],
+  const fields: Array<{
+    name: Exclude<
+      keyof typeof initialForm,
+      "organization_type" | "supporting_document_url"
+    >;
+    label: string;
+    type: "text" | "tel" | "email" | "url";
+    required?: boolean;
+  }> = [
+    {
+      name: "official_name",
+      label: t.officialName,
+      type: "text",
+      required: true,
+    },
+    {
+      name: "address",
+      label: t.organizationAddress,
+      type: "text",
+      required: true,
+    },
+    { name: "phone", label: t.officialPhone, type: "tel", required: true },
+    {
+      name: "official_email",
+      label: t.officialEmail,
+      type: "email",
+      required: true,
+    },
+    { name: "registration_number", label: t.registrationNumber, type: "text" },
+    { name: "license_number", label: t.licenseNumber, type: "text" },
+    { name: "website_url", label: t.website, type: "url" },
+    {
+      name: "administrator_name",
+      label: t.administratorName,
+      type: "text",
+      required: true,
+    },
+    {
+      name: "administrator_role",
+      label: t.administratorRole,
+      type: "text",
+      required: true,
+    },
   ];
 
   return (
@@ -99,34 +146,50 @@ export function OrganizationRegistration() {
           <form className="auth-form" onSubmit={submit}>
             <label>
               {t.organizationType}
-              <select
+              <Combobox
                 value={form.organization_type}
-                onChange={(event) =>
-                  update("organization_type", event.target.value)
-                }
+                onValueChange={(value) => update("organization_type", value)}
               >
-                <option value="hospital">{t.hospital}</option>
-                <option value="medical_center">{t.medicalCenter}</option>
-              </select>
+                <ComboboxTrigger>
+                  <ComboboxValue />
+                </ComboboxTrigger>
+                <ComboboxContent>
+                  <ComboboxInput />
+                  <ComboboxList>
+                    <ComboboxItem value="hospital">{t.hospital}</ComboboxItem>
+                    <ComboboxItem value="medical_center">
+                      {t.medicalCenter}
+                    </ComboboxItem>
+                  </ComboboxList>
+                </ComboboxContent>
+              </Combobox>
             </label>
-            {fields.map(([name, label, type]) => (
-              <label key={name}>
-                {label}
-                <input
-                  required={
-                    name === "official_name" ||
-                    name === "address" ||
-                    name === "phone" ||
-                    name === "official_email" ||
-                    name === "administrator_name" ||
-                    name === "administrator_role"
-                  }
-                  type={type}
-                  value={form[name]}
-                  onChange={(event) => update(name, event.target.value)}
-                />
-              </label>
+            {fields.map(({ name, label, type, required }) => (
+              <Input
+                key={name}
+                label={label}
+                required={required}
+                type={type}
+                value={form[name]}
+                onChange={(value) => update(name, value)}
+              />
             ))}
+            <AttachmentUpload
+              accept=".pdf,.png,.jpg,.jpeg"
+              maxFiles={1}
+              attachmentsLabel={t.supportingDocument}
+              title={t.supportingDocument}
+              description="PDF, PNG or JPG"
+              value={attachments}
+              onValueChange={setAttachments}
+            />
+            <Input
+              label={`${t.supportingDocument} URL`}
+              type="url"
+              value={form.supporting_document_url}
+              onChange={(value) => update("supporting_document_url", value)}
+              placeholder="https://..."
+            />
             {error && (
               <p className="form-error" role="alert">
                 {error}

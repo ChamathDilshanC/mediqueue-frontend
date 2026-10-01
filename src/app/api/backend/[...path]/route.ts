@@ -28,7 +28,7 @@ async function proxy(request: NextRequest, context: Context) {
           {
             method: request.method,
             headers: {
-              Authorization: `******`,
+              Authorization: `Bearer ${token}`,
               "Content-Type":
                 request.headers.get("content-type") ?? "application/json",
             },
@@ -74,7 +74,7 @@ async function proxy(request: NextRequest, context: Context) {
         {
           method: request.method,
           headers: {
-            Authorization: `******`,
+            Authorization: `Bearer ${session.access_token}`,
             "Content-Type":
               request.headers.get("content-type") ?? "application/json",
           },
