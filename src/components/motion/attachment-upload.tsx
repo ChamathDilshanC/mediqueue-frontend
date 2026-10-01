@@ -22,7 +22,7 @@ import {
   motion,
   useReducedMotion,
 } from "motion/react";
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Tooltip } from "@/components/motion/tooltip";
 import { EASE_OUT, SPRING_LAYOUT, SPRING_PRESS } from "@/lib/ease";
@@ -71,7 +71,7 @@ export interface AttachmentUploadProps {
   disabled?: boolean;
   title?: string;
   description?: string;
-  attachmentsLabel?: string;
+  attachmentsLabel?: ReactNode;
   className?: string;
   classNames?: AttachmentUploadClassNames;
 }

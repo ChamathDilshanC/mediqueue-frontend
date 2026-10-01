@@ -219,7 +219,7 @@ export function OrganizationRegistration() {
           <p>{t.organizationIntro}</p>
           <form className="auth-form organization-form" onSubmit={submit}>
             <label className="field-wide">
-              {t.organizationType} (Required)
+              {t.organizationType} <span className="text-destructive">*</span>
               <Combobox
                 value={form.organization_type}
                 onValueChange={(value) => update("organization_type", value)}
@@ -241,7 +241,11 @@ export function OrganizationRegistration() {
             {fields.map(({ name, label, type, required }) => (
               <Input
                 key={name}
-                label={`${label} ${required ? "(Required)" : "(Optional)"}`}
+                label={
+                  <span>
+                    {label} <span className={required ? "text-destructive" : "text-blue-500"}>*</span>
+                  </span>
+                }
                 required={required}
                 type={type}
                 value={form[name]}
@@ -257,7 +261,11 @@ export function OrganizationRegistration() {
               className="field-wide"
               accept=".pdf,.png,.jpg,.jpeg"
               maxFiles={1}
-              attachmentsLabel={`${t.supportingDocument} (Required)`}
+              attachmentsLabel={
+                <span>
+                  {t.supportingDocument} <span className="text-destructive">*</span>
+                </span>
+              }
               title={t.supportingDocument}
               description="PDF, PNG or JPG"
               value={attachments}
@@ -265,7 +273,11 @@ export function OrganizationRegistration() {
             />
             <Input
               className="field-wide"
-              label={`${t.supportingDocument} URL (Optional)`}
+              label={
+                <span>
+                  {t.supportingDocument} URL <span className="text-blue-500">*</span>
+                </span>
+              }
               type="url"
               value={form.supporting_document_url}
               onChange={(value) => update("supporting_document_url", value)}

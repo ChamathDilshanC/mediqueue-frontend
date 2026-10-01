@@ -33,7 +33,7 @@ export interface InputProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
   "value" | "defaultValue" | "onChange"
 > {
-  label?: string;
+  label?: ReactNode;
   value?: string;
   defaultValue?: string;
   onChange?: (value: string) => void;
