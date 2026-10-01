@@ -4558,3 +4558,26 @@ html[data-magicui-theme-vt="active"]::view-transition-new(root) {
   clip-path: var(--magicui-theme-vt-clip-from);
   z-index: 1;
 }
+
+html[data-theme="dark"] .cta-panel,
+html[data-theme="dark"] .queue-card,
+html[data-theme="dark"] .journey-caption,
+html[data-theme="dark"] .language-illustration > span,
+html[data-theme="dark"] .step-connector,
+html[data-theme="dark"] .auth-visual-side > .eyebrow-pill {
+  background-color: var(--theme-surface) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text) !important;
+}
+html[data-theme="dark"] .cta-panel p:not(.eyebrow) {
+  color: var(--content-secondary);
+}
+html[data-theme="dark"] .cta-panel .eyebrow {
+  color: var(--brand-accent);
+}
+html[data-theme="dark"] .queue-card h3 {
+  color: var(--theme-text);
+}
+html[data-theme="dark"] .queue-card p {
+  color: var(--content-secondary);
+}
