@@ -179,7 +179,7 @@ export function OrganizationRegistration() {
           <p>{t.organizationIntro}</p>
           <form className="auth-form organization-form" onSubmit={submit}>
             <label className="field-wide">
-              {t.organizationType}
+              {t.organizationType} (Required)
               <Combobox
                 value={form.organization_type}
                 onValueChange={(value) => update("organization_type", value)}
@@ -201,7 +201,7 @@ export function OrganizationRegistration() {
             {fields.map(({ name, label, type, required }) => (
               <Input
                 key={name}
-                label={label}
+                label={`${label} ${required ? "(Required)" : "(Optional)"}`}
                 required={required}
                 type={type}
                 value={form[name]}
@@ -217,7 +217,7 @@ export function OrganizationRegistration() {
               className="field-wide"
               accept=".pdf,.png,.jpg,.jpeg"
               maxFiles={1}
-              attachmentsLabel={t.supportingDocument}
+              attachmentsLabel={`${t.supportingDocument} (Required)`}
               title={t.supportingDocument}
               description="PDF, PNG or JPG"
               value={attachments}
@@ -225,7 +225,7 @@ export function OrganizationRegistration() {
             />
             <Input
               className="field-wide"
-              label={`${t.supportingDocument} URL`}
+              label={`${t.supportingDocument} URL (Optional)`}
               type="url"
               value={form.supporting_document_url}
               onChange={(value) => update("supporting_document_url", value)}
@@ -236,9 +236,11 @@ export function OrganizationRegistration() {
                 {error}
               </p>
             )}
-            <button className="button primary" type="submit" disabled={busy}>
-              {busy ? t.submitting : t.submitOrganization}
-            </button>
+            <div className="field-wide" style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+              <button className="button primary" type="submit" disabled={busy}>
+                {busy ? t.submitting : t.submitOrganization}
+              </button>
+            </div>
           </form>
         </section>
       </main>
