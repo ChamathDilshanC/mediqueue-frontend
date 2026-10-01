@@ -140,8 +140,8 @@ export function Dashboard() {
   return (
     <>
       <SiteHeader simple />
-      <main className="dashboard-page dashboard-shell container">
-        <div className="dashboard-content">
+      <main className="flex-1 w-full bg-white min-h-screen pb-12">
+        <div className="px-6 md:px-10 lg:px-12 pt-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 mt-4">
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-[#e2ead8] rounded-full text-xs font-medium text-[#61714d] mb-4 shadow-sm">
