@@ -207,9 +207,9 @@ function FormDialog({
       : `New ${config.en.singular}`;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-      <div className="w-full max-w-lg bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-2xl border border-[#f3f4f6] dark:border-gray-800 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#f3f4f6] dark:border-gray-800 bg-[#fafcfa] dark:bg-[#1a1a1a]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md">
+      <div className="w-full max-w-md bg-white dark:bg-[#18181b] rounded-3xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border border-gray-200/50 dark:border-gray-800/50 overflow-visible animate-in fade-in zoom-in-95 duration-300">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#18181b] rounded-t-3xl">
           <h3 className="text-lg font-bold text-[#111827] dark:text-gray-100">{title}</h3>
           <button
             onClick={onClose}
@@ -220,8 +220,8 @@ function FormDialog({
         </div>
         <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-4">
           {editableFields.map((f) => (
-            <label key={f.key} className="flex flex-col gap-1.5">
-              <span className="text-sm font-medium text-[#374151] dark:text-[#d1d5db]">
+            <label key={f.key} className="flex flex-col gap-2 relative">
+              <span className="text-[13px] font-semibold tracking-wide text-gray-700 dark:text-gray-300 ml-1">
                 {label(f)}
                 {f.required && <span className="text-red-500 ml-1">*</span>}
               </span>
@@ -232,7 +232,7 @@ function FormDialog({
                     setFormData((prev) => ({ ...prev, [f.key]: val }))
                   }
                 >
-                  <MorphSelectTrigger className="px-3 py-2 bg-white dark:bg-[#1e1e1e] border border-[#e5e7eb] dark:border-gray-700 text-[#111827] dark:text-gray-100 rounded-xl text-sm w-full flex items-center justify-between">
+                  <MorphSelectTrigger className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] w-full flex items-center justify-between focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm">
                     <MorphSelectValue placeholder={`— ${language === "si" ? "තෝරන්න" : "Select"} —`} />
                   </MorphSelectTrigger>
                   <MorphSelectContent searchable searchPlaceholder={language === "si" ? "සොයන්න..." : "Search..."}>
@@ -255,7 +255,7 @@ function FormDialog({
                     setFormData((prev) => ({ ...prev, [f.key]: val }))
                   }
                 >
-                  <MorphSelectTrigger className="px-3 py-2 bg-white dark:bg-[#1e1e1e] border border-[#e5e7eb] dark:border-gray-700 text-[#111827] dark:text-gray-100 rounded-xl text-sm w-full flex items-center justify-between">
+                  <MorphSelectTrigger className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] w-full flex items-center justify-between focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm">
                     <MorphSelectValue placeholder={`— ${language === "si" ? "තෝරන්න" : "Select"} —`} />
                   </MorphSelectTrigger>
                   <MorphSelectContent searchable searchPlaceholder={language === "si" ? "සොයන්න..." : "Search..."}>
@@ -281,7 +281,7 @@ function FormDialog({
                       [f.key]: val ? new Date(val).toISOString() : "",
                     }));
                   }}
-                  className="px-3 py-2.5 bg-white dark:bg-[#1e1e1e] border border-[#e5e7eb] dark:border-gray-700 text-[#111827] dark:text-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#76aa32]/20 focus:border-[#76aa32] transition-all"
+                  className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] focus:outline-none focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm"
                   required={f.required}
                 />
               ) : f.type === "number" ? (
@@ -291,7 +291,7 @@ function FormDialog({
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, [f.key]: e.target.value }))
                   }
-                  className="px-3 py-2.5 bg-white dark:bg-[#1e1e1e] border border-[#e5e7eb] dark:border-gray-700 text-[#111827] dark:text-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#76aa32]/20 focus:border-[#76aa32] transition-all"
+                  className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] focus:outline-none focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm"
                   required={f.required}
                   min={1}
                 />
@@ -304,7 +304,7 @@ function FormDialog({
                   }
                   placeholder={f.placeholder ?? ""}
                   maxLength={f.maxLength}
-                  className="px-3 py-2.5 bg-white dark:bg-[#1e1e1e] border border-[#e5e7eb] dark:border-gray-700 text-[#111827] dark:text-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#76aa32]/20 focus:border-[#76aa32] transition-all"
+                  className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] focus:outline-none focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm"
                   required={f.required}
                 />
               )}

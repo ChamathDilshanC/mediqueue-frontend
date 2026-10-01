@@ -323,14 +323,14 @@ export function MorphSelectContent({
             <div className="h-px bg-border" />
             {searchable && (
               <>
-                <div className="px-2 py-2">
+                <div className="px-3 py-2.5">
                   <input
                     autoFocus
                     type="text"
                     placeholder={searchPlaceholder}
                     value={context.searchQuery}
                     onChange={(e) => context.setSearchQuery(e.target.value)}
-                    className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                    className="w-full bg-transparent text-sm outline-none border-none focus:ring-0 focus:outline-none placeholder:text-muted-foreground"
                   />
                 </div>
                 <div className="h-px bg-border" />
@@ -340,7 +340,7 @@ export function MorphSelectContent({
               initial="hidden"
               animate="show"
               variants={context.reduce ? undefined : LIST}
-              className="p-1"
+              className="p-1 max-h-[200px] overflow-y-auto custom-scrollbar"
             >
               {children}
             </motion.ul>
