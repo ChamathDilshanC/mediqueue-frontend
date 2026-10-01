@@ -40,7 +40,7 @@ function statusColor(status: string) {
     return "bg-green-50 text-green-700 border-green-200";
   if (["CANCELLED", "NO_SHOW", "FALSE", "INACTIVE", "REJECTED"].includes(s))
     return "bg-red-50 text-red-700 border-red-200";
-  return "bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700";
+  return "bg-[#f9fafb] dark:bg-gray-800 text-[#4b5563] dark:text-[#9ca3af] border-[#e5e7eb] dark:border-gray-700";
 }
 
 function StatusBadge({ value }: { value: string }) {
@@ -60,7 +60,7 @@ function cellValue(
   language: string,
 ): ReactNode {
   if (value === null || value === undefined || value === "")
-    return <span className="text-gray-300">—</span>;
+    return <span className="text-[#d1d5db]">—</span>;
 
   if (field.type === "boolean")
     return <StatusBadge value={value ? "TRUE" : "FALSE"} />;
@@ -75,15 +75,15 @@ function cellValue(
       const label = match[field.refLabel];
       if (field.refLabel === "starts_at" && typeof label === "string") {
         return (
-          <span className="text-sm text-gray-700 dark:text-gray-300">
+          <span className="text-sm text-[#374151] dark:text-[#d1d5db]">
             {new Date(label).toLocaleString()}
           </span>
         );
       }
-      return <span className="text-sm text-gray-700 dark:text-gray-300">{String(label)}</span>;
+      return <span className="text-sm text-[#374151] dark:text-[#d1d5db]">{String(label)}</span>;
     }
     return (
-      <span className="text-gray-400 text-xs font-mono">
+      <span className="text-[#9ca3af] text-xs font-mono">
         {String(value).slice(0, 8)}…
       </span>
     );
@@ -91,7 +91,7 @@ function cellValue(
 
   if (field.type === "datetime" && typeof value === "string") {
     return (
-      <span className="text-sm text-gray-700 dark:text-gray-300">
+      <span className="text-sm text-[#374151] dark:text-[#d1d5db]">
         {new Date(value).toLocaleString()}
       </span>
     );
@@ -99,10 +99,10 @@ function cellValue(
 
   if (typeof value === "object")
     return (
-      <span className="text-xs text-gray-500 dark:text-gray-400">{JSON.stringify(value)}</span>
+      <span className="text-xs text-[#6b7280] dark:text-[#9ca3af]">{JSON.stringify(value)}</span>
     );
 
-  return <span className="text-sm text-gray-900 dark:text-gray-100">{String(value)}</span>;
+  return <span className="text-sm text-[#111827] dark:text-gray-100">{String(value)}</span>;
 }
 
 /* ─────────────────── Create / Edit Dialog ─────────────────── */
@@ -201,20 +201,20 @@ function FormDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-      <div className="w-full max-w-lg bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-[#fafcfa] dark:bg-[#1a1a1a]">
-          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">{title}</h3>
+      <div className="w-full max-w-lg bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-2xl border border-[#f3f4f6] dark:border-gray-800 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#f3f4f6] dark:border-gray-800 bg-[#fafcfa] dark:bg-[#1a1a1a]">
+          <h3 className="text-lg font-bold text-[#111827] dark:text-gray-100">{title}</h3>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:bg-gray-800 rounded-lg transition-colors"
+            className="p-2 hover:bg-[#f3f4f6] dark:bg-gray-800 rounded-lg transition-colors"
           >
-            <X size={18} className="text-gray-500 dark:text-gray-400" />
+            <X size={18} className="text-[#6b7280] dark:text-[#9ca3af]" />
           </button>
         </div>
         <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-4">
           {editableFields.map((f) => (
             <label key={f.key} className="flex flex-col gap-1.5">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <span className="text-sm font-medium text-[#374151] dark:text-[#d1d5db]">
                 {label(f)}
                 {f.required && <span className="text-red-500 ml-1">*</span>}
               </span>
@@ -224,7 +224,7 @@ function FormDialog({
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, [f.key]: e.target.value }))
                   }
-                  className="px-3 py-2.5 bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#76aa32]/20 focus:border-[#76aa32] transition-all"
+                  className="px-3 py-2.5 bg-white dark:bg-[#1e1e1e] border border-[#e5e7eb] dark:border-gray-700 text-[#111827] dark:text-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#76aa32]/20 focus:border-[#76aa32] transition-all"
                   required={f.required}
                 >
                   <option value="">
@@ -244,7 +244,7 @@ function FormDialog({
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, [f.key]: e.target.value }))
                   }
-                  className="px-3 py-2.5 bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#76aa32]/20 focus:border-[#76aa32] transition-all"
+                  className="px-3 py-2.5 bg-white dark:bg-[#1e1e1e] border border-[#e5e7eb] dark:border-gray-700 text-[#111827] dark:text-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#76aa32]/20 focus:border-[#76aa32] transition-all"
                   required={f.required}
                 >
                   <option value="">
@@ -271,7 +271,7 @@ function FormDialog({
                       [f.key]: val ? new Date(val).toISOString() : "",
                     }));
                   }}
-                  className="px-3 py-2.5 bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#76aa32]/20 focus:border-[#76aa32] transition-all"
+                  className="px-3 py-2.5 bg-white dark:bg-[#1e1e1e] border border-[#e5e7eb] dark:border-gray-700 text-[#111827] dark:text-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#76aa32]/20 focus:border-[#76aa32] transition-all"
                   required={f.required}
                 />
               ) : f.type === "number" ? (
@@ -281,7 +281,7 @@ function FormDialog({
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, [f.key]: e.target.value }))
                   }
-                  className="px-3 py-2.5 bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#76aa32]/20 focus:border-[#76aa32] transition-all"
+                  className="px-3 py-2.5 bg-white dark:bg-[#1e1e1e] border border-[#e5e7eb] dark:border-gray-700 text-[#111827] dark:text-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#76aa32]/20 focus:border-[#76aa32] transition-all"
                   required={f.required}
                   min={1}
                 />
@@ -294,7 +294,7 @@ function FormDialog({
                   }
                   placeholder={f.placeholder ?? ""}
                   maxLength={f.maxLength}
-                  className="px-3 py-2.5 bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#76aa32]/20 focus:border-[#76aa32] transition-all"
+                  className="px-3 py-2.5 bg-white dark:bg-[#1e1e1e] border border-[#e5e7eb] dark:border-gray-700 text-[#111827] dark:text-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#76aa32]/20 focus:border-[#76aa32] transition-all"
                   required={f.required}
                 />
               )}
@@ -311,7 +311,7 @@ function FormDialog({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100 font-medium text-sm transition-colors"
+              className="px-4 py-2 text-[#4b5563] dark:text-[#9ca3af] hover:text-[#111827] dark:text-gray-100 font-medium text-sm transition-colors"
             >
               {language === "si" ? "අවලංගු කරන්න" : "Cancel"}
             </button>
@@ -391,15 +391,15 @@ function DeleteConfirm({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-      <div className="w-full max-w-md bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div className="w-full max-w-md bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-2xl border border-[#f3f4f6] dark:border-gray-800 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         <div className="p-6 flex flex-col items-center text-center">
           <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mb-4">
             <Trash2 size={24} className="text-red-500" />
           </div>
-          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">
+          <h3 className="text-lg font-bold text-[#111827] dark:text-gray-100 mb-2">
             {language === "si" ? "මකා දැමීම තහවුරු කරන්න" : "Confirm Delete"}
           </h3>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
+          <p className="text-[#6b7280] dark:text-[#9ca3af] text-sm mb-6">
             {language === "si"
               ? `මෙම ${config.si.singular} ස්ථිරවම මකා දැමේ. මෙය ආපසු හැරවිය නොහැක.`
               : `This ${config.en.singular.toLowerCase()} will be permanently deleted. This action cannot be undone.`}
@@ -412,7 +412,7 @@ function DeleteConfirm({
           <div className="flex items-center gap-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100 font-medium text-sm transition-colors"
+              className="px-4 py-2 text-[#4b5563] dark:text-[#9ca3af] hover:text-[#111827] dark:text-gray-100 font-medium text-sm transition-colors"
             >
               {language === "si" ? "අවලංගු කරන්න" : "Cancel"}
             </button>
@@ -575,15 +575,15 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
         />
       )}
 
-      <section className="w-full bg-white dark:bg-[#1e1e1e] rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden flex flex-col">
+      <section className="w-full bg-white dark:bg-[#1e1e1e] rounded-3xl border border-[#f3f4f6] dark:border-gray-800 shadow-sm overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex flex-col p-6 border-b border-gray-50 dark:border-gray-800 bg-[#fafcfa] dark:bg-[#1a1a1a] gap-4">
+        <div className="flex flex-col p-6 border-b border-[#f9fafb] dark:border-gray-800 bg-[#fafcfa] dark:bg-[#1a1a1a] gap-4">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+              <h2 className="text-xl font-bold text-[#111827] dark:text-gray-100">
                 {meta.plural}
               </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{meta.description}</p>
+              <p className="text-sm text-[#6b7280] dark:text-[#9ca3af] mt-1">{meta.description}</p>
             </div>
             {config.canCreate && config.inputFields.length > 0 && (
               <button
@@ -602,7 +602,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
           <div className="flex flex-wrap items-center gap-3 pt-1">
             <div className="relative flex-1 min-w-[200px] max-w-md">
               <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9ca3af]"
                 size={16}
               />
               <input
@@ -613,10 +613,10 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
                     ? `${meta.plural} සොයන්න...`
                     : `Search ${meta.plural.toLowerCase()}...`
                 }
-                className="w-full pl-9 pr-4 py-2 bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#76aa32]/20 focus:border-[#76aa32] transition-all"
+                className="w-full pl-9 pr-4 py-2 bg-white dark:bg-[#1e1e1e] border border-[#e5e7eb] dark:border-gray-700 text-[#111827] dark:text-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#76aa32]/20 focus:border-[#76aa32] transition-all"
               />
             </div>
-            <span className="px-3 py-1.5 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-full text-xs font-semibold border border-gray-100 dark:border-gray-800">
+            <span className="px-3 py-1.5 bg-[#f9fafb] dark:bg-gray-800 text-[#6b7280] dark:text-[#9ca3af] rounded-full text-xs font-semibold border border-[#f3f4f6] dark:border-gray-800">
               {rows.length} {language === "si" ? "වාර්තා" : "records"}
             </span>
           </div>
@@ -629,14 +629,14 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
               <div className="w-12 h-12 rounded-full bg-red-50 text-red-500 flex items-center justify-center mb-4">
                 <X size={24} />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+              <h3 className="text-lg font-semibold text-[#111827] dark:text-gray-100 mb-2">
                 {language === "si"
                   ? "දත්ත පූරණය කළ නොහැක"
                   : "Unable to load data"}
               </h3>
-              <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 max-w-md">{error}</p>
+              <p className="text-[#6b7280] dark:text-[#9ca3af] text-sm mb-6 max-w-md">{error}</p>
               <button
-                className="px-4 py-2 bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium rounded-xl text-sm transition-all shadow-sm"
+                className="px-4 py-2 bg-white dark:bg-[#1e1e1e] border border-[#e5e7eb] dark:border-gray-700 hover:bg-[#f9fafb] dark:bg-gray-800 text-[#374151] dark:text-[#d1d5db] font-medium rounded-xl text-sm transition-all shadow-sm"
                 onClick={() => void loadRows()}
               >
                 {t.retry}
@@ -648,21 +648,21 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
                 size={32}
                 className="animate-spin text-[#76aa32] mb-4"
               />
-              <p className="text-gray-500 dark:text-gray-400 text-sm">
+              <p className="text-[#6b7280] dark:text-[#9ca3af] text-sm">
                 {language === "si" ? "පූරණය වෙමින්…" : "Loading…"}
               </p>
             </div>
           ) : filteredRows.length === 0 ? (
             <div className="p-16 flex flex-col items-center justify-center text-center">
-              <div className="w-16 h-16 rounded-2xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-800 flex items-center justify-center text-gray-400 mb-4">
+              <div className="w-16 h-16 rounded-2xl bg-[#f9fafb] dark:bg-gray-800 border border-[#f3f4f6] dark:border-gray-800 flex items-center justify-center text-[#9ca3af] mb-4">
                 <Search size={28} />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+              <h3 className="text-lg font-semibold text-[#111827] dark:text-gray-100 mb-2">
                 {language === "si"
                   ? `${meta.plural} හමු නොවීය`
                   : `No ${meta.plural.toLowerCase()} found`}
               </h3>
-              <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 max-w-sm">
+              <p className="text-[#6b7280] dark:text-[#9ca3af] text-sm mb-6 max-w-sm">
                 {language === "si"
                   ? "ඔබේ සෙවුම් පෙරීම් ඉවත් කරන්න හෝ නව වාර්තාවක් එකතු කරන්න."
                   : "Try clearing your search or add a new record."}
@@ -670,7 +670,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
             </div>
           ) : (
             <table className="w-full text-sm text-left whitespace-nowrap">
-              <thead className="text-xs text-gray-500 dark:text-gray-400 uppercase bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800">
+              <thead className="text-xs text-[#6b7280] dark:text-[#9ca3af] uppercase bg-[#f9fafb]/50 dark:bg-gray-800/50 border-b border-[#f3f4f6] dark:border-gray-800">
                 <tr>
                   {tableFields.map((f) => (
                     <th
@@ -696,7 +696,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
                     {tableFields.map((f, colIdx) => (
                       <td
                         key={f.key}
-                        className={`px-6 py-4 ${colIdx === 0 ? "font-medium text-gray-900 dark:text-gray-100" : "text-gray-500 dark:text-gray-400"}`}
+                        className={`px-6 py-4 ${colIdx === 0 ? "font-medium text-[#111827] dark:text-gray-100" : "text-[#6b7280] dark:text-[#9ca3af]"}`}
                       >
                         {cellValue(f, row[f.key], refCache, language)}
                       </td>
@@ -708,7 +708,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
                             config.inputFields.length > 0 && (
                               <button
                                 onClick={() => setEditRow(row)}
-                                className="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+                                className="p-2 text-[#9ca3af] hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
                                 title={language === "si" ? "සංස්කරණය" : "Edit"}
                               >
                                 <Pencil size={15} />
@@ -717,7 +717,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
                           {config.canDelete && (
                             <button
                               onClick={() => setDeleteRow(row)}
-                              className="p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                              className="p-2 text-[#9ca3af] hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"
                               title={language === "si" ? "මකන්න" : "Delete"}
                             >
                               <Trash2 size={15} />
@@ -734,7 +734,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
         </div>
 
         {/* Pagination */}
-        <div className="flex items-center justify-between p-4 border-t border-gray-100 dark:border-gray-800 bg-[#fafcfa] dark:bg-[#1a1a1a] text-sm text-gray-500 dark:text-gray-400">
+        <div className="flex items-center justify-between p-4 border-t border-[#f3f4f6] dark:border-gray-800 bg-[#fafcfa] dark:bg-[#1a1a1a] text-sm text-[#6b7280] dark:text-[#9ca3af]">
           <span>
             {language === "si"
               ? `${rows.length === 0 ? 0 : page * PAGE_SIZE + 1}–${Math.min((page + 1) * PAGE_SIZE, page * PAGE_SIZE + rows.length)} වාර්තා`
@@ -745,18 +745,18 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
               aria-label="Previous page"
               disabled={page === 0 || loading}
               onClick={() => setPage((c) => c - 1)}
-              className="p-2 rounded-lg border border-transparent hover:bg-gray-100 dark:bg-gray-800 disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
+              className="p-2 rounded-lg border border-transparent hover:bg-[#f3f4f6] dark:bg-gray-800 disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
             >
               <ChevronLeft size={16} />
             </button>
-            <span className="px-4 font-medium text-gray-900 dark:text-gray-100">
+            <span className="px-4 font-medium text-[#111827] dark:text-gray-100">
               {language === "si" ? `පිටුව ${page + 1}` : `Page ${page + 1}`}
             </span>
             <button
               aria-label="Next page"
               disabled={rows.length < PAGE_SIZE || loading}
               onClick={() => setPage((c) => c + 1)}
-              className="p-2 rounded-lg border border-transparent hover:bg-gray-100 dark:bg-gray-800 disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
+              className="p-2 rounded-lg border border-transparent hover:bg-[#f3f4f6] dark:bg-gray-800 disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
             >
               <ChevronRight size={16} />
             </button>
