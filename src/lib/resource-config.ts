@@ -67,10 +67,10 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     fields: [
       { key: "name", en: "Name", si: "නම", type: "text", required: true, showInTable: true, maxLength: 200 },
       { key: "timezone", en: "Timezone", si: "වේලා කලාපය", type: "text", required: true, showInTable: true, maxLength: 64, placeholder: "Asia/Colombo" },
-      { key: "tenant_id", en: "Hospital", si: "රෝහල", type: "readonly", showInTable: false },
+      { key: "tenant_id", en: "Hospital", si: "රෝහල", type: "uuid-ref", required: true, showInTable: true, refResource: "hospitals", refLabel: "name" },
     ],
-    inputFields: ["name", "timezone"],
-    canCreate: false, canEdit: true, canDelete: true,
+    inputFields: ["tenant_id", "name", "timezone"],
+    canCreate: true, canEdit: true, canDelete: true,
   },
 
   departments: {
