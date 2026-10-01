@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "./providers";
+import { Loader } from "./loader";
 import { SiteHeader } from "./site-header";
 import {
   AttachmentUpload,
@@ -50,20 +51,30 @@ export function OrganizationRegistration() {
   const [busy, setBusy] = useState(false);
   const [attachments, setAttachments] = useState<AttachmentUploadItem[]>([]);
   const [existingApp, setExistingApp] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const controller = new AbortController();
     async function checkExisting() {
       try {
-        const res = await fetch("/api/backend/hospital-applications/me");
+        const res = await fetch("/api/backend/hospital-applications/me", {
+          signal: controller.signal,
+        });
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data) && data.length > 0) {
             setExistingApp(data[0]);
           }
         }
-      } catch (err) {}
+      } catch (err) {
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
     }
-    checkExisting();
+    void checkExisting();
+    return () => controller.abort();
   }, []);
 
   function update(name: keyof typeof initialForm, value: string) {
@@ -96,6 +107,17 @@ export function OrganizationRegistration() {
   const hasExisting = existingApp !== null;
   const currentApp = hasExisting ? existingApp : null;
   const status = currentApp?.status || "pending_review";
+
+  if (loading) {
+    return (
+      <>
+        <SiteHeader simple />
+        <main className="organization-page container" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}>
+          <Loader />
+        </main>
+      </>
+    );
+  }
 
   if (submitted || hasExisting) {
     return (

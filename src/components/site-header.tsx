@@ -81,7 +81,7 @@ export function SiteHeader({ simple = false }: { simple?: boolean }) {
     },
   ];
   return (
-    <header className="site-header">
+    <header className={`site-header ${workspace ? "workspace-header" : ""}`}>
       <div className="header-inner">
         <div className="header-brand-group">
           {(!simple || workspace) && (
@@ -105,7 +105,7 @@ export function SiteHeader({ simple = false }: { simple?: boolean }) {
               <PanelLeft size={20} />
             </AnimatedSidebarTrigger>
           )}
-          <Brand destination={workspace ? "/account" : "/"} />
+          {!workspace && <Brand destination={workspace ? "/account" : "/"} />}
         </div>
         {!simple && (
           <nav className="site-header-nav" aria-label="Primary navigation">

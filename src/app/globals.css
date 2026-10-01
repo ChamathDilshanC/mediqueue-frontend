@@ -235,6 +235,9 @@ strong {
   justify-content: space-between;
   gap: 30px;
 }
+.workspace-header .header-inner {
+  height: 62px;
+}
 .brand {
   display: inline-flex;
   align-items: center;

@@ -182,7 +182,7 @@ export function AppSidebar() {
           {(workspace
             ? [
                 { title: t.account, href: "/account", icon: UserRound },
-                { title: t.home, href: "/", icon: Home },
+                { title: t.backToDashboard || "Dashboard", href: "/dashboard", icon: LayoutGrid },
                 {
                   title: t.registerOrganization,
                   href: "/organization/register",
