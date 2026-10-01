@@ -44,6 +44,8 @@ interface MorphContextValue {
   labelFor: (value: string | undefined) => string | undefined;
   placeholder: string;
   setPlaceholder: (value: string) => void;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
   reduce: boolean;
   layoutId: string;
   triggerId: string;
@@ -86,6 +88,7 @@ export function MorphSelect({
     new Map<string, { label: string; count: number }>(),
   );
   const [placeholder, setPlaceholder] = useState("Select");
+  const [searchQuery, setSearchQuery] = useState("");
   const controlled = value !== undefined;
   const current = controlled ? value : internal;
 
@@ -147,6 +150,8 @@ export function MorphSelect({
         itemValue === undefined ? undefined : labels.get(itemValue)?.label,
       placeholder,
       setPlaceholder,
+      searchQuery,
+      setSearchQuery,
       reduce,
       layoutId: `${baseId}-surface`,
       triggerId: `${baseId}-trigger`,
@@ -161,6 +166,7 @@ export function MorphSelect({
       unregister,
       labels,
       placeholder,
+      searchQuery,
       reduce,
       baseId,
       disabled,
@@ -256,12 +262,23 @@ export function MorphSelectTrigger({
 export function MorphSelectContent({
   className,
   children,
+  searchable,
+  searchPlaceholder = "Search...",
 }: {
   className?: string;
   children: ReactNode;
+  searchable?: boolean;
+  searchPlaceholder?: string;
 }) {
   const context = useMorphContext("MorphSelectContent");
   const label = context.labelFor(context.value);
+  
+  // Clear search when opening/closing
+  useEffect(() => {
+    if (!context.open) {
+      context.setSearchQuery("");
+    }
+  }, [context.open, context.setSearchQuery]);
   return (
     <>
       <div className="hidden">{children}</div>
@@ -304,6 +321,21 @@ export function MorphSelectContent({
               </motion.span>
             </motion.button>
             <div className="h-px bg-border" />
+            {searchable && (
+              <>
+                <div className="px-2 py-2">
+                  <input
+                    autoFocus
+                    type="text"
+                    placeholder={searchPlaceholder}
+                    value={context.searchQuery}
+                    onChange={(e) => context.setSearchQuery(e.target.value)}
+                    className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                  />
+                </div>
+                <div className="h-px bg-border" />
+              </>
+            )}
             <motion.ul
               initial="hidden"
               animate="show"
@@ -337,6 +369,11 @@ export function MorphSelectItem({
     context.register(value, label);
     return () => context.unregister(value);
   }, [context.register, context.unregister, value, label]);
+
+  if (context.searchQuery && !label.toLowerCase().includes(context.searchQuery.toLowerCase())) {
+    return null;
+  }
+
   return (
     <motion.li variants={context.reduce ? undefined : ITEM}>
       <button

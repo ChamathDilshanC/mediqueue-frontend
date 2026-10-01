@@ -20,6 +20,12 @@ import {
   X,
 } from "lucide-react";
 import { useLanguage } from "./providers";
+import MorphSelect, {
+  MorphSelectContent,
+  MorphSelectItem,
+  MorphSelectTrigger,
+  MorphSelectValue,
+} from "./ui/select-morph";
 import type { ResourceConfig, FieldDef } from "@/lib/resource-config";
 
 /* ─────────────────── Types ─────────────────── */
@@ -220,43 +226,46 @@ function FormDialog({
                 {f.required && <span className="text-red-500 ml-1">*</span>}
               </span>
               {f.type === "uuid-ref" ? (
-                <select
-                  value={formData[f.key] ?? ""}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, [f.key]: e.target.value }))
+                <MorphSelect
+                  value={formData[f.key] ?? undefined}
+                  onValueChange={(val) =>
+                    setFormData((prev) => ({ ...prev, [f.key]: val }))
                   }
-                  className="px-3 py-2.5 bg-white dark:bg-[#1e1e1e] border border-[#e5e7eb] dark:border-gray-700 text-[#111827] dark:text-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#76aa32]/20 focus:border-[#76aa32] transition-all"
-                  required={f.required}
                 >
-                  <option value="">
-                    — {language === "si" ? "තෝරන්න" : "Select"} —
-                  </option>
-                  {(refCache[f.refResource!] ?? []).map((opt) => (
-                    <option key={String(opt.id)} value={String(opt.id)}>
-                      {f.refLabel === "starts_at"
-                        ? new Date(String(opt[f.refLabel!])).toLocaleString()
-                        : String(opt[f.refLabel!] ?? opt.id)}
-                    </option>
-                  ))}
-                </select>
+                  <MorphSelectTrigger className="px-3 py-2 bg-white dark:bg-[#1e1e1e] border border-[#e5e7eb] dark:border-gray-700 text-[#111827] dark:text-gray-100 rounded-xl text-sm w-full flex items-center justify-between">
+                    <MorphSelectValue placeholder={`— ${language === "si" ? "තෝරන්න" : "Select"} —`} />
+                  </MorphSelectTrigger>
+                  <MorphSelectContent searchable searchPlaceholder={language === "si" ? "සොයන්න..." : "Search..."}>
+                    {(refCache[f.refResource!] ?? []).map((opt) => {
+                      const display = f.refLabel === "starts_at"
+                          ? new Date(String(opt[f.refLabel!])).toLocaleString()
+                          : String(opt[f.refLabel!] ?? opt.id);
+                      return (
+                        <MorphSelectItem key={String(opt.id)} value={String(opt.id)}>
+                          {display}
+                        </MorphSelectItem>
+                      );
+                    })}
+                  </MorphSelectContent>
+                </MorphSelect>
               ) : f.type === "select" ? (
-                <select
-                  value={formData[f.key] ?? ""}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, [f.key]: e.target.value }))
+                <MorphSelect
+                  value={formData[f.key] ?? undefined}
+                  onValueChange={(val) =>
+                    setFormData((prev) => ({ ...prev, [f.key]: val }))
                   }
-                  className="px-3 py-2.5 bg-white dark:bg-[#1e1e1e] border border-[#e5e7eb] dark:border-gray-700 text-[#111827] dark:text-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#76aa32]/20 focus:border-[#76aa32] transition-all"
-                  required={f.required}
                 >
-                  <option value="">
-                    — {language === "si" ? "තෝරන්න" : "Select"} —
-                  </option>
-                  {(f.options ?? []).map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {language === "si" ? opt.si : opt.en}
-                    </option>
-                  ))}
-                </select>
+                  <MorphSelectTrigger className="px-3 py-2 bg-white dark:bg-[#1e1e1e] border border-[#e5e7eb] dark:border-gray-700 text-[#111827] dark:text-gray-100 rounded-xl text-sm w-full flex items-center justify-between">
+                    <MorphSelectValue placeholder={`— ${language === "si" ? "තෝරන්න" : "Select"} —`} />
+                  </MorphSelectTrigger>
+                  <MorphSelectContent searchable searchPlaceholder={language === "si" ? "සොයන්න..." : "Search..."}>
+                    {(f.options ?? []).map((opt) => (
+                      <MorphSelectItem key={opt.value} value={opt.value}>
+                        {language === "si" ? opt.si : opt.en}
+                      </MorphSelectItem>
+                    ))}
+                  </MorphSelectContent>
+                </MorphSelect>
               ) : f.type === "datetime" ? (
                 <input
                   type="datetime-local"
