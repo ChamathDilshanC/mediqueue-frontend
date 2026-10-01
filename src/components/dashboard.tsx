@@ -129,10 +129,6 @@ export function Dashboard() {
   const title =
     resources.find(({ key }) => key === resource)?.label ?? "Hospitals";
 
-  function selectResource(key: ResourceKey) {
-    router.push(`/dashboard?resource=${key}`);
-  }
-
   return (
     <>
       <SiteHeader simple />
@@ -190,46 +186,8 @@ export function Dashboard() {
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-6">
-            <aside className="md:w-64 flex-shrink-0 flex flex-col gap-1" aria-label="Resources">
-              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3 px-3 hidden md:block">Database Resources</p>
-              
-              <div className="md:hidden mb-4">
-                <MorphSelect
-                  value={resource}
-                  onValueChange={(value) => selectResource(value as ResourceKey)}
-                  className="w-full"
-                >
-                  <MorphSelectTrigger>
-                    <MorphSelectValue placeholder="Select resource" />
-                  </MorphSelectTrigger>
-                  <MorphSelectContent>
-                    {resources.map(({ key, label }) => (
-                      <MorphSelectItem key={key} value={key}>
-                        {label}
-                      </MorphSelectItem>
-                    ))}
-                  </MorphSelectContent>
-                </MorphSelect>
-              </div>
-
-              <div className="hidden md:flex flex-col gap-1">
-                {resources.map(({ key, label }) => (
-                  <button
-                    key={key}
-                    onClick={() => selectResource(key)}
-                    className={`text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                      resource === key
-                        ? "bg-[#f4f7f0] text-[#76aa32] shadow-sm ring-1 ring-inset ring-[#76aa32]/20"
-                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </aside>
-            <section className="flex-1 bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+          <div className="flex-1">
+            <section className="w-full bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
               <div className="flex items-center justify-between p-6 border-b border-gray-50 bg-[#fafcfa]">
                 <div className="flex items-center gap-4">
                   <div className="flex flex-col">
