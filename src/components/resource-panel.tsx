@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { useRouter } from "next/navigation";
+import useSWR from "swr";
 import {
   ChevronLeft,
   ChevronRight,
@@ -437,10 +438,7 @@ function DeleteConfirm({
 export function ResourcePanel({ config }: { config: ResourceConfig }) {
   const { t, language } = useLanguage();
   const router = useRouter();
-  const [rows, setRows] = useState<Row[]>([]);
   const [page, setPage] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [refCache, setRefCache] = useState<RefCache>({});
 
@@ -481,45 +479,28 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
     setRefCache(cache);
   }, [refFields]);
 
-  const loadRows = useCallback(
-    async (signal?: AbortSignal) => {
-      setLoading(true);
-      setError("");
-      try {
-        const resp = await fetch(
-          `/api/backend/${config.endpoint}?limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}`,
-          { cache: "no-store", signal },
-        );
-        if (resp.status === 401) {
-          router.replace("/login");
-          return;
-        }
-        if (resp.status === 403) {
-          setError(t.accessDenied);
-          setRows([]);
-          return;
-        }
-        if (!resp.ok) throw new Error("Unable to load");
-        const data = await resp.json();
-        if (!Array.isArray(data)) throw new Error("Invalid response");
-        setRows(data);
-      } catch (cause) {
-        if (cause instanceof DOMException && cause.name === "AbortError")
-          return;
-        setError(t.unavailable);
-        setRows([]);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [config.endpoint, page, router, t.accessDenied, t.unavailable],
+  const fetcher = useCallback(async (url: string) => {
+    const resp = await fetch(url);
+    if (resp.status === 401) {
+      router.replace("/login");
+      throw new Error("401");
+    }
+    if (resp.status === 403) throw new Error("403");
+    if (!resp.ok) throw new Error("Unable to load");
+    const data = await resp.json();
+    if (!Array.isArray(data)) throw new Error("Invalid response");
+    return data;
+  }, [router]);
+
+  const { data: rowsData, error: swrError, mutate: mutateRows, isLoading } = useSWR(
+    `/api/backend/${config.endpoint}?limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}`,
+    fetcher
   );
 
-  useEffect(() => {
-    const c = new AbortController();
-    void loadRows(c.signal);
-    return () => c.abort();
-  }, [loadRows]);
+  const rows: Row[] = rowsData ?? [];
+  const loading = isLoading;
+  const error = swrError?.message === "403" ? t.accessDenied : (swrError ? t.unavailable : "");
+
 
   useEffect(() => {
     void loadRefs();
@@ -541,13 +522,13 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
   const onSaved = () => {
     setShowCreate(false);
     setEditRow(null);
-    void loadRows();
+    void mutateRows();
     void loadRefs();
   };
 
   const onDeleted = () => {
     setDeleteRow(null);
-    void loadRows();
+    void mutateRows();
   };
 
   return (
@@ -638,7 +619,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
               <p className="text-[#6b7280] dark:text-[#9ca3af] text-sm mb-6 max-w-md">{error}</p>
               <button
                 className="button secondary"
-                onClick={() => void loadRows()}
+                onClick={() => void mutateRows()}
               >
                 {t.retry}
               </button>
