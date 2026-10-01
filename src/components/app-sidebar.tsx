@@ -66,10 +66,10 @@ export function AppSidebar() {
   const { state, isMobile } = useAnimatedSidebar();
   const [profile, setProfile] = useState<Profile | null>(null);
   const workspace = pathname === "/dashboard" || pathname === "/account";
-  const selected = params.get("resource") ?? "hospitals";
-  const resource = resources.some(({ key }) => key === selected)
+  const selected = params.get("resource");
+  const resource = selected && resources.some(({ key }) => key === selected)
     ? selected
-    : "hospitals";
+    : selected === null ? "overview" : "hospitals";
   useEffect(() => {
     if (!workspace) return;
     const controller = new AbortController();
@@ -134,47 +134,97 @@ export function AppSidebar() {
           id="mobile-navigation"
           aria-label={workspace ? "Workspace" : "Site navigation"}
         >
-          <AnimatedSidebarGroup>
-            <AnimatedSidebarGroupLabel>
-              {workspace
-                ? language === "si"
-                  ? "කළමනාකරණය"
-                  : "Workspace"
-                : language === "si"
-                  ? "MediQueue වෙත සාදරයෙන්"
-                  : "Explore MediQueue"}
-            </AnimatedSidebarGroupLabel>
-            <AnimatedSidebarMenu>
-              {workspace
-                ? visibleResources.map(({ key, label, si }) => {
-                    const Icon =
-                      icons[resources.findIndex((item) => item.key === key)];
-                    return (
-                      <AnimatedSidebarMenuItem key={key}>
-                        <AnimatedSidebarMenuButton
-                          href={`/dashboard?resource=${key}`}
-                          icon={<Icon size={19} />}
-                          isActive={
-                            pathname === "/dashboard" && resource === key
-                          }
-                        >
-                          {language === "si" ? si : label}
-                        </AnimatedSidebarMenuButton>
-                      </AnimatedSidebarMenuItem>
-                    );
-                  })
-                : publicLinks.map(({ title, href, icon: Icon }) => (
-                    <AnimatedSidebarMenuItem key={href}>
-                      <AnimatedSidebarMenuButton
-                        href={href}
-                        icon={<Icon size={19} />}
-                      >
-                        {title}
-                      </AnimatedSidebarMenuButton>
-                    </AnimatedSidebarMenuItem>
-                  ))}
-            </AnimatedSidebarMenu>
-          </AnimatedSidebarGroup>
+          {workspace ? (
+            <div className="flex flex-col gap-6 mt-4">
+              {[
+                {
+                  title: "Overview",
+                  items: [{ key: "overview", label: "Dashboard", si: "ප්‍රධාන පුවරුව", icon: LayoutGrid }]
+                },
+                {
+                  title: "Hospital Management",
+                  items: [
+                    { key: "hospitals", label: "Hospitals", si: "රෝහල්", icon: Hospital },
+                    { key: "branches", label: "Branches", si: "ශාඛා", icon: Building2 },
+                    { key: "departments", label: "Departments", si: "අංශ", icon: DoorOpen },
+                    { key: "rooms", label: "Rooms", si: "කාමර", icon: DoorOpen }
+                  ]
+                },
+                {
+                  title: "Clinical Operations",
+                  items: [
+                    { key: "doctors", label: "Doctors", si: "වෛද්‍යවරු", icon: Stethoscope },
+                    { key: "schedules", label: "Schedules", si: "කාලසටහන්", icon: CalendarClock },
+                    { key: "patients", label: "Patients", si: "රෝගීන්", icon: UserRound },
+                    { key: "appointments", label: "Appointments", si: "හමුවීම්", icon: CalendarDays }
+                  ]
+                },
+                {
+                  title: "Queue Operations",
+                  items: [
+                    { key: "queues", label: "Live Queue", si: "පෝලිම්", icon: Activity },
+                    { key: "visits", label: "Visits", si: "රෝහල් පැමිණීම්", icon: ClipboardList }
+                  ]
+                },
+                {
+                  title: "Administration",
+                  items: [
+                    { key: "users", label: "Users", si: "පරිශීලකයන්", icon: UsersRound },
+                    { key: "memberships", label: "Memberships", si: "සාමාජිකත්ව", icon: UsersRound }
+                  ]
+                },
+                {
+                  title: "System",
+                  items: [
+                    { key: "audit-events", label: "Audit events", si: "විගණන සටහන්", icon: ShieldCheck }
+                  ]
+                }
+              ].map((group, idx) => {
+                const availableItems = group.items.filter(item => item.key === 'overview' || visibleResources.some(r => r.key === item.key));
+                if (availableItems.length === 0) return null;
+                
+                return (
+                  <AnimatedSidebarGroup key={idx}>
+                    <AnimatedSidebarGroupLabel className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-2 px-4">
+                      {group.title}
+                    </AnimatedSidebarGroupLabel>
+                    <AnimatedSidebarMenu>
+                      {availableItems.map(({ key, label, si, icon: Icon }) => (
+                        <AnimatedSidebarMenuItem key={key}>
+                          <AnimatedSidebarMenuButton
+                            href={`/dashboard${key === 'overview' ? '' : `?resource=${key}`}`}
+                            icon={<Icon size={18} className="text-gray-500" />}
+                            isActive={
+                              (pathname === "/dashboard" && resource === key) ||
+                              (pathname === "/dashboard" && key === 'overview' && !params.get("resource"))
+                            }
+                            className="text-[13px] font-medium"
+                          >
+                            {language === "si" ? si : label}
+                          </AnimatedSidebarMenuButton>
+                        </AnimatedSidebarMenuItem>
+                      ))}
+                    </AnimatedSidebarMenu>
+                  </AnimatedSidebarGroup>
+                );
+              })}
+            </div>
+          ) : (
+            <AnimatedSidebarGroup>
+              <AnimatedSidebarGroupLabel>
+                {language === "si" ? "MediQueue වෙත සාදරයෙන්" : "Explore MediQueue"}
+              </AnimatedSidebarGroupLabel>
+              <AnimatedSidebarMenu>
+                {publicLinks.map(({ title, href, icon: Icon }) => (
+                  <AnimatedSidebarMenuItem key={href}>
+                    <AnimatedSidebarMenuButton href={href} icon={<Icon size={19} />}>
+                      {title}
+                    </AnimatedSidebarMenuButton>
+                  </AnimatedSidebarMenuItem>
+                ))}
+              </AnimatedSidebarMenu>
+            </AnimatedSidebarGroup>
+          )}
         </nav>
       </AnimatedSidebarContent>
       <AnimatedSidebarFooter>
