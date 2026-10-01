@@ -9,7 +9,7 @@ import {
 
 type Context = { params: Promise<{ path: string[] }> };
 
-export async function GET(request: NextRequest, context: Context) {
+async function proxy(request: NextRequest, context: Context) {
   const token = request.cookies.get(ACCESS_COOKIE)?.value;
   const refresh = request.cookies.get(REFRESH_COOKIE)?.value;
   if (!token) {
@@ -19,12 +19,19 @@ export async function GET(request: NextRequest, context: Context) {
   const { path } = await context.params;
   const base =
     process.env.MEDIQUEUE_API_URL ?? "https://mediqueue-backend-eta.vercel.app";
+  const body = request.method === "POST" ? await request.text() : undefined;
 
   try {
     let upstream = await fetch(
       `${base.replace(/\/$/, "")}/v1/${path.join("/")}${request.nextUrl.search}`,
       {
-        headers: { Authorization: `Bearer ${token}` },
+        method: request.method,
+        headers: {
+          Authorization: `******`,
+          "Content-Type":
+            request.headers.get("content-type") ?? "application/json",
+        },
+        body,
         cache: "no-store",
         signal: AbortSignal.timeout(15000),
       },
@@ -41,7 +48,6 @@ export async function GET(request: NextRequest, context: Context) {
           signal: AbortSignal.timeout(15000),
         },
       );
-
       if (!refreshed.ok) {
         const response = NextResponse.json(
           { error: "sessionExpired" },
@@ -64,7 +70,13 @@ export async function GET(request: NextRequest, context: Context) {
       upstream = await fetch(
         `${base.replace(/\/$/, "")}/v1/${path.join("/")}${request.nextUrl.search}`,
         {
-          headers: { Authorization: `Bearer ${session.access_token}` },
+          method: request.method,
+          headers: {
+            Authorization: `******`,
+            "Content-Type":
+              request.headers.get("content-type") ?? "application/json",
+          },
+          body,
           cache: "no-store",
           signal: AbortSignal.timeout(15000),
         },
@@ -97,3 +109,6 @@ export async function GET(request: NextRequest, context: Context) {
     );
   }
 }
+
+export const GET = proxy;
+export const POST = proxy;

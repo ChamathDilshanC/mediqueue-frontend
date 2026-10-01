@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   Activity,
   ArrowUpRight,
@@ -27,6 +28,7 @@ import {
 } from "lucide-react";
 import { useLanguage } from "./providers";
 import { resources } from "@/lib/dashboard-resources";
+import type { Profile } from "@/lib/auth-contract";
 import {
   AnimatedSidebar,
   AnimatedSidebarClose,
@@ -62,11 +64,44 @@ export function AppSidebar() {
   const params = useSearchParams();
   const { t, language } = useLanguage();
   const { state, isMobile } = useAnimatedSidebar();
+  const [profile, setProfile] = useState<Profile | null>(null);
   const workspace = pathname === "/dashboard" || pathname === "/account";
   const selected = params.get("resource") ?? "hospitals";
   const resource = resources.some(({ key }) => key === selected)
     ? selected
     : "hospitals";
+  useEffect(() => {
+    if (!workspace) return;
+    const controller = new AbortController();
+    void fetch("/api/auth/me", { cache: "no-store", signal: controller.signal })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((value) => {
+        if (value) setProfile(value as Profile);
+      })
+      .catch(() => undefined);
+    return () => controller.abort();
+  }, [workspace]);
+  const hasAdminMembership = profile?.memberships?.some(
+    (membership) => membership.active && membership.role === "admin",
+  );
+  const userResources = new Set([
+    "hospitals",
+    "branches",
+    "departments",
+    "rooms",
+    "doctors",
+    "schedules",
+    "patients",
+    "queues",
+    "visits",
+    "appointments",
+  ]);
+  const visibleResources = resources.filter(
+    ({ key }) =>
+      !profile?.memberships?.length ||
+      hasAdminMembership ||
+      userResources.has(key),
+  );
   const publicLinks = [
     { title: t.home, href: "/", icon: Home },
     { title: t.how, href: "/#how-it-works", icon: HeartPulse },
@@ -111,8 +146,9 @@ export function AppSidebar() {
             </AnimatedSidebarGroupLabel>
             <AnimatedSidebarMenu>
               {workspace
-                ? resources.map(({ key, label, si }, index) => {
-                    const Icon = icons[index];
+                ? visibleResources.map(({ key, label, si }) => {
+                    const Icon =
+                      icons[resources.findIndex((item) => item.key === key)];
                     return (
                       <AnimatedSidebarMenuItem key={key}>
                         <AnimatedSidebarMenuButton
@@ -147,6 +183,11 @@ export function AppSidebar() {
             ? [
                 { title: t.account, href: "/account", icon: UserRound },
                 { title: t.home, href: "/", icon: Home },
+                {
+                  title: t.registerOrganization,
+                  href: "/organization/register",
+                  icon: Building2,
+                },
               ]
             : [
                 { title: t.login, href: "/login", icon: LogIn },

@@ -5,7 +5,16 @@ const oauthCodes = new Map();
 const profile = {
   id: "00000000-0000-4000-8000-000000000001",
   display_name: "Test User",
-  memberships: [],
+  memberships: [
+    {
+      id: "00000000-0000-4000-8000-000000000003",
+      user_id: "00000000-0000-4000-8000-000000000001",
+      tenant_id: "00000000-0000-4000-8000-000000000004",
+      branch_id: "00000000-0000-4000-8000-000000000005",
+      role: "admin",
+      active: true,
+    },
+  ],
 };
 const session = {
   access_token: "fixture-access",
