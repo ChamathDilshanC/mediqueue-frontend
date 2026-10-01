@@ -58,6 +58,11 @@ export function Dashboard() {
           router.replace("/login");
           return;
         }
+        if (response.status === 403) {
+          setError(t.accessDenied);
+          setRows([]);
+          return;
+        }
         if (!response.ok) throw new Error("Unable to load records");
         const data: unknown = await response.json();
         if (!Array.isArray(data)) throw new Error("Invalid records response");
@@ -71,7 +76,7 @@ export function Dashboard() {
         setLoading(false);
       }
     },
-    [page, resource, router, t.unavailable],
+    [page, resource, router, t.accessDenied, t.unavailable],
   );
 
   useEffect(() => {

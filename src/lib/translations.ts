@@ -143,6 +143,8 @@ export const en = {
     "Check your email and password, and make sure your email is confirmed.",
   rateLimit: "Too many requests. Please wait a little and try again.",
   unavailable: "Unable to connect right now. Please try again.",
+  accessDenied:
+    "You do not have permission to view this resource. Ask your hospital administrator for access.",
   validation: "Please check the form and try again.",
   sessionExpired: "Your session has expired. Please sign in again.",
   account: "My account",
@@ -310,6 +312,8 @@ export const si: Messages = {
     "ඊමේල් ලිපිනය සහ මුරපදය පරීක්ෂා කරන්න. ඊමේල් ලිපිනය තහවුරු කර තිබිය යුතුයි.",
   rateLimit: "ඉල්ලීම් වැඩියි. මඳ වේලාවකින් නැවත උත්සාහ කරන්න.",
   unavailable: "මේ මොහොතේ සම්බන්ධ විය නොහැකියි. නැවත උත්සාහ කරන්න.",
+  accessDenied:
+    "මෙම සම්පත බැලීමට ඔබට අවසර නැහැ. ප්‍රවේශය සඳහා රෝහල් පරිපාලකගෙන් විමසන්න.",
   validation: "ඇතුළත් කළ තොරතුරු පරීක්ෂා කරන්න.",
   sessionExpired: "ඔබේ සැසිය අවසන් වී ඇත. නැවත පිවිසෙන්න.",
   account: "මගේ ගිණුම",
