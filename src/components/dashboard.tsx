@@ -45,32 +45,39 @@ export function Dashboard() {
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
 
-  const loadRows = useCallback(async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const response = await fetch(
-        `/api/backend/${resource}?limit=${pageSize}&offset=${page * pageSize}`,
-        { cache: "no-store" },
-      );
-      if (response.status === 401) {
-        router.replace("/login");
-        return;
+  const loadRows = useCallback(
+    async (signal?: AbortSignal) => {
+      setLoading(true);
+      setError("");
+      try {
+        const response = await fetch(
+          `/api/backend/${resource}?limit=${pageSize}&offset=${page * pageSize}`,
+          { cache: "no-store", signal },
+        );
+        if (response.status === 401) {
+          router.replace("/login");
+          return;
+        }
+        if (!response.ok) throw new Error("Unable to load records");
+        const data: unknown = await response.json();
+        if (!Array.isArray(data)) throw new Error("Invalid records response");
+        setRows(data as Row[]);
+      } catch (cause) {
+        if (cause instanceof DOMException && cause.name === "AbortError")
+          return;
+        setError(t.unavailable);
+        setRows([]);
+      } finally {
+        setLoading(false);
       }
-      if (!response.ok) throw new Error("Unable to load records");
-      const data: unknown = await response.json();
-      if (!Array.isArray(data)) throw new Error("Invalid records response");
-      setRows(data as Row[]);
-    } catch {
-      setError(t.unavailable);
-      setRows([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [page, resource, router, t.unavailable]);
+    },
+    [page, resource, router, t.unavailable],
+  );
 
   useEffect(() => {
-    void loadRows();
+    const controller = new AbortController();
+    void loadRows(controller.signal);
+    return () => controller.abort();
   }, [loadRows]);
 
   useEffect(() => {

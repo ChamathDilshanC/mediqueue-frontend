@@ -84,25 +84,27 @@ export function SiteHeader({ simple = false }: { simple?: boolean }) {
     <header className="site-header">
       <div className="header-inner">
         <div className="header-brand-group">
-          <AnimatedSidebarTrigger
-            className={
-              workspace
-                ? "navigation-trigger"
-                : "navigation-trigger public-trigger"
-            }
-            aria-label={
-              isMobile
-                ? openMobile
-                  ? t.close
-                  : t.menu
-                : state === "expanded"
-                  ? "Collapse navigation"
-                  : "Expand navigation"
-            }
-            aria-controls="mobile-navigation"
-          >
-            <PanelLeft size={20} />
-          </AnimatedSidebarTrigger>
+          {(!simple || workspace || isMobile) && (
+            <AnimatedSidebarTrigger
+              className={
+                workspace
+                  ? "navigation-trigger"
+                  : "navigation-trigger public-trigger"
+              }
+              aria-label={
+                isMobile
+                  ? openMobile
+                    ? t.close
+                    : t.menu
+                  : state === "expanded"
+                    ? "Collapse navigation"
+                    : "Expand navigation"
+              }
+              aria-controls="mobile-navigation"
+            >
+              <PanelLeft size={20} />
+            </AnimatedSidebarTrigger>
+          )}
           <Brand />
         </div>
         {!simple && (
