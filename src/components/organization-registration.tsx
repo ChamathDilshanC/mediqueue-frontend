@@ -18,6 +18,14 @@ import {
   ComboboxValue,
 } from "./motion/combobox";
 import { Input } from "./motion/input";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "./ui/breadcrumb";
 
 const initialForm = {
   organization_type: "hospital",
@@ -73,11 +81,26 @@ export function OrganizationRegistration() {
     return (
       <>
         <SiteHeader simple />
-        <main className="auth-page container">
-          <section className="auth-card">
+        <main className="organization-page container">
+          <Breadcrumb className="organization-breadcrumb">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/">{t.home}</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{t.organizationPending}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          <section className="organization-status-card">
+            <div className="organization-status-icon" aria-hidden>
+              <span />
+            </div>
             <span className="eyebrow-pill">{t.organizationPending}</span>
             <h1>{t.organizationSubmitted}</h1>
             <p>{t.organizationSubmittedBody}</p>
+            <div className="organization-status-divider" />
             <button
               className="button primary"
               onClick={() => router.push("/dashboard")}
@@ -138,7 +161,18 @@ export function OrganizationRegistration() {
   return (
     <>
       <SiteHeader simple />
-      <main className="auth-page container">
+      <main className="organization-page container">
+        <Breadcrumb className="organization-breadcrumb">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">{t.home}</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{t.registerOrganization}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
         <section className="auth-card organization-card">
           <span className="eyebrow-pill">{t.organizationPending}</span>
           <h1>{t.registerOrganization}</h1>
