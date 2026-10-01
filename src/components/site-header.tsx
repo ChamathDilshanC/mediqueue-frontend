@@ -22,9 +22,9 @@ import MorphSelect, {
   MorphSelectTrigger,
   MorphSelectValue,
 } from "./ui/select-morph";
-export function Brand() {
+export function Brand({ destination = "/" }: { destination?: string }) {
   return (
-    <Link className="brand" href="/" aria-label="MediQueue">
+    <Link className="brand" href={destination} aria-label="MediQueue">
       <Image src="/brand/logo.png" alt="" width={38} height={38} priority />
       <span>
         MediQueue<span className="brand-dot">.</span>
@@ -105,7 +105,7 @@ export function SiteHeader({ simple = false }: { simple?: boolean }) {
               <PanelLeft size={20} />
             </AnimatedSidebarTrigger>
           )}
-          <Brand />
+          <Brand destination={workspace ? "/account" : "/"} />
         </div>
         {!simple && (
           <nav className="site-header-nav" aria-label="Primary navigation">

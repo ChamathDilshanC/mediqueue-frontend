@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "./providers";
 import { SiteHeader } from "./site-header";
@@ -49,6 +49,22 @@ export function OrganizationRegistration() {
   const [submitted, setSubmitted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [attachments, setAttachments] = useState<AttachmentUploadItem[]>([]);
+  const [existingApp, setExistingApp] = useState<any>(null);
+
+  useEffect(() => {
+    async function checkExisting() {
+      try {
+        const res = await fetch("/api/backend/hospital-applications/me");
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setExistingApp(data[0]);
+          }
+        }
+      } catch (err) {}
+    }
+    checkExisting();
+  }, []);
 
   function update(name: keyof typeof initialForm, value: string) {
     setForm((current) => ({ ...current, [name]: value }));
@@ -77,7 +93,11 @@ export function OrganizationRegistration() {
     }
   }
 
-  if (submitted) {
+  const hasExisting = existingApp !== null;
+  const currentApp = hasExisting ? existingApp : null;
+  const status = currentApp?.status || "pending_review";
+
+  if (submitted || hasExisting) {
     return (
       <>
         <SiteHeader simple />
@@ -93,13 +113,33 @@ export function OrganizationRegistration() {
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
-          <section className="organization-status-card">
+          <section className="organization-status-card" style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center', padding: '3rem 2rem' }}>
             <div className="organization-status-icon" aria-hidden>
               <span />
             </div>
             <span className="eyebrow-pill">{t.organizationPending}</span>
-            <h1>{t.organizationSubmitted}</h1>
-            <p>{t.organizationSubmittedBody}</p>
+            <h1>{status === "verified" ? "Application Approved!" : status === "rejected" ? "Application Rejected" : t.organizationSubmitted}</h1>
+            <p style={{ marginBottom: '2rem' }}>{status === "pending_review" ? t.organizationSubmittedBody : status === "verified" ? "Your organization has been approved. You can now access your workspace." : "Unfortunately, your application was not approved."}</p>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', margin: '3rem 0', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: '16px', left: '10%', right: '10%', height: '2px', background: 'var(--border)', zIndex: 0 }} />
+              
+              <div style={{ background: 'var(--background)', padding: '0 1rem', zIndex: 1 }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--primary)', color: 'var(--primary-foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', fontWeight: 'bold' }}>1</div>
+                <small style={{ marginTop: '0.75rem', display: 'block', fontWeight: '500' }}>Submitted</small>
+              </div>
+
+              <div style={{ background: 'var(--background)', padding: '0 1rem', zIndex: 1 }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: status !== 'pending_review' ? 'var(--primary)' : 'var(--muted)', color: status !== 'pending_review' ? 'var(--primary-foreground)' : 'var(--muted-foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', fontWeight: 'bold' }}>2</div>
+                <small style={{ marginTop: '0.75rem', display: 'block', fontWeight: '500' }}>Under Review</small>
+              </div>
+
+              <div style={{ background: 'var(--background)', padding: '0 1rem', zIndex: 1 }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: status === 'verified' ? '#22c55e' : status === 'rejected' ? '#ef4444' : 'var(--muted)', color: status !== 'pending_review' ? '#fff' : 'var(--muted-foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', fontWeight: 'bold' }}>3</div>
+                <small style={{ marginTop: '0.75rem', display: 'block', fontWeight: '500' }}>{status === 'rejected' ? 'Rejected' : 'Approved'}</small>
+              </div>
+            </div>
+
             <div className="organization-status-divider" />
             <button
               className="button primary"

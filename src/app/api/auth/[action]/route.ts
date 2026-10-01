@@ -44,7 +44,6 @@ export async function POST(request: NextRequest, context: Context) {
       const session = authResultSchema.parse(await refreshed.json());
       if (!session.access_token) return apiError(503);
       const response = json({ success: true });
-      clearSession(response);
       setSession(response, session);
       return response;
     } catch {
@@ -136,7 +135,6 @@ export async function POST(request: NextRequest, context: Context) {
       success: true,
       confirmationRequired: !session.access_token,
     });
-    clearSession(response);
     setSession(response, session);
     return response;
   } catch {

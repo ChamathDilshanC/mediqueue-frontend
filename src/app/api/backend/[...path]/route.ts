@@ -19,7 +19,7 @@ async function proxy(request: NextRequest, context: Context) {
   const { path } = await context.params;
   const base =
     process.env.MEDIQUEUE_API_URL ?? "https://mediqueue-backend-eta.vercel.app";
-  const body = request.method === "POST" ? await request.text() : undefined;
+  const body = ["POST", "PUT", "PATCH"].includes(request.method) ? await request.text() : undefined;
 
   try {
     let upstream = token
@@ -114,3 +114,6 @@ async function proxy(request: NextRequest, context: Context) {
 
 export const GET = proxy;
 export const POST = proxy;
+export const PUT = proxy;
+export const PATCH = proxy;
+export const DELETE = proxy;
