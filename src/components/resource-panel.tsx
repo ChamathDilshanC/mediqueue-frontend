@@ -311,14 +311,14 @@ function FormDialog({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-[#4b5563] dark:text-[#9ca3af] hover:text-[#111827] dark:text-gray-100 font-medium text-sm transition-colors"
+              className="button secondary"
             >
               {language === "si" ? "අවලංගු කරන්න" : "Cancel"}
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="flex items-center gap-2 px-5 py-2.5 bg-[#76aa32] hover:bg-[#68982a] text-white font-medium rounded-xl text-sm transition-colors shadow-sm disabled:opacity-60"
+              className="button primary flex items-center gap-2"
             >
               {submitting && <Loader2 size={16} className="animate-spin" />}
               {editing
@@ -412,14 +412,15 @@ function DeleteConfirm({
           <div className="flex items-center gap-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-[#4b5563] dark:text-[#9ca3af] hover:text-[#111827] dark:text-gray-100 font-medium text-sm transition-colors"
+              className="button secondary"
             >
               {language === "si" ? "අවලංගු කරන්න" : "Cancel"}
             </button>
             <button
               onClick={handleDelete}
               disabled={deleting}
-              className="flex items-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl text-sm transition-colors shadow-sm disabled:opacity-60"
+              className="button primary flex items-center gap-2"
+              style={{ background: "#dc2626", borderColor: "#b91c1c", color: "white" }}
             >
               {deleting && <Loader2 size={16} className="animate-spin" />}
               {language === "si" ? "මකන්න" : "Delete"}
@@ -588,7 +589,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
             {config.canCreate && config.inputFields.length > 0 && (
               <button
                 onClick={() => setShowCreate(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-[#76aa32] hover:bg-[#68982a] text-white font-medium rounded-xl text-sm transition-colors shadow-sm"
+                className="button primary flex items-center gap-2"
               >
                 <Plus size={16} />
                 {language === "si"
@@ -636,7 +637,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
               </h3>
               <p className="text-[#6b7280] dark:text-[#9ca3af] text-sm mb-6 max-w-md">{error}</p>
               <button
-                className="px-4 py-2 bg-white dark:bg-[#1e1e1e] border border-[#e5e7eb] dark:border-gray-700 hover:bg-[#f9fafb] dark:bg-gray-800 text-[#374151] dark:text-[#d1d5db] font-medium rounded-xl text-sm transition-all shadow-sm"
+                className="button secondary"
                 onClick={() => void loadRows()}
               >
                 {t.retry}
