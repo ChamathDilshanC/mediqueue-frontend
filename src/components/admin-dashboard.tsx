@@ -6,6 +6,7 @@ import { Check, X, Search, ShieldCheck } from "lucide-react";
 import { useLanguage } from "./providers";
 import { SiteHeader } from "./site-header";
 import { gooeyToast } from "goey-toast";
+import { Error403 } from "./error-403";
 
 type Application = {
   id: string;
@@ -30,12 +31,14 @@ export function AdminDashboard() {
   const [apps, setApps] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isForbidden, setIsForbidden] = useState(false);
   const [query, setQuery] = useState("");
 
   const loadApps = useCallback(
     async (signal?: AbortSignal) => {
       setLoading(true);
       setError("");
+      setIsForbidden(false);
       try {
         const response = await fetch(`/api/backend/admin/hospital-applications`, {
           cache: "no-store",
@@ -46,7 +49,7 @@ export function AdminDashboard() {
           return;
         }
         if (response.status === 403) {
-          setError(t.accessDenied || "Access Denied. You must be the system admin.");
+          setIsForbidden(true);
           setApps([]);
           return;
         }
@@ -92,6 +95,8 @@ export function AdminDashboard() {
         )
       : true
   );
+
+  if (isForbidden) return <Error403 />;
 
   return (
     <>
