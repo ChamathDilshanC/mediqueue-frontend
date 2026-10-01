@@ -84,7 +84,7 @@ export function SiteHeader({ simple = false }: { simple?: boolean }) {
     <header className="site-header">
       <div className="header-inner">
         <div className="header-brand-group">
-          {(!simple || workspace || isMobile) && (
+          {(!simple || workspace) && (
             <AnimatedSidebarTrigger
               className={
                 workspace

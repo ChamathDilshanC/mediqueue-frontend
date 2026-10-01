@@ -177,8 +177,8 @@ export function OrganizationRegistration() {
           <span className="eyebrow-pill">{t.organizationPending}</span>
           <h1>{t.registerOrganization}</h1>
           <p>{t.organizationIntro}</p>
-          <form className="auth-form" onSubmit={submit}>
-            <label>
+          <form className="auth-form organization-form" onSubmit={submit}>
+            <label className="field-wide">
               {t.organizationType}
               <Combobox
                 value={form.organization_type}
@@ -206,9 +206,15 @@ export function OrganizationRegistration() {
                 type={type}
                 value={form[name]}
                 onChange={(value) => update(name, value)}
+                className={
+                  name === "address" || name === "website_url"
+                    ? "field-wide"
+                    : undefined
+                }
               />
             ))}
             <AttachmentUpload
+              className="field-wide"
               accept=".pdf,.png,.jpg,.jpeg"
               maxFiles={1}
               attachmentsLabel={t.supportingDocument}
@@ -218,6 +224,7 @@ export function OrganizationRegistration() {
               onValueChange={setAttachments}
             />
             <Input
+              className="field-wide"
               label={`${t.supportingDocument} URL`}
               type="url"
               value={form.supporting_document_url}
