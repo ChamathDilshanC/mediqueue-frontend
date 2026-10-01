@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Check, X, Search, ShieldCheck } from "lucide-react";
 import { useLanguage } from "./providers";
 import { SiteHeader } from "./site-header";
-import toast from "goey-toast";
+import { gooeyToast } from "goey-toast";
 
 type Application = {
   id: string;
@@ -78,10 +78,10 @@ export function AdminDashboard() {
         body: JSON.stringify({ status }),
       });
       if (!res.ok) throw new Error("Update failed");
-      toast.success(status === "verified" ? "Application Approved" : "Application Rejected");
+      gooeyToast.success(status === "verified" ? "Application Approved" : "Application Rejected");
       void loadApps();
     } catch {
-      toast.error("Failed to update status");
+      gooeyToast.error("Failed to update status");
     }
   }
 
