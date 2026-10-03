@@ -179,19 +179,27 @@ function FormDialog({
     return true;
   };
 
-  const handleNext = () => {
+  const handleNext = (e?: React.MouseEvent | React.FormEvent) => {
+    if (e) e.preventDefault();
     if (validateStep(currentStep)) {
       setCurrentStep((prev) => Math.min(steps.length - 1, prev + 1));
     }
   };
 
-  const handlePrev = () => {
+  const handlePrev = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     setError("");
     setCurrentStep((prev) => Math.max(0, prev - 1));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // If not on the last step, move to next step instead of submitting
+    if (currentStep < steps.length - 1) {
+      handleNext();
+      return;
+    }
 
     // Validate all steps before submission
     for (let i = 0; i < steps.length; i++) {
@@ -469,6 +477,7 @@ function FormDialog({
             <div className="flex items-center gap-2">
               {!isLastStep ? (
                 <button
+                  key="next-step-btn"
                   type="button"
                   onClick={handleNext}
                   className="button primary flex items-center gap-2"
@@ -478,6 +487,7 @@ function FormDialog({
                 </button>
               ) : (
                 <button
+                  key="submit-step-btn"
                   type="submit"
                   disabled={submitting}
                   className="button primary flex items-center gap-2"
