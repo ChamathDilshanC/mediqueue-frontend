@@ -119,6 +119,22 @@ function StatusBadge({ value }: { value: string }) {
   );
 }
 
+function formatRefDisplay(refResource: string, refLabel: string, opt: Row): string {
+  const primary = opt[refLabel];
+  if (refLabel === "starts_at" && typeof primary === "string") {
+    return new Date(primary).toLocaleString();
+  }
+  const main = String(primary ?? opt.name ?? opt.id);
+
+  if (refResource === "departments" && opt.code) {
+    return `${main} (${opt.code})`;
+  }
+  if (refResource === "doctors" && opt.specialty) {
+    return `${main} - ${opt.specialty}`;
+  }
+  return main;
+}
+
 function cellValue(
   field: FieldDef,
   value: unknown,
@@ -138,15 +154,11 @@ function cellValue(
     const items = refCache[field.refResource] ?? [];
     const match = items.find((r) => r.id === value);
     if (match) {
-      const label = match[field.refLabel];
-      if (field.refLabel === "starts_at" && typeof label === "string") {
-        return (
-          <span className="text-sm text-[#374151] dark:text-[#d1d5db]">
-            {new Date(label).toLocaleString()}
-          </span>
-        );
-      }
-      return <span className="text-sm text-[#374151] dark:text-[#d1d5db]">{String(label)}</span>;
+      return (
+        <span className="text-sm text-[#374151] dark:text-[#d1d5db]">
+          {formatRefDisplay(field.refResource, field.refLabel, match)}
+        </span>
+      );
     }
     return (
       <span className="text-[#9ca3af] text-xs font-mono">
@@ -430,16 +442,11 @@ function FormDialog({
                     <MorphSelectValue placeholder={`— ${language === "si" ? "තෝරන්න" : "Select"} —`} />
                   </MorphSelectTrigger>
                   <MorphSelectContent searchable searchPlaceholder={language === "si" ? "සොයන්න..." : "Search..."}>
-                    {(refCache[f.refResource!] ?? []).map((opt) => {
-                      const display = f.refLabel === "starts_at"
-                          ? new Date(String(opt[f.refLabel!])).toLocaleString()
-                          : String(opt[f.refLabel!] ?? opt.id);
-                      return (
-                        <MorphSelectItem key={String(opt.id)} value={String(opt.id)}>
-                          {display}
-                        </MorphSelectItem>
-                      );
-                    })}
+                    {(refCache[f.refResource!] ?? []).map((opt) => (
+                      <MorphSelectItem key={String(opt.id)} value={String(opt.id)}>
+                        {formatRefDisplay(f.refResource!, f.refLabel!, opt)}
+                      </MorphSelectItem>
+                    ))}
                   </MorphSelectContent>
                 </MorphSelect>
               ) : f.type === "select" ? (
