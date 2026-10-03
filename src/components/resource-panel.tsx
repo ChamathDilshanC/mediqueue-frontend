@@ -487,8 +487,8 @@ function FormDialog({
                     <MorphSelectValue placeholder={`— ${language === "si" ? "තෝරන්න" : "Select"} —`} />
                   </MorphSelectTrigger>
                   <MorphSelectContent>
-                    <MorphSelectItem value="true">{language === "si" ? "සක්‍රිය (Active)" : "Active (True)"}</MorphSelectItem>
-                    <MorphSelectItem value="false">{language === "si" ? "අක්‍රිය (Inactive)" : "Inactive (False)"}</MorphSelectItem>
+                    <MorphSelectItem value="true">{language === "si" ? "සක්‍රිය" : "Active"}</MorphSelectItem>
+                    <MorphSelectItem value="false">{language === "si" ? "අක්‍රිය" : "Inactive"}</MorphSelectItem>
                   </MorphSelectContent>
                 </MorphSelect>
               ) : f.type === "datetime" ? (

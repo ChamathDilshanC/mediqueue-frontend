@@ -169,8 +169,8 @@ export function AppSidebar() {
                 {
                   title: "Ward & Bed Management",
                   items: [
-                    { key: "wards", label: "Wards", si: "වෝඩ් (Wards)", icon: Building2 },
-                    { key: "beds", label: "Beds", si: "ඇඳන් (Beds)", icon: LayoutGrid },
+                    { key: "wards", label: "Wards", si: "වෝඩ්", icon: Building2 },
+                    { key: "beds", label: "Beds", si: "ඇඳන්", icon: LayoutGrid },
                     { key: "ward-admissions", label: "Ward Admissions", si: "වෝඩ් ඇතුළත් කිරීම්", icon: HeartPulse }
                   ]
                 },
