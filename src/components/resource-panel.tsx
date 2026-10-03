@@ -337,23 +337,41 @@ function FormDialog({
       ? `නව ${config.si.singular}`
       : `New ${config.en.singular}`;
 
-  const stepTitlesEn = ["Basic Information", "Additional Details", "Final Options"];
-  const stepTitlesSi = ["මූලික තොරතුරු", "අමතර විස්තර", "අවසාන තේරීම්"];
+  const stepTitlesEn = [
+    "Basic Information",
+    "Location & Contact",
+    "Capacity & Type",
+    "Management & Staff",
+    "Additional Details",
+    "Final Options",
+  ];
+  const stepTitlesSi = [
+    "මූලික තොරතුරු",
+    "ස්ථානය සහ සම්බන්ධතා",
+    "ධාරිතාව සහ වර්ගය",
+    "කළමනාකරණය",
+    "අමතර විස්තර",
+    "අවසාන තේරීම්",
+  ];
   const stepIcons = [
     <Sparkles key="1" size={13} />,
-    <FileText key="2" size={13} />,
-    <CheckCircle2 key="3" size={13} />,
+    <Building2 key="2" size={13} />,
+    <Users key="3" size={13} />,
+    <UserCheck key="4" size={13} />,
+    <FileText key="5" size={13} />,
+    <CheckCircle2 key="6" size={13} />,
   ];
 
   const currentStepFields = steps[currentStep] ?? [];
   const isLastStep = currentStep === steps.length - 1;
   const progressPercent = Math.round(((currentStep + 1) / steps.length) * 100);
+  const modalWidthClass = steps.length > 3 ? "max-w-2xl" : "max-w-lg";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md">
-      <div className="w-full max-w-lg bg-white dark:bg-[#18181b] rounded-3xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border border-gray-200/50 dark:border-gray-800/50 overflow-hidden animate-in fade-in zoom-in-95 duration-300 flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md p-4 overflow-y-auto">
+      <div className={`w-full ${modalWidthClass} max-h-[90vh] bg-white dark:bg-[#18181b] rounded-3xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border border-gray-200/50 dark:border-gray-800/50 overflow-hidden animate-in fade-in zoom-in-95 duration-300 flex flex-col my-auto`}>
         {/* Multistep Header */}
-        <div className="flex flex-col px-6 pt-5 pb-4 border-b border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#18181b]">
+        <div className="flex flex-col px-6 pt-5 pb-4 border-b border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#18181b] shrink-0">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#76aa32]/20 to-[#76aa32]/5 text-[#76aa32] dark:text-[#8bc34a] border border-[#76aa32]/30 flex items-center justify-center shrink-0 shadow-xs">
@@ -388,7 +406,7 @@ function FormDialog({
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
-              <div className="flex items-center justify-between gap-2 pt-1">
+              <div className="flex items-center gap-2 pt-1 overflow-x-auto pb-1 no-scrollbar">
                 {steps.map((_, idx) => (
                   <button
                     key={idx}
@@ -398,7 +416,7 @@ function FormDialog({
                         setCurrentStep(idx);
                       }
                     }}
-                    className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl border transition-all ${
+                    className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl border transition-all shrink-0 ${
                       idx === currentStep
                         ? "bg-[#76aa32]/10 border-[#76aa32] text-[#76aa32] dark:text-[#8bc34a] shadow-xs"
                         : idx < currentStep
@@ -409,7 +427,7 @@ function FormDialog({
                     <span className="w-4 h-4 rounded-md flex items-center justify-center text-[10px] font-bold border border-current shrink-0">
                       {idx < currentStep ? <CheckCircle2 size={10} /> : idx + 1}
                     </span>
-                    <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-1 whitespace-nowrap">
                       {stepIcons[idx] ?? <Sparkles size={12} />}
                       {language === "si" ? stepTitlesSi[idx] ?? `පියවර ${idx + 1}` : stepTitlesEn[idx] ?? `Step ${idx + 1}`}
                     </span>
