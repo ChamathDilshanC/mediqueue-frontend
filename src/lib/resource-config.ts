@@ -23,6 +23,10 @@ export interface FieldDef {
   formOnly?: boolean;
   /** Hide from forms but show in table */
   tableOnly?: boolean;
+  /** Show only in create form */
+  createOnly?: boolean;
+  /** Show only in edit form */
+  editOnly?: boolean;
   /** Show in table */
   showInTable?: boolean;
   /** Max length for text inputs */
@@ -67,7 +71,7 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     fields: [
       { key: "name", en: "Name", si: "නම", type: "text", required: true, showInTable: true, maxLength: 200 },
       { key: "timezone", en: "Timezone", si: "වේලා කලාපය", type: "text", required: true, showInTable: true, maxLength: 64, placeholder: "Asia/Colombo" },
-      { key: "tenant_id", en: "Hospital", si: "රෝහල", type: "uuid-ref", required: true, showInTable: true, refResource: "hospitals", refLabel: "name" },
+      { key: "tenant_id", en: "Hospital", si: "රෝහල", type: "uuid-ref", required: true, showInTable: true, refResource: "hospitals", refLabel: "name", createOnly: true },
     ],
     inputFields: ["tenant_id", "name", "timezone"],
     canCreate: true, canEdit: true, canDelete: true,
@@ -76,13 +80,18 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
   departments: {
     key: "departments",
     endpoint: "departments",
-    en: { singular: "Department", plural: "Departments", description: "Manage hospital departments like Cardiology, OPD, etc." },
-    si: { singular: "අංශය", plural: "අංශ", description: "හෘද රෝග, බාහිර රෝගී අංශය වැනි රෝහල් අංශ කළමනාකරණය කරන්න." },
+    en: { singular: "Department", plural: "Departments", description: "Manage hospital departments, locations, HODs, and active status." },
+    si: { singular: "අංශය", plural: "අංශ", description: "රෝහල් අංශ, පිහිටීම, අංශ ප්‍රධානී සහ සක්‍රිය තත්ත්වය කළමනාකරණය කරන්න." },
     fields: [
-      { key: "name", en: "Name", si: "නම", type: "text", required: true, showInTable: true, maxLength: 200 },
+      { key: "name", en: "Department Name", si: "අංශයේ නම", type: "text", required: true, showInTable: true, maxLength: 200, placeholder: "e.g. Cardiology" },
+      { key: "code", en: "Code", si: "සංකේතය", type: "text", showInTable: true, maxLength: 20, placeholder: "e.g. CARD" },
+      { key: "location", en: "Location", si: "ස්ථානය", type: "text", showInTable: true, maxLength: 200, placeholder: "e.g. Building A, 2nd Floor" },
+      { key: "head_of_dept", en: "Head of Dept", si: "අංශ ප්‍රධානියා", type: "text", showInTable: true, maxLength: 200, placeholder: "e.g. Dr. Perera" },
+      { key: "description", en: "Description", si: "විස්තරය", type: "text", showInTable: false, maxLength: 500, placeholder: "Scope and details" },
+      { key: "is_active", en: "Status", si: "තත්ත්වය", type: "boolean", showInTable: true },
       { key: "id", en: "ID", si: "හැඳුනුම්පත", type: "readonly", showInTable: false },
     ],
-    inputFields: ["name"],
+    inputFields: ["name", "code", "location", "head_of_dept", "description", "is_active"],
     canCreate: true, canEdit: true, canDelete: true,
   },
 
@@ -203,16 +212,16 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     en: { singular: "Membership", plural: "Memberships", description: "Manage user access roles." },
     si: { singular: "සාමාජිකත්වය", plural: "සාමාජිකත්ව", description: "පරිශීලක ප්‍රවේශ භූමිකා කළමනාකරණය කරන්න." },
     fields: [
-      { key: "user_id", en: "User", si: "පරිශීලකයා", type: "uuid-ref", required: true, showInTable: true, refResource: "users", refLabel: "display_name" },
+      { key: "user_id", en: "User", si: "පරිශීලකයා", type: "uuid-ref", required: true, showInTable: true, refResource: "users", refLabel: "display_name", createOnly: true },
       { key: "role", en: "Role", si: "භූමිකාව", type: "select", required: true, showInTable: true, options: [
         { value: "admin", en: "Administrator", si: "පරිපාලක" },
         { value: "staff", en: "Staff", si: "කාර්ය මණ්ඩලය" },
         { value: "reception", en: "Reception", si: "පිළිගැනීම" },
         { value: "doctor", en: "Doctor", si: "වෛද්‍ය" },
       ]},
-      { key: "active", en: "Active", si: "සක්‍රිය", type: "boolean", showInTable: true },
+      { key: "active", en: "Active", si: "සක්‍රිය", type: "boolean", showInTable: true, editOnly: true },
     ],
-    inputFields: ["user_id", "role"],
+    inputFields: ["user_id", "role", "active"],
     canCreate: true, canEdit: true, canDelete: true,
   },
 

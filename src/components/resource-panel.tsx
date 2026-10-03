@@ -39,23 +39,24 @@ const PAGE_SIZE = 20;
 
 function statusColor(status: string) {
   const s = status.toUpperCase();
-  if (["ACTIVE", "BOOKED", "WAITING"].includes(s))
-    return "bg-blue-50 text-blue-700 border-blue-200";
+  if (["ACTIVE", "BOOKED", "WAITING", "TRUE"].includes(s))
+    return "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/40 dark:text-green-400 dark:border-green-800";
   if (["CHECKED_IN", "SERVING", "CALLED"].includes(s))
-    return "bg-amber-50 text-amber-700 border-amber-200";
-  if (["COMPLETED", "TRUE"].includes(s))
-    return "bg-green-50 text-green-700 border-green-200";
+    return "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800";
+  if (["COMPLETED"].includes(s))
+    return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800";
   if (["CANCELLED", "NO_SHOW", "FALSE", "INACTIVE", "REJECTED"].includes(s))
-    return "bg-red-50 text-red-700 border-red-200";
+    return "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-800";
   return "bg-[#f9fafb] dark:bg-gray-800 text-[#4b5563] dark:text-[#9ca3af] border-[#e5e7eb] dark:border-gray-700";
 }
 
 function StatusBadge({ value }: { value: string }) {
+  const display = value === "TRUE" ? "ACTIVE" : value === "FALSE" ? "INACTIVE" : value.replace(/_/g, " ");
   return (
     <span
       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold border uppercase tracking-wider ${statusColor(value)}`}
     >
-      {value.replace(/_/g, " ")}
+      {display}
     </span>
   );
 }
@@ -135,7 +136,10 @@ function FormDialog({
   const [error, setError] = useState("");
 
   const editableFields = config.fields.filter(
-    (f) => f.type !== "readonly" && config.inputFields.includes(f.key),
+    (f) =>
+      f.type !== "readonly" &&
+      config.inputFields.includes(f.key) &&
+      (editing ? !f.createOnly : !f.editOnly)
   );
 
   useEffect(() => {
@@ -167,6 +171,7 @@ function FormDialog({
       }
       if (f.type === "number") body[f.key] = Number(val);
       else if (f.type === "datetime") body[f.key] = val;
+      else if (f.type === "boolean") body[f.key] = val === "true";
       else body[f.key] = val;
     }
 
@@ -220,11 +225,11 @@ function FormDialog({
         </div>
         <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-4">
           {editableFields.map((f) => (
-            <label key={f.key} className="flex flex-col gap-2 relative">
-              <span className="text-[13px] font-semibold tracking-wide text-gray-700 dark:text-gray-300 ml-1">
+            <div key={f.key} className="flex flex-col gap-2 relative">
+              <label className="text-[13px] font-semibold tracking-wide text-gray-700 dark:text-gray-300 ml-1">
                 {label(f)}
                 {f.required && <span className="text-red-500 ml-1">*</span>}
-              </span>
+              </label>
               {f.type === "uuid-ref" ? (
                 <MorphSelect
                   value={formData[f.key] ?? undefined}
@@ -264,6 +269,21 @@ function FormDialog({
                         {language === "si" ? opt.si : opt.en}
                       </MorphSelectItem>
                     ))}
+                  </MorphSelectContent>
+                </MorphSelect>
+              ) : f.type === "boolean" ? (
+                <MorphSelect
+                  value={formData[f.key] ?? "true"}
+                  onValueChange={(val) =>
+                    setFormData((prev) => ({ ...prev, [f.key]: val }))
+                  }
+                >
+                  <MorphSelectTrigger className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] w-full flex items-center justify-between focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm">
+                    <MorphSelectValue placeholder={`— ${language === "si" ? "තෝරන්න" : "Select"} —`} />
+                  </MorphSelectTrigger>
+                  <MorphSelectContent>
+                    <MorphSelectItem value="true">{language === "si" ? "ඔව් (True)" : "Yes (True)"}</MorphSelectItem>
+                    <MorphSelectItem value="false">{language === "si" ? "නැත (False)" : "No (False)"}</MorphSelectItem>
                   </MorphSelectContent>
                 </MorphSelect>
               ) : f.type === "datetime" ? (
@@ -308,7 +328,7 @@ function FormDialog({
                   required={f.required}
                 />
               )}
-            </label>
+            </div>
           ))}
 
           {error && (

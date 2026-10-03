@@ -21,17 +21,25 @@ async function proxy(request: NextRequest, context: Context) {
     process.env.MEDIQUEUE_API_URL ?? "https://mediqueue-backend-eta.vercel.app";
   const body = ["POST", "PUT", "PATCH"].includes(request.method) ? await request.text() : undefined;
 
+  const getHeaders = (bearerToken: string) => {
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${bearerToken}`,
+      "Content-Type": request.headers.get("content-type") ?? "application/json",
+    };
+    const xTenant = request.headers.get("x-tenant-id") || request.cookies.get("active_tenant_id")?.value;
+    const xBranch = request.headers.get("x-branch-id") || request.cookies.get("active_branch_id")?.value;
+    if (xTenant) headers["X-Tenant-ID"] = xTenant;
+    if (xBranch) headers["X-Branch-ID"] = xBranch;
+    return headers;
+  };
+
   try {
     let upstream = token
       ? await fetch(
           `${base.replace(/\/$/, "")}/v1/${path.join("/")}${request.nextUrl.search}`,
           {
             method: request.method,
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type":
-                request.headers.get("content-type") ?? "application/json",
-            },
+            headers: getHeaders(token),
             body,
             cache: "no-store",
             signal: AbortSignal.timeout(15000),
@@ -73,11 +81,7 @@ async function proxy(request: NextRequest, context: Context) {
         `${base.replace(/\/$/, "")}/v1/${path.join("/")}${request.nextUrl.search}`,
         {
           method: request.method,
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-            "Content-Type":
-              request.headers.get("content-type") ?? "application/json",
-          },
+          headers: getHeaders(session.access_token),
           body,
           cache: "no-store",
           signal: AbortSignal.timeout(15000),
