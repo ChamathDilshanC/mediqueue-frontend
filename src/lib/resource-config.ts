@@ -13,6 +13,7 @@ export interface FieldDef {
   type: FieldType;
   required?: boolean;
   placeholder?: string;
+  placeholderSi?: string;
   /** For select fields */
   options?: { value: string; en: string; si: string }[];
   /** For uuid-ref fields: which resource endpoint to fetch options from */
@@ -84,7 +85,7 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     si: { singular: "අංශය", plural: "අංශ", description: "රෝහල් අංශ, පිහිටීම, අංශ ප්‍රධානී සහ සක්‍රිය තත්ත්වය කළමනාකරණය කරන්න." },
     fields: [
       { key: "name", en: "Department Name", si: "අංශයේ නම", type: "text", required: true, showInTable: true, maxLength: 200, placeholder: "e.g. Cardiology" },
-      { key: "code", en: "Code", si: "සංකේතය", type: "text", showInTable: true, maxLength: 20, placeholder: "Auto-generated (e.g. DEPT-01)" },
+      { key: "code", en: "Code", si: "සංකේතය", type: "text", showInTable: true, maxLength: 20, placeholder: "Auto-generated (e.g. DEPT-01)", placeholderSi: "ස්වයංක්‍රීයව සෑදේ (උදා. DEPT-01)" },
       { key: "location", en: "Location", si: "ස්ථානය", type: "text", showInTable: true, maxLength: 200, placeholder: "e.g. Building A, 2nd Floor" },
       { key: "head_of_dept", en: "Head of Dept", si: "අංශ ප්‍රධානියා", type: "text", showInTable: true, maxLength: 200, placeholder: "e.g. Dr. Perera" },
       { key: "description", en: "Description", si: "විස්තරය", type: "text", showInTable: false, maxLength: 500, placeholder: "Scope and details" },
@@ -116,7 +117,7 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     si: { singular: "වෝඩ් එක", plural: "වෝඩ්", description: "රෝහල් වෝඩ්, ධාරිතාව, තට්ටු පිහිටීම සහ අංශ කළමනාකරණය කරන්න." },
     fields: [
       { key: "name", en: "Ward Name", si: "වෝඩ් නම", type: "text", required: true, showInTable: true, maxLength: 200, placeholder: "e.g. General Ward A" },
-      { key: "ward_code", en: "Ward Code", si: "වෝඩ් සංකේතය", type: "text", required: false, showInTable: true, maxLength: 50, placeholder: "Auto-generated (e.g. WARD-001)" },
+      { key: "ward_code", en: "Ward Code", si: "වෝඩ් සංකේතය", type: "text", required: false, showInTable: true, maxLength: 50, placeholder: "Auto-generated (e.g. WARD-001)", placeholderSi: "ස්වයංක්‍රීයව සෑදේ (උදා. WARD-001)" },
       { key: "department_id", en: "Department", si: "අංශය", type: "uuid-ref", required: true, showInTable: true, refResource: "departments", refLabel: "name" },
       { key: "ward_type", en: "Ward Type", si: "වෝඩ් වර්ගය", type: "select", required: true, showInTable: true, options: [
         { value: "General", en: "General", si: "සාමාන්‍ය" },
@@ -153,7 +154,7 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     en: { singular: "Bed", plural: "Beds", description: "Manage individual beds within wards and their real-time status." },
     si: { singular: "ඇඳ", plural: "ඇඳන්", description: "වෝඩ් ඇතුළත තනි ඇඳන් සහ ඒවායේ සජීවී තත්ත්වය කළමනාකරණය කරන්න." },
     fields: [
-      { key: "bed_number", en: "Bed Number", si: "ඇඳ අංකය", type: "text", required: false, showInTable: true, maxLength: 50, placeholder: "Auto-generated (e.g. BED-001)" },
+      { key: "bed_number", en: "Bed Number", si: "ඇඳ අංකය", type: "text", required: false, showInTable: true, maxLength: 50, placeholder: "Auto-generated (e.g. BED-001)", placeholderSi: "ස්වයංක්‍රීයව සෑදේ (උදා. BED-001)" },
       { key: "ward_id", en: "Ward", si: "වෝඩ් එක", type: "uuid-ref", required: true, showInTable: true, refResource: "wards", refLabel: "name" },
       { key: "bed_type", en: "Bed Type", si: "ඇඳ වර්ගය", type: "select", required: true, showInTable: true, options: [
         { value: "STANDARD", en: "Standard", si: "සාමාන්‍ය" },
@@ -237,7 +238,7 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     si: { singular: "රෝගියා", plural: "රෝගීන්", description: "රෝගී ප්‍රධාන පැතිකඩ, MRN, සම්බන්ධතා සහ සායනික තොරතුරු කළමනාකරණය කරන්න." },
     fields: [
       { key: "external_ref", en: "Full Name", si: "සම්පූර්ණ නම", type: "text", required: true, showInTable: true, maxLength: 200, placeholder: "e.g. Chamath Dilshan" },
-      { key: "mrn", en: "MRN", si: "MRN අංකය", type: "text", showInTable: true, maxLength: 50, placeholder: "e.g. MRN-2026-000145" },
+      { key: "mrn", en: "MRN", si: "MRN අංකය", type: "text", showInTable: true, maxLength: 50, placeholder: "Auto-generated (e.g. MRN-2026-000101)", placeholderSi: "ස්වයංක්‍රීයව සෑදේ (උදා. MRN-2026-000101)" },
       { key: "gender", en: "Gender", si: "ලිංගිකත්වය", type: "select", showInTable: true, options: [
         { value: "Male", en: "Male", si: "පිරිමි" },
         { value: "Female", en: "Female", si: "කාන්තා" },
