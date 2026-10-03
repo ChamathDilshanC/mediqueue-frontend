@@ -10,13 +10,38 @@ import {
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import {
+  Activity,
+  AlignLeft,
+  Award,
+  Building2,
+  CalendarClock,
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  Clock,
+  CreditCard,
+  DoorOpen,
+  FileText,
+  Globe,
+  Hash,
+  Hospital,
+  Info,
+  Layers,
   Loader2,
+  Mail,
+  MapPin,
   Pencil,
+  Phone,
   Plus,
   Search,
+  ShieldCheck,
+  Sparkles,
+  Stethoscope,
+  Tag,
+  ToggleLeft,
   Trash2,
+  UserCheck,
+  Users,
   X,
 } from "lucide-react";
 import { useLanguage } from "./providers";
@@ -27,6 +52,39 @@ import MorphSelect, {
   MorphSelectValue,
 } from "./ui/select-morph";
 import type { ResourceConfig, FieldDef } from "@/lib/resource-config";
+
+/* ─────────────────── Helpers ─────────────────── */
+
+function getFieldIcon(key: string, type: string) {
+  const k = key.toLowerCase();
+  const iconProps = { size: 14, className: "text-[#76aa32] dark:text-[#8bc34a] shrink-0" };
+
+  if (k.includes("hospital")) return <Hospital {...iconProps} />;
+  if (k.includes("branch")) return <Building2 {...iconProps} />;
+  if (k.includes("department")) return <Layers {...iconProps} />;
+  if (k.includes("room")) return <DoorOpen {...iconProps} />;
+  if (k.includes("doctor") || k.includes("staff")) return <Stethoscope {...iconProps} />;
+  if (k.includes("user") || k.includes("patient")) return <UserCheck {...iconProps} />;
+  if (k.includes("queue")) return <Users {...iconProps} />;
+  if (k.includes("name")) return <Tag {...iconProps} />;
+  if (k.includes("code") || k.includes("number") || k.includes("token")) return <Hash {...iconProps} />;
+  if (k.includes("address") || k.includes("location")) return <MapPin {...iconProps} />;
+  if (k.includes("phone") || k.includes("contact")) return <Phone {...iconProps} />;
+  if (k.includes("email")) return <Mail {...iconProps} />;
+  if (k.includes("capacity") || k.includes("count")) return <Users {...iconProps} />;
+  if (k.includes("status") || k.includes("active")) return <Activity {...iconProps} />;
+  if (k.includes("role")) return <ShieldCheck {...iconProps} />;
+  if (k.includes("time") || k.includes("date") || k.includes("start") || k.includes("end")) return <CalendarClock {...iconProps} />;
+  if (k.includes("note") || k.includes("desc")) return <AlignLeft {...iconProps} />;
+  if (k.includes("fee") || k.includes("price") || k.includes("cost")) return <CreditCard {...iconProps} />;
+
+  if (type === "number") return <Hash {...iconProps} />;
+  if (type === "boolean") return <ToggleLeft {...iconProps} />;
+  if (type === "datetime") return <CalendarClock {...iconProps} />;
+  if (type === "uuid-ref") return <Layers {...iconProps} />;
+
+  return <Sparkles {...iconProps} />;
+}
 
 /* ─────────────────── Types ─────────────────── */
 
@@ -260,6 +318,11 @@ function FormDialog({
 
   const stepTitlesEn = ["Basic Information", "Additional Details", "Final Options"];
   const stepTitlesSi = ["මූලික තොරතුරු", "අමතර විස්තර", "අවසාන තේරීම්"];
+  const stepIcons = [
+    <Sparkles key="1" size={13} />,
+    <FileText key="2" size={13} />,
+    <CheckCircle2 key="3" size={13} />,
+  ];
 
   const currentStepFields = steps[currentStep] ?? [];
   const isLastStep = currentStep === steps.length - 1;
@@ -271,15 +334,21 @@ function FormDialog({
         {/* Multistep Header */}
         <div className="flex flex-col px-6 pt-5 pb-4 border-b border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#18181b]">
           <div className="flex items-center justify-between mb-3">
-            <div>
-              <h3 className="text-lg font-bold text-[#111827] dark:text-gray-100">{title}</h3>
-              {steps.length > 1 && (
-                <p className="text-xs text-[#76aa32] font-semibold mt-0.5">
-                  {language === "si"
-                    ? `පියවර ${currentStep + 1}/${steps.length}: ${stepTitlesSi[currentStep] ?? `පියවර ${currentStep + 1}`}`
-                    : `Step ${currentStep + 1} of ${steps.length}: ${stepTitlesEn[currentStep] ?? `Step ${currentStep + 1}`}`}
-                </p>
-              )}
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#76aa32]/20 to-[#76aa32]/5 text-[#76aa32] dark:text-[#8bc34a] border border-[#76aa32]/30 flex items-center justify-center shrink-0 shadow-xs">
+                {editing ? <Pencil size={20} /> : <Sparkles size={20} />}
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-[#111827] dark:text-gray-100">{title}</h3>
+                {steps.length > 1 && (
+                  <p className="text-xs text-[#76aa32] dark:text-[#8bc34a] font-semibold mt-0.5 flex items-center gap-1.5">
+                    <Sparkles size={12} className="shrink-0 animate-pulse" />
+                    {language === "si"
+                      ? `පියවර ${currentStep + 1}/${steps.length}: ${stepTitlesSi[currentStep] ?? `පියවර ${currentStep + 1}`}`
+                      : `Step ${currentStep + 1} of ${steps.length}: ${stepTitlesEn[currentStep] ?? `Step ${currentStep + 1}`}`}
+                  </p>
+                )}
+              </div>
             </div>
             <button
               onClick={onClose}
@@ -308,18 +377,19 @@ function FormDialog({
                         setCurrentStep(idx);
                       }
                     }}
-                    className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border transition-all ${
+                    className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl border transition-all ${
                       idx === currentStep
-                        ? "bg-[#76aa32]/10 border-[#76aa32] text-[#76aa32]"
+                        ? "bg-[#76aa32]/10 border-[#76aa32] text-[#76aa32] dark:text-[#8bc34a] shadow-xs"
                         : idx < currentStep
                           ? "bg-green-50 dark:bg-green-950/30 border-green-200 text-green-600 dark:text-green-400"
                           : "bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-400"
                     }`}
                   >
-                    <span className="w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold border border-current">
-                      {idx + 1}
+                    <span className="w-4 h-4 rounded-md flex items-center justify-center text-[10px] font-bold border border-current shrink-0">
+                      {idx < currentStep ? <CheckCircle2 size={10} /> : idx + 1}
                     </span>
-                    <span>
+                    <span className="flex items-center gap-1">
+                      {stepIcons[idx] ?? <Sparkles size={12} />}
                       {language === "si" ? stepTitlesSi[idx] ?? `පියවර ${idx + 1}` : stepTitlesEn[idx] ?? `Step ${idx + 1}`}
                     </span>
                   </button>
@@ -334,9 +404,14 @@ function FormDialog({
           {currentStepFields.map((f) => (
             <div key={f.key} className="flex flex-col gap-2 relative">
               <label className="text-[13px] font-semibold tracking-wide text-gray-700 dark:text-gray-300 ml-1 flex items-center justify-between">
-                <span>
-                  {label(f)}
-                  {f.required && <span className="text-red-500 ml-1">*</span>}
+                <span className="flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-lg bg-[#76aa32]/10 dark:bg-[#76aa32]/20 flex items-center justify-center shrink-0 border border-[#76aa32]/20">
+                    {getFieldIcon(f.key, f.type)}
+                  </span>
+                  <span>
+                    {label(f)}
+                    {f.required && <span className="text-red-500 ml-1">*</span>}
+                  </span>
                 </span>
                 {f.placeholder && (
                   <span className="text-[11px] font-normal text-gray-400 dark:text-gray-500">
