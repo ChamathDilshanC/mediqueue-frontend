@@ -98,13 +98,14 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
   rooms: {
     key: "rooms",
     endpoint: "rooms",
-    en: { singular: "Room", plural: "Rooms", description: "Manage consultation and examination rooms." },
-    si: { singular: "කාමරය", plural: "කාමර", description: "උපදේශන සහ පරීක්ෂණ කාමර කළමනාකරණය කරන්න." },
+    en: { singular: "Room", plural: "Rooms", description: "Manage consultation and examination rooms by department." },
+    si: { singular: "කාමරය", plural: "කාමර", description: "අංශය අනුව උපදේශන සහ පරීක්ෂණ කාමර කළමනාකරණය කරන්න." },
     fields: [
-      { key: "name", en: "Name", si: "නම", type: "text", required: true, showInTable: true, maxLength: 120 },
+      { key: "name", en: "Name", si: "නම", type: "text", required: true, showInTable: true, maxLength: 120, placeholder: "e.g. Room 101" },
+      { key: "department_id", en: "Department", si: "අංශය", type: "uuid-ref", required: false, showInTable: true, refResource: "departments", refLabel: "name" },
       { key: "id", en: "ID", si: "හැඳුනුම්පත", type: "readonly", showInTable: false },
     ],
-    inputFields: ["name"],
+    inputFields: ["name", "department_id"],
     canCreate: true, canEdit: true, canDelete: true,
   },
 
@@ -154,14 +155,15 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
   queues: {
     key: "queues",
     endpoint: "queues",
-    en: { singular: "Queue", plural: "Queues", description: "Manage live queues." },
-    si: { singular: "පෝලිම", plural: "පෝලිම්", description: "සජීවී පෝලිම් කළමනාකරණය කරන්න." },
+    en: { singular: "Queue", plural: "Queues", description: "Manage live queues by department." },
+    si: { singular: "පෝලිම", plural: "පෝලිම්", description: "අංශය අනුව සජීවී පෝලිම් කළමනාකරණය කරන්න." },
     fields: [
-      { key: "name", en: "Name", si: "නම", type: "text", required: true, showInTable: true, maxLength: 120 },
+      { key: "name", en: "Name", si: "නම", type: "text", required: true, showInTable: true, maxLength: 120, placeholder: "e.g. OPD Queue" },
+      { key: "department_id", en: "Department", si: "අංශය", type: "uuid-ref", required: false, showInTable: true, refResource: "departments", refLabel: "name" },
       { key: "timezone", en: "Timezone", si: "වේලා කලාපය", type: "readonly", showInTable: true },
       { key: "token_sequence", en: "Token Seq.", si: "ටෝකන් අනුපිළිවෙල", type: "readonly", showInTable: true },
     ],
-    inputFields: ["name"],
+    inputFields: ["name", "department_id"],
     canCreate: true, canEdit: true, canDelete: true,
   },
 
