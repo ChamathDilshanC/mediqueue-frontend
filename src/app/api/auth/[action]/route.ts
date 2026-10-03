@@ -185,7 +185,26 @@ export async function GET(request: NextRequest, context: Context) {
       if (rotated) setSession(response, rotated);
       return response;
     }
-    const response = json(profileSchema.parse(await upstream.json()));
+    const profileData = profileSchema.parse(await upstream.json());
+    const response = json(profileData);
+    if (profileData.memberships && profileData.memberships.length > 0) {
+      const activeMem =
+        profileData.memberships.find((m) => m.active) || profileData.memberships[0];
+      if (activeMem?.tenant_id && !request.cookies.get("active_tenant_id")?.value) {
+        response.cookies.set("active_tenant_id", activeMem.tenant_id, {
+          path: "/",
+          httpOnly: false,
+          sameSite: "lax",
+        });
+      }
+      if (activeMem?.branch_id && !request.cookies.get("active_branch_id")?.value) {
+        response.cookies.set("active_branch_id", activeMem.branch_id, {
+          path: "/",
+          httpOnly: false,
+          sameSite: "lax",
+        });
+      }
+    }
     if (rotated) setSession(response, rotated);
     return response;
   } catch {

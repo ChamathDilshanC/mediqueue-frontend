@@ -134,6 +134,7 @@ function FormDialog({
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [currentStep, setCurrentStep] = useState(0);
 
   const editableFields = config.fields.filter(
     (f) =>
@@ -142,21 +143,64 @@ function FormDialog({
       (editing ? !f.createOnly : !f.editOnly)
   );
 
+  // Group fields into steps (up to 3 fields per step for multi-step UX)
+  const steps = useMemo(() => {
+    const chunks: FieldDef[][] = [];
+    for (let i = 0; i < editableFields.length; i += 3) {
+      chunks.push(editableFields.slice(i, i + 3));
+    }
+    return chunks.length > 0 ? chunks : [[]];
+  }, [editableFields]);
+
   useEffect(() => {
     const initial: Record<string, string> = {};
     for (const f of editableFields) {
       if (editing) {
         initial[f.key] = String(editing[f.key] ?? "");
       } else {
-        initial[f.key] = f.type === "number" ? "20" : "";
+        initial[f.key] = f.type === "number" ? "20" : f.type === "boolean" ? "true" : "";
       }
     }
     setFormData(initial);
+    setCurrentStep(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editing]);
 
+  const validateStep = (stepIdx: number) => {
+    const fieldsInStep = steps[stepIdx] ?? [];
+    for (const f of fieldsInStep) {
+      const val = formData[f.key] ?? "";
+      if (f.required && !val.trim()) {
+        setError(`${language === "si" ? f.si : f.en} ${language === "si" ? "අවශ්‍ය වේ" : "is required"}`);
+        return false;
+      }
+    }
+    setError("");
+    return true;
+  };
+
+  const handleNext = () => {
+    if (validateStep(currentStep)) {
+      setCurrentStep((prev) => Math.min(steps.length - 1, prev + 1));
+    }
+  };
+
+  const handlePrev = () => {
+    setError("");
+    setCurrentStep((prev) => Math.max(0, prev - 1));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate all steps before submission
+    for (let i = 0; i < steps.length; i++) {
+      if (!validateStep(i)) {
+        setCurrentStep(i);
+        return;
+      }
+    }
+
     setSubmitting(true);
     setError("");
 
@@ -164,11 +208,6 @@ function FormDialog({
     const body: Record<string, unknown> = {};
     for (const f of editableFields) {
       const val = formData[f.key] ?? "";
-      if (f.required && !val.trim()) {
-        setError(`${language === "si" ? f.si : f.en} is required`);
-        setSubmitting(false);
-        return;
-      }
       if (f.type === "number") body[f.key] = Number(val);
       else if (f.type === "datetime") body[f.key] = val;
       else if (f.type === "boolean") body[f.key] = val === "true";
@@ -211,24 +250,91 @@ function FormDialog({
       ? `නව ${config.si.singular}`
       : `New ${config.en.singular}`;
 
+  const stepTitlesEn = ["Basic Information", "Additional Details", "Final Options"];
+  const stepTitlesSi = ["මූලික තොරතුරු", "අමතර විස්තර", "අවසාන තේරීම්"];
+
+  const currentStepFields = steps[currentStep] ?? [];
+  const isLastStep = currentStep === steps.length - 1;
+  const progressPercent = Math.round(((currentStep + 1) / steps.length) * 100);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md">
-      <div className="w-full max-w-md bg-white dark:bg-[#18181b] rounded-3xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border border-gray-200/50 dark:border-gray-800/50 overflow-visible animate-in fade-in zoom-in-95 duration-300">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#18181b] rounded-t-3xl">
-          <h3 className="text-lg font-bold text-[#111827] dark:text-gray-100">{title}</h3>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-[#f3f4f6] dark:bg-gray-800 rounded-lg transition-colors"
-          >
-            <X size={18} className="text-[#6b7280] dark:text-[#9ca3af]" />
-          </button>
+      <div className="w-full max-w-lg bg-white dark:bg-[#18181b] rounded-3xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border border-gray-200/50 dark:border-gray-800/50 overflow-hidden animate-in fade-in zoom-in-95 duration-300 flex flex-col">
+        {/* Multistep Header */}
+        <div className="flex flex-col px-6 pt-5 pb-4 border-b border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#18181b]">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h3 className="text-lg font-bold text-[#111827] dark:text-gray-100">{title}</h3>
+              {steps.length > 1 && (
+                <p className="text-xs text-[#76aa32] font-semibold mt-0.5">
+                  {language === "si"
+                    ? `පියවර ${currentStep + 1}/${steps.length}: ${stepTitlesSi[currentStep] ?? `පියවර ${currentStep + 1}`}`
+                    : `Step ${currentStep + 1} of ${steps.length}: ${stepTitlesEn[currentStep] ?? `Step ${currentStep + 1}`}`}
+                </p>
+              )}
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-[#f3f4f6] dark:hover:bg-gray-800 rounded-lg transition-colors"
+            >
+              <X size={18} className="text-[#6b7280] dark:text-[#9ca3af]" />
+            </button>
+          </div>
+
+          {/* Progress Bar & Step Chips */}
+          {steps.length > 1 && (
+            <div className="flex flex-col gap-2 pt-1">
+              <div className="w-full h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-[#76aa32] to-[#5a8626] transition-all duration-300 ease-out"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+              <div className="flex items-center justify-between gap-2 pt-1">
+                {steps.map((_, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      if (idx < currentStep || validateStep(currentStep)) {
+                        setCurrentStep(idx);
+                      }
+                    }}
+                    className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border transition-all ${
+                      idx === currentStep
+                        ? "bg-[#76aa32]/10 border-[#76aa32] text-[#76aa32]"
+                        : idx < currentStep
+                          ? "bg-green-50 dark:bg-green-950/30 border-green-200 text-green-600 dark:text-green-400"
+                          : "bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-400"
+                    }`}
+                  >
+                    <span className="w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold border border-current">
+                      {idx + 1}
+                    </span>
+                    <span>
+                      {language === "si" ? stepTitlesSi[idx] ?? `පියවර ${idx + 1}` : stepTitlesEn[idx] ?? `Step ${idx + 1}`}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* Step Form Body */}
         <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-4">
-          {editableFields.map((f) => (
+          {currentStepFields.map((f) => (
             <div key={f.key} className="flex flex-col gap-2 relative">
-              <label className="text-[13px] font-semibold tracking-wide text-gray-700 dark:text-gray-300 ml-1">
-                {label(f)}
-                {f.required && <span className="text-red-500 ml-1">*</span>}
+              <label className="text-[13px] font-semibold tracking-wide text-gray-700 dark:text-gray-300 ml-1 flex items-center justify-between">
+                <span>
+                  {label(f)}
+                  {f.required && <span className="text-red-500 ml-1">*</span>}
+                </span>
+                {f.placeholder && (
+                  <span className="text-[11px] font-normal text-gray-400 dark:text-gray-500">
+                    {f.placeholder}
+                  </span>
+                )}
               </label>
               {f.type === "uuid-ref" ? (
                 <MorphSelect
@@ -282,8 +388,8 @@ function FormDialog({
                     <MorphSelectValue placeholder={`— ${language === "si" ? "තෝරන්න" : "Select"} —`} />
                   </MorphSelectTrigger>
                   <MorphSelectContent>
-                    <MorphSelectItem value="true">{language === "si" ? "ඔව් (True)" : "Yes (True)"}</MorphSelectItem>
-                    <MorphSelectItem value="false">{language === "si" ? "නැත (False)" : "No (False)"}</MorphSelectItem>
+                    <MorphSelectItem value="true">{language === "si" ? "සක්‍රිය (Active)" : "Active (True)"}</MorphSelectItem>
+                    <MorphSelectItem value="false">{language === "si" ? "අක්‍රිය (Inactive)" : "Inactive (False)"}</MorphSelectItem>
                   </MorphSelectContent>
                 </MorphSelect>
               ) : f.type === "datetime" ? (
@@ -337,28 +443,56 @@ function FormDialog({
             </div>
           )}
 
-          <div className="flex items-center justify-end gap-3 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="button secondary"
-            >
-              {language === "si" ? "අවලංගු කරන්න" : "Cancel"}
-            </button>
-            <button
-              type="submit"
-              disabled={submitting}
-              className="button primary flex items-center gap-2"
-            >
-              {submitting && <Loader2 size={16} className="animate-spin" />}
-              {editing
-                ? language === "si"
-                  ? "යාවත්කාලීන කරන්න"
-                  : "Update"
-                : language === "si"
-                  ? "සාදන්න"
-                  : "Create"}
-            </button>
+          {/* Controls: Prev, Next & Submit */}
+          <div className="flex items-center justify-between gap-3 pt-4 border-t border-gray-100 dark:border-gray-800/50 mt-2">
+            <div>
+              {currentStep > 0 ? (
+                <button
+                  type="button"
+                  onClick={handlePrev}
+                  className="button secondary flex items-center gap-1.5"
+                >
+                  <ChevronLeft size={16} />
+                  {language === "si" ? "ආපසු" : "Back"}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="button secondary"
+                >
+                  {language === "si" ? "අවලංගු කරන්න" : "Cancel"}
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
+              {!isLastStep ? (
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="button primary flex items-center gap-2"
+                >
+                  {language === "si" ? "ඊළඟ පියවර" : "Next Step"}
+                  <ChevronRight size={16} />
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="button primary flex items-center gap-2"
+                >
+                  {submitting && <Loader2 size={16} className="animate-spin" />}
+                  {editing
+                    ? language === "si"
+                      ? "යාවත්කාලීන කරන්න"
+                      : "Update"
+                    : language === "si"
+                      ? "සාදන්න"
+                      : "Create"}
+                </button>
+              )}
+            </div>
           </div>
         </form>
       </div>

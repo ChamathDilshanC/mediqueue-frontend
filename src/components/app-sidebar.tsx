@@ -76,7 +76,20 @@ export function AppSidebar() {
     void fetch("/api/auth/me", { cache: "no-store", signal: controller.signal })
       .then((response) => (response.ok ? response.json() : null))
       .then((value) => {
-        if (value) setProfile(value as Profile);
+        if (value) {
+          setProfile(value as Profile);
+          if (value.memberships && value.memberships.length > 0) {
+            const activeMem =
+              value.memberships.find((m: { active?: boolean }) => m.active) ||
+              value.memberships[0];
+            if (activeMem?.tenant_id && !document.cookie.includes("active_tenant_id=")) {
+              document.cookie = `active_tenant_id=${activeMem.tenant_id}; path=/; max-age=86400`;
+            }
+            if (activeMem?.branch_id && !document.cookie.includes("active_branch_id=")) {
+              document.cookie = `active_branch_id=${activeMem.branch_id}; path=/; max-age=86400`;
+            }
+          }
+        }
       })
       .catch(() => undefined);
     return () => controller.abort();
