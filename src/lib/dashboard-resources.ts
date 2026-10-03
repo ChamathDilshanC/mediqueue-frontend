@@ -5,6 +5,9 @@ export const resources = [
   { key: "memberships", label: "Memberships", si: "සාමාජිකත්ව" },
   { key: "departments", label: "Departments", si: "අංශ" },
   { key: "rooms", label: "Rooms", si: "කාමර" },
+  { key: "wards", label: "Wards", si: "වෝඩ් (Wards)" },
+  { key: "beds", label: "Beds", si: "ඇඳන් (Beds)" },
+  { key: "ward-admissions", label: "Ward Admissions", si: "වෝඩ් ඇතුළත් කිරීම්" },
   { key: "doctors", label: "Doctors", si: "වෛද්‍යවරු" },
   { key: "schedules", label: "Schedules", si: "කාලසටහන්" },
   { key: "patients", label: "Patients", si: "රෝගීන්" },
@@ -14,3 +17,4 @@ export const resources = [
   { key: "audit-events", label: "Audit events", si: "විගණන සටහන්" },
 ] as const;
 export type ResourceKey = (typeof resources)[number]["key"];
+

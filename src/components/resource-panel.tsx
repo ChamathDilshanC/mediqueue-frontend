@@ -62,19 +62,22 @@ function getFieldIcon(key: string, type: string) {
   if (k.includes("hospital")) return <Hospital {...iconProps} />;
   if (k.includes("branch")) return <Building2 {...iconProps} />;
   if (k.includes("department")) return <Layers {...iconProps} />;
+  if (k.includes("ward")) return <Building2 {...iconProps} />;
+  if (k.includes("bed")) return <DoorOpen {...iconProps} />;
+  if (k.includes("admission")) return <Activity {...iconProps} />;
   if (k.includes("room")) return <DoorOpen {...iconProps} />;
   if (k.includes("doctor") || k.includes("staff")) return <Stethoscope {...iconProps} />;
   if (k.includes("user") || k.includes("patient")) return <UserCheck {...iconProps} />;
   if (k.includes("queue")) return <Users {...iconProps} />;
   if (k.includes("name")) return <Tag {...iconProps} />;
   if (k.includes("code") || k.includes("number") || k.includes("token")) return <Hash {...iconProps} />;
-  if (k.includes("address") || k.includes("location")) return <MapPin {...iconProps} />;
-  if (k.includes("phone") || k.includes("contact")) return <Phone {...iconProps} />;
+  if (k.includes("address") || k.includes("location") || k.includes("floor") || k.includes("building")) return <MapPin {...iconProps} />;
+  if (k.includes("phone") || k.includes("contact") || k.includes("extension")) return <Phone {...iconProps} />;
   if (k.includes("email")) return <Mail {...iconProps} />;
   if (k.includes("capacity") || k.includes("count")) return <Users {...iconProps} />;
   if (k.includes("status") || k.includes("active")) return <Activity {...iconProps} />;
   if (k.includes("role")) return <ShieldCheck {...iconProps} />;
-  if (k.includes("time") || k.includes("date") || k.includes("start") || k.includes("end")) return <CalendarClock {...iconProps} />;
+  if (k.includes("time") || k.includes("date") || k.includes("start") || k.includes("end") || k.includes("admitted") || k.includes("discharged")) return <CalendarClock {...iconProps} />;
   if (k.includes("note") || k.includes("desc")) return <AlignLeft {...iconProps} />;
   if (k.includes("fee") || k.includes("price") || k.includes("cost")) return <CreditCard {...iconProps} />;
 
@@ -97,13 +100,13 @@ const PAGE_SIZE = 20;
 
 function statusColor(status: string) {
   const s = status.toUpperCase();
-  if (["ACTIVE", "BOOKED", "WAITING", "TRUE"].includes(s))
+  if (["ACTIVE", "BOOKED", "WAITING", "TRUE", "AVAILABLE", "ADMITTED"].includes(s))
     return "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/40 dark:text-green-400 dark:border-green-800";
-  if (["CHECKED_IN", "SERVING", "CALLED"].includes(s))
+  if (["CHECKED_IN", "SERVING", "CALLED", "RESERVED", "CLEANING", "TRANSFERRED"].includes(s))
     return "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800";
-  if (["COMPLETED"].includes(s))
+  if (["COMPLETED", "DISCHARGED", "OCCUPIED"].includes(s))
     return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800";
-  if (["CANCELLED", "NO_SHOW", "FALSE", "INACTIVE", "REJECTED"].includes(s))
+  if (["CANCELLED", "NO_SHOW", "FALSE", "INACTIVE", "REJECTED", "MAINTENANCE"].includes(s))
     return "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-800";
   return "bg-[#f9fafb] dark:bg-gray-800 text-[#4b5563] dark:text-[#9ca3af] border-[#e5e7eb] dark:border-gray-700";
 }
@@ -131,6 +134,12 @@ function formatRefDisplay(refResource: string, refLabel: string, opt: Row): stri
   }
   if (refResource === "doctors" && opt.specialty) {
     return `${main} - ${opt.specialty}`;
+  }
+  if (refResource === "wards" && opt.ward_code) {
+    return `${main} (${opt.ward_code})`;
+  }
+  if (refResource === "beds" && opt.bed_type) {
+    return `${main} [${opt.bed_type}]`;
   }
   return main;
 }

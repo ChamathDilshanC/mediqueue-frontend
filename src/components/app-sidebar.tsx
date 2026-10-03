@@ -102,6 +102,9 @@ export function AppSidebar() {
     "branches",
     "departments",
     "rooms",
+    "wards",
+    "beds",
+    "ward-admissions",
     "doctors",
     "schedules",
     "patients",
@@ -161,6 +164,14 @@ export function AppSidebar() {
                     { key: "branches", label: "Branches", si: "ශාඛා", icon: Building2 },
                     { key: "departments", label: "Departments", si: "අංශ", icon: DoorOpen },
                     { key: "rooms", label: "Rooms", si: "කාමර", icon: DoorOpen }
+                  ]
+                },
+                {
+                  title: "Ward & Bed Management",
+                  items: [
+                    { key: "wards", label: "Wards", si: "වෝඩ් (Wards)", icon: Building2 },
+                    { key: "beds", label: "Beds", si: "ඇඳන් (Beds)", icon: LayoutGrid },
+                    { key: "ward-admissions", label: "Ward Admissions", si: "වෝඩ් ඇතුළත් කිරීම්", icon: HeartPulse }
                   ]
                 },
                 {
