@@ -7,6 +7,7 @@ import {
   Building2,
   CalendarClock,
   ClipboardList,
+  DoorOpen,
   Loader2,
   RefreshCw,
   ShieldCheck,
@@ -30,6 +31,7 @@ function OverviewDashboard() {
   // Live stats from backend
   const [stats, setStats] = useState({
     doctors: 0,
+    departments: 0,
     patients: 0,
     queues: 0,
     appointments: 0,
@@ -37,6 +39,7 @@ function OverviewDashboard() {
   });
   const [recentAppointments, setRecentAppointments] = useState<Row[]>([]);
   const [recentDoctors, setRecentDoctors] = useState<Row[]>([]);
+  const [recentDepartments, setRecentDepartments] = useState<Row[]>([]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -44,9 +47,13 @@ function OverviewDashboard() {
 
     async function load() {
       try {
-        const [doctorsRes, patientsRes, queuesRes, appointmentsRes] =
+        const [doctorsRes, departmentsRes, patientsRes, queuesRes, appointmentsRes] =
           await Promise.allSettled([
             fetch("/api/backend/doctors?limit=200", {
+              cache: "no-store",
+              signal,
+            }),
+            fetch("/api/backend/departments?limit=10", {
               cache: "no-store",
               signal,
             }),
@@ -68,6 +75,10 @@ function OverviewDashboard() {
           doctorsRes.status === "fulfilled" && doctorsRes.value.ok
             ? await doctorsRes.value.json()
             : [];
+        const departmentsData =
+          departmentsRes.status === "fulfilled" && departmentsRes.value.ok
+            ? await departmentsRes.value.json()
+            : [];
         const patientsData =
           patientsRes.status === "fulfilled" && patientsRes.value.ok
             ? await patientsRes.value.json()
@@ -84,6 +95,7 @@ function OverviewDashboard() {
 
         setStats({
           doctors: Array.isArray(doctorsData) ? doctorsData.length : 0,
+          departments: Array.isArray(departmentsData) ? departmentsData.length : 0,
           patients: Array.isArray(patientsData) ? patientsData.length : 0,
           queues: Array.isArray(queuesData) ? queuesData.length : 0,
           appointments: Array.isArray(appointmentsData)
@@ -96,6 +108,8 @@ function OverviewDashboard() {
           setRecentAppointments(appointmentsData.slice(0, 5));
         if (Array.isArray(doctorsData))
           setRecentDoctors(doctorsData.slice(0, 5));
+        if (Array.isArray(departmentsData))
+          setRecentDepartments(departmentsData.slice(0, 5));
       } catch {
         setStats((prev) => ({ ...prev, loading: false }));
       }
@@ -109,31 +123,38 @@ function OverviewDashboard() {
 
   const cards = [
     {
+      label: si ? "අංශ" : "Departments",
+      value: stats.departments,
+      icon: <DoorOpen size={18} />,
+      color: "bg-teal-50 text-teal-600 dark:bg-teal-950/40 dark:text-teal-400",
+      gradient: "from-teal-50",
+    },
+    {
       label: si ? "වෛද්‍යවරු" : "Doctors",
       value: stats.doctors,
       icon: <Stethoscope size={18} />,
-      color: "bg-blue-50 text-blue-600",
+      color: "bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400",
       gradient: "from-blue-50",
     },
     {
       label: si ? "රෝගීන්" : "Patients",
       value: stats.patients,
       icon: <Users size={18} />,
-      color: "bg-green-50 text-green-600",
+      color: "bg-green-50 text-green-600 dark:bg-green-950/40 dark:text-green-400",
       gradient: "from-green-50",
     },
     {
       label: si ? "සජීවී පෝලිම්" : "Active Queues",
       value: stats.queues,
       icon: <Activity size={18} />,
-      color: "bg-amber-50 text-amber-600",
+      color: "bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400",
       gradient: "from-amber-50",
     },
     {
       label: si ? "හමුවීම්" : "Appointments",
       value: stats.appointments,
       icon: <CalendarClock size={18} />,
-      color: "bg-purple-50 text-purple-600",
+      color: "bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400",
       gradient: "from-purple-50",
     },
   ];
@@ -300,6 +321,75 @@ function OverviewDashboard() {
                       </td>
                       <td className="px-5 py-3 text-right text-[#6b7280] dark:text-[#9ca3af]">
                         {String(doc.specialty ?? "—") || "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+
+        {/* Departments */}
+        <div className="bg-white dark:bg-[#1e1e1e] rounded-3xl border border-[#f3f4f6] dark:border-gray-800 shadow-sm overflow-hidden flex flex-col lg:col-span-2">
+          <div className="p-5 border-b border-[#f9fafb] dark:border-gray-800 bg-[#fafcfa] dark:bg-[#1a1a1a] flex items-center justify-between">
+            <h3 className="font-bold text-[#111827] dark:text-gray-100 flex items-center gap-2">
+              <DoorOpen size={18} className="text-[#76aa32]" />
+              {si ? "රෝහල් අංශ (Departments)" : "Hospital Departments"}
+            </h3>
+            <button
+              onClick={() => router.push("/dashboard?resource=departments")}
+              className="text-xs text-[#76aa32] font-semibold hover:underline"
+            >
+              {si ? "සියල්ල බලන්න →" : "View all →"}
+            </button>
+          </div>
+          <div className="p-0">
+            {recentDepartments.length === 0 ? (
+              <div className="p-8 text-center text-[#9ca3af] text-sm">
+                {si ? "අංශ හමු නොවීය" : "No departments found"}
+              </div>
+            ) : (
+              <table className="w-full text-sm text-left">
+                <thead className="text-xs text-[#6b7280] dark:text-[#9ca3af] uppercase bg-[#f9fafb]/50 dark:bg-gray-800/50">
+                  <tr>
+                    <th className="px-5 py-3 font-medium">{si ? "අංශයේ නම" : "Department"}</th>
+                    <th className="px-5 py-3 font-medium">{si ? "සංකේතය" : "Code"}</th>
+                    <th className="px-5 py-3 font-medium">{si ? "ස්ථානය" : "Location"}</th>
+                    <th className="px-5 py-3 font-medium">{si ? "අංශ ප්‍රධානියා" : "Head of Dept"}</th>
+                    <th className="px-5 py-3 font-medium text-right">{si ? "තත්ත්වය" : "Status"}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {recentDepartments.map((dept, i) => (
+                    <tr
+                      key={String(dept.id ?? i)}
+                      className="hover:bg-[#f9fafb]/50 dark:bg-gray-800/50 transition-colors"
+                    >
+                      <td className="px-5 py-3 font-medium text-[#111827] dark:text-gray-100">
+                        {String(dept.name ?? "—")}
+                      </td>
+                      <td className="px-5 py-3">
+                        <span className="px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-xs font-mono font-semibold text-gray-700 dark:text-gray-300">
+                          {String(dept.code || "—")}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 text-[#6b7280] dark:text-[#9ca3af] text-xs">
+                        {String(dept.location || "—")}
+                      </td>
+                      <td className="px-5 py-3 text-[#6b7280] dark:text-[#9ca3af] text-xs">
+                        {String(dept.head_of_dept || "—")}
+                      </td>
+                      <td className="px-5 py-3 text-right">
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                            dept.is_active !== false
+                              ? "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/40 dark:text-green-400"
+                              : "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-400"
+                          }`}
+                        >
+                          {dept.is_active !== false ? "ACTIVE" : "INACTIVE"}
+                        </span>
                       </td>
                     </tr>
                   ))}
