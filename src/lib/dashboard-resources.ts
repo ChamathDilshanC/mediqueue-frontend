@@ -1,4 +1,5 @@
 export const resources = [
+  { key: "bed-board", label: "Bed board", si: "ඇඳන් පුවරුව" },
   { key: "reports", label: "Reports", si: "වාර්තා" },
   { key: "hospitals", label: "Hospitals", si: "රෝහල්" },
   { key: "branches", label: "Branches", si: "ශාඛා" },

@@ -193,6 +193,12 @@ export function AppSidebar() {
                   title: "Ward & Bed Management",
                   items: [
                     {
+                      key: "bed-board",
+                      label: "Bed board",
+                      si: "ඇඳන් පුවරුව",
+                      icon: LayoutGrid,
+                    },
+                    {
                       key: "wards",
                       label: "Wards",
                       si: "වෝඩ්",

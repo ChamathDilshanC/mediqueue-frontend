@@ -1859,3 +1859,27 @@ for (const config of Object.values(resourceConfigs)) {
 resourceConfigs["ward-admissions"].canDelete = false;
 
 resourceConfigs["audit-events"].en.plural = "Audit events";
+
+const admissionConfig = resourceConfigs["ward-admissions"];
+const admissionDate = admissionConfig.fields.find(
+  (field) => field.key === "admitted_at",
+);
+if (admissionDate) {
+  admissionDate.type = "datetime";
+  admissionDate.en = "Admission date";
+}
+admissionConfig.fields.push({
+  key: "planned_discharge_at",
+  en: "Planned discharge date",
+  si: "නියමිත පිටත් දිනය",
+  type: "datetime",
+  showInTable: true,
+});
+admissionConfig.fields.push({
+  key: "bed_assigned_at",
+  en: "Bed allocated",
+  si: "ඇඳ ලබාදුන් දිනය",
+  type: "readonly",
+  showInTable: true,
+});
+admissionConfig.inputFields.push("admitted_at", "planned_discharge_at");

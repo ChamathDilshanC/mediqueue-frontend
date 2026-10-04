@@ -18,6 +18,8 @@ import { useLanguage } from "./providers";
 import { SiteHeader } from "./site-header";
 import { ResourcePanel } from "./resource-panel";
 import { WorkflowPanel } from "./workflow-panel";
+import { WardBedBoard } from "./ward-bed-board";
+import Link from "next/link";
 import { OperationsReport, reportSchema } from "./operations-report";
 import { resources, type ResourceKey } from "@/lib/dashboard-resources";
 import { resourceConfigs } from "@/lib/resource-config";
@@ -485,14 +487,18 @@ export function Dashboard() {
                   ? si
                     ? "ප්‍රධාන පුවරුව"
                     : "Operations Dashboard"
-                  : resource === "reports"
+                  : resource === "bed-board"
                     ? si
-                      ? "වාර්තා"
-                      : "Reports"
-                    : si
-                      ? (resourceConfigs[resource]?.si.plural ??
-                        "ප්‍රධාන පුවරුව")
-                      : (resourceConfigs[resource]?.en.plural ?? "Dashboard")}
+                      ? "ඇඳන් පුවරුව"
+                      : "Bed board"
+                    : resource === "reports"
+                      ? si
+                        ? "වාර්තා"
+                        : "Reports"
+                      : si
+                        ? (resourceConfigs[resource]?.si.plural ??
+                          "ප්‍රධාන පුවරුව")
+                        : (resourceConfigs[resource]?.en.plural ?? "Dashboard")}
               </h1>
               <p className="text-[#6b7280] dark:text-[#9ca3af] text-sm md:text-base">
                 {resource === "overview"
@@ -509,10 +515,20 @@ export function Dashboard() {
           </div>
 
           {/* Content */}
+          {["wards", "beds", "ward-admissions"].includes(resource) && (
+            <Link
+              className="button secondary mb-6"
+              href="/dashboard?resource=bed-board"
+            >
+              {si ? "වෝඩ් ඇඳන් දෘශ්‍ය පුවරුව" : "Open visual bed board"}
+            </Link>
+          )}
           {(resource === "queues" || resource === "appointments") && (
             <WorkflowPanel kind={resource} role={role} />
           )}
-          {resource === "reports" ? (
+          {resource === "bed-board" ? (
+            <WardBedBoard />
+          ) : resource === "reports" ? (
             <OperationsReport />
           ) : resource === "overview" ? (
             <OverviewDashboard />

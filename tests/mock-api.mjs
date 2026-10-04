@@ -39,6 +39,11 @@ createServer(async (req, res) => {
   };
   if (req.url === "/health") return send(200, { ok: true });
   const url = new URL(req.url, "http://127.0.0.1:4100");
+  if (url.pathname === "/v1/fixture-server-error") {
+    res.setHeader("Content-Type", "text/plain");
+    res.writeHead(500);
+    return res.end("Internal Server Error private SQL diagnostics");
+  }
   if (url.pathname === "/auth/v1/authorize") {
     if (
       url.searchParams.get("provider") !== "google" ||

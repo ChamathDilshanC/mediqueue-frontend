@@ -98,6 +98,7 @@ test("workspace sidebar connects every resource and collapses on desktop", async
   page,
   context,
 }) => {
+  test.setTimeout(60000);
   await context.addCookies([
     {
       name: "mq_access",

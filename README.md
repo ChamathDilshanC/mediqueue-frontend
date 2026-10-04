@@ -172,3 +172,11 @@ ownership and role permissions remain enforced by the API.
 Deploy the backend migration `0006_management` before this frontend. Configure the
 existing Supabase and backend environment variables; no separate patient identity
 provider is needed. Run `npm run build` and `npm test` for validation.
+## Visual ward beds
+
+Open `/dashboard?resource=bed-board` from Ward & Bed Management. Select a ward,
+filter status or search bed/patient/MRN, then select a bed for allocation/admission
+dates, stay/bed day counts, planned/actual discharge and staff details. The board
+refreshes every 30 seconds and supports mobile, dark mode and Sinhala/English.
+Manage dates under Admissions. Patients see their own ward stays under `/patient`.
+Upstream failures show a retry message instead of JSON parser/server diagnostics.

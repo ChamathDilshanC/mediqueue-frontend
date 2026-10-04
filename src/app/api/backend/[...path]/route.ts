@@ -10,6 +10,30 @@ import {
 
 type Context = { params: Promise<{ path: string[] }> };
 
+function forwardResponse(upstream: Response) {
+  if (
+    upstream.status >= 500 ||
+    (upstream.status !== 204 &&
+      !upstream.headers.get("content-type")?.includes("application/json"))
+  ) {
+    return NextResponse.json(
+      {
+        error: "backendUnavailable",
+        detail: "Healthcare data is temporarily unavailable. Please try again.",
+      },
+      { status: 503, headers: { "Cache-Control": "no-store" } },
+    );
+  }
+  return new NextResponse(upstream.body, {
+    status: upstream.status,
+    headers: {
+      "Content-Type":
+        upstream.headers.get("content-type") ?? "application/json",
+      "Cache-Control": "no-store",
+    },
+  });
+}
+
 async function proxy(request: NextRequest, context: Context) {
   if (
     ["POST", "PUT", "PATCH", "DELETE"].includes(request.method) &&
@@ -103,26 +127,12 @@ async function proxy(request: NextRequest, context: Context) {
         },
       );
 
-      const response = new NextResponse(upstream.body, {
-        status: upstream.status,
-        headers: {
-          "Content-Type":
-            upstream.headers.get("content-type") ?? "application/json",
-          "Cache-Control": "no-store",
-        },
-      });
+      const response = forwardResponse(upstream);
       setSession(response, session);
       return response;
     }
 
-    return new NextResponse(upstream.body, {
-      status: upstream.status,
-      headers: {
-        "Content-Type":
-          upstream.headers.get("content-type") ?? "application/json",
-        "Cache-Control": "no-store",
-      },
-    });
+    return forwardResponse(upstream);
   } catch {
     return NextResponse.json(
       { error: "backendUnavailable" },

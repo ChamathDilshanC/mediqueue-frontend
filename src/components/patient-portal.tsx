@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { CalendarDays, FileText, HeartPulse, RefreshCw } from "lucide-react";
 import { SiteHeader } from "./site-header";
 import { useLanguage } from "./providers";
+import { StayDetails } from "./ward-stay";
+import { apiJson } from "@/lib/api-json";
 
 type Center = { id: string; tenant_id: string; name: string };
 type Slot = {
@@ -15,6 +17,20 @@ type Slot = {
   capacity: number;
 };
 type Overview = {
+  ward_stays?: {
+    id: string;
+    ward: string;
+    bed: string | null;
+    status: string;
+    admitted_at: string;
+    bed_assigned_at: string | null;
+    stay_days: number;
+    bed_days: number | null;
+    planned_discharge_at: string | null;
+    discharged_at: string | null;
+    discharge_state: string;
+    timezone: string;
+  }[];
   profiles: { id: string; name: string; mrn: string; tenant_id: string }[];
   appointments: {
     id: string;
@@ -48,16 +64,12 @@ export function PatientPortal() {
         router.replace("/patient/login");
         throw new Error(si ? "නැවත පිවිසෙන්න" : "Please sign in again");
       }
-      const data = await response.json();
-      if (!response.ok)
-        throw new Error(
-          typeof data.detail === "string"
-            ? data.detail
-            : si
-              ? "ඉල්ලීම සම්පූර්ණ කළ නොහැක"
-              : "Unable to complete request",
-        );
-      return data;
+      return apiJson(
+        response,
+        si
+          ? "සෞඛ්‍ය සේවා දත්ත දැනට ලබාගත නොහැක. නැවත උත්සාහ කරන්න."
+          : "Healthcare data is temporarily unavailable. Please try again.",
+      );
     },
     [router, si],
   );
@@ -178,7 +190,7 @@ export function PatientPortal() {
                 </option>
               ))}
             </select>
-            {!centers.length && !loading && (
+            {!centers.length && !loading && !error && (
               <p>{si ? "මධ්‍යස්ථාන නොමැත" : "No centers available yet."}</p>
             )}
             {selected && !enrolled && (
@@ -279,6 +291,27 @@ export function PatientPortal() {
               ))}
             </div>
           </section>
+          {overview?.ward_stays && overview.ward_stays.length > 0 && (
+            <section className="account-card patient-records">
+              <HeartPulse size={24} />
+              <h2>{si ? "මගේ වෝඩ් නේවාසික තොරතුරු" : "My ward stays"}</h2>
+              <div className="patient-stay-list">
+                {overview.ward_stays.map((stay) => (
+                  <article key={stay.id}>
+                    <h3>{stay.ward}</h3>
+                    <p>
+                      {si ? "ඇඳ" : "Bed"}: {stay.bed || "—"}
+                    </p>
+                    <StayDetails
+                      stay={stay}
+                      language={language}
+                      zone={stay.timezone}
+                    />
+                  </article>
+                ))}
+              </div>
+            </section>
+          )}
           <section className="account-card patient-records">
             <FileText size={24} />
             <h2>{si ? "මගේ වාර්තා සහ බිල්පත්" : "My records and bills"}</h2>
