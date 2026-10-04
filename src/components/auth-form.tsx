@@ -24,11 +24,13 @@ export type AuthMode = "login" | "register" | "forgot-password";
 export function AuthForm({
   mode,
   initialError = null,
+  audience = "staff",
 }: {
   mode: AuthMode;
   initialError?: keyof Messages | null;
+  audience?: "patient" | "staff";
 }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const router = useRouter();
   const [visible, setVisible] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -95,7 +97,7 @@ export function AuthForm({
         gooeyToast.success(recovery ? t.recoverySent : t.confirmation);
       } else {
         gooeyToast.success(t.success);
-        router.replace("/account");
+        router.replace(audience === "patient" ? "/patient" : "/account");
         router.refresh();
       }
     } catch {
@@ -110,7 +112,7 @@ export function AuthForm({
     setGoogleBusy(true);
     setError(null);
     try {
-      const response = await fetch("/api/auth/google", {
+      const response = await fetch(`/api/auth/google?audience=${audience}`, {
         method: "POST",
         signal: AbortSignal.timeout(20000),
       });
@@ -144,7 +146,10 @@ export function AuthForm({
               </span>
               <h1>{recovery ? t.recoverySent : t.confirmation}</h1>
               <p>{recovery ? t.recoveryBody : t.confirmationBody}</p>
-              <Link href="/login" className="button primary">
+              <Link
+                href={audience === "patient" ? "/patient/login" : "/login"}
+                className="button primary"
+              >
                 {t.returnLogin}
                 <ArrowRight size={17} />
               </Link>
@@ -155,15 +160,49 @@ export function AuthForm({
                 <HeartMark />
               </span>
               <p className="eyebrow">MEDIQUEUE</p>
+              {!recovery && (
+                <nav className="flex gap-3 mb-4" aria-label="Sign in options">
+                  <Link
+                    className={`button ${audience === "patient" ? "primary" : "secondary"}`}
+                    href={`/patient/${register ? "register" : "login"}`}
+                  >
+                    {language === "si" ? "රෝගී" : "Patient"}
+                  </Link>
+                  <Link
+                    className={`button ${audience === "staff" ? "primary" : "secondary"}`}
+                    href={`/${register ? "register" : "login"}`}
+                  >
+                    {language === "si"
+                      ? "කාර්ය මණ්ඩල / පරිපාලක"
+                      : "Staff / administrator"}
+                  </Link>
+                </nav>
+              )}
               <h1>
-                {recovery ? t.recovery : register ? t.registerTitle : t.welcome}
+                {audience === "patient" && !recovery
+                  ? language === "si"
+                    ? register
+                      ? "රෝගී ගිණුමක් සාදන්න"
+                      : "රෝගී ගිණුමට පිවිසෙන්න"
+                    : register
+                      ? "Create your patient account"
+                      : "Patient sign in"
+                  : recovery
+                    ? t.recovery
+                    : register
+                      ? t.registerTitle
+                      : t.welcome}
               </h1>
               <p className="auth-subtitle">
-                {recovery
-                  ? t.recoveryIntro
-                  : register
-                    ? t.registerIntro
-                    : t.authIntro}
+                {audience === "patient" && !recovery
+                  ? language === "si"
+                    ? "ඔබගේ හමුවීම්, වෛද්‍ය වාර්තා සහ බිල්පත් කළමනාකරණය කරන්න."
+                    : "Manage your appointments, medical records and bills."
+                  : recovery
+                    ? t.recoveryIntro
+                    : register
+                      ? t.registerIntro
+                      : t.authIntro}
               </p>
               {!recovery && (
                 <>
@@ -284,11 +323,25 @@ export function AuthForm({
               </form>
               <div className="auth-switch">
                 {recovery ? (
-                  <Link href="/login">{t.returnLogin}</Link>
+                  <Link
+                    href={audience === "patient" ? "/patient/login" : "/login"}
+                  >
+                    {t.returnLogin}
+                  </Link>
                 ) : (
                   <>
                     {register ? t.hasAccount : t.noAccount}{" "}
-                    <Link href={register ? "/login" : "/register"}>
+                    <Link
+                      href={
+                        audience === "patient"
+                          ? register
+                            ? "/patient/login"
+                            : "/patient/register"
+                          : register
+                            ? "/login"
+                            : "/register"
+                      }
+                    >
                       {register ? t.login : t.signUpLink}
                       <ArrowUpRightMini />
                     </Link>

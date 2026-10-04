@@ -116,7 +116,7 @@ test("workspace sidebar connects every resource and collapses on desktop", async
     await sidebar.getByRole("link", { name: label, exact: true }).click();
     await expect(page).toHaveURL(`/dashboard?resource=${key}`);
     await expect(
-      page.getByRole("heading", { name: label, exact: true }),
+      page.getByRole("heading", { name: label, exact: true, level: 1 }),
     ).toBeVisible();
     await expect(
       sidebar.getByRole("link", { name: label, exact: true }),
@@ -157,7 +157,7 @@ test("workspace sidebar connects every resource and collapses on desktop", async
     .click();
   await expect(page).toHaveURL("/dashboard?resource=patients");
   await expect(
-    page.getByRole("heading", { name: "Patients", exact: true }),
+    page.getByRole("heading", { name: "Patients", exact: true, level: 1 }),
   ).toBeVisible();
   expect(
     await page.evaluate(

@@ -5,11 +5,18 @@ import {
   REFRESH_COOKIE,
   clearSession,
   setSession,
+  requestOrigin,
 } from "@/lib/auth-server";
 
 type Context = { params: Promise<{ path: string[] }> };
 
 async function proxy(request: NextRequest, context: Context) {
+  if (
+    ["POST", "PUT", "PATCH", "DELETE"].includes(request.method) &&
+    request.headers.get("origin") !== requestOrigin(request)
+  ) {
+    return NextResponse.json({ error: "invalid" }, { status: 403 });
+  }
   const token = request.cookies.get(ACCESS_COOKIE)?.value;
   const refresh = request.cookies.get(REFRESH_COOKIE)?.value;
   if (!token && !refresh) {
@@ -19,17 +26,25 @@ async function proxy(request: NextRequest, context: Context) {
   const { path } = await context.params;
   const base =
     process.env.MEDIQUEUE_API_URL ?? "https://mediqueue-backend-eta.vercel.app";
-  const body = ["POST", "PUT", "PATCH"].includes(request.method) ? await request.text() : undefined;
+  const body = ["POST", "PUT", "PATCH"].includes(request.method)
+    ? await request.text()
+    : undefined;
 
   const getHeaders = (bearerToken: string) => {
     const headers: Record<string, string> = {
       Authorization: `Bearer ${bearerToken}`,
       "Content-Type": request.headers.get("content-type") ?? "application/json",
     };
-    const xTenant = request.headers.get("x-tenant-id") || request.cookies.get("active_tenant_id")?.value;
-    const xBranch = request.headers.get("x-branch-id") || request.cookies.get("active_branch_id")?.value;
+    const xTenant =
+      request.headers.get("x-tenant-id") ||
+      request.cookies.get("active_tenant_id")?.value;
+    const xBranch =
+      request.headers.get("x-branch-id") ||
+      request.cookies.get("active_branch_id")?.value;
     if (xTenant) headers["X-Tenant-ID"] = xTenant;
     if (xBranch) headers["X-Branch-ID"] = xBranch;
+    const idempotency = request.headers.get("idempotency-key");
+    if (idempotency) headers["Idempotency-Key"] = idempotency;
     return headers;
   };
 

@@ -35,6 +35,13 @@ export function startGoogle(request: NextRequest) {
     authorization.searchParams.set("prompt", "select_account");
     const response = json({ url: authorization.toString() });
     response.cookies.set(OAUTH_COOKIE, verifier, cookieOptions);
+    response.cookies.set(
+      "mq_google_audience",
+      request.nextUrl.searchParams.get("audience") === "patient"
+        ? "patient"
+        : "staff",
+      cookieOptions,
+    );
     return response;
   } catch {
     return json({ error: "googleUnavailable" }, 503);
@@ -42,6 +49,8 @@ export function startGoogle(request: NextRequest) {
 }
 
 export async function finishGoogle(request: NextRequest) {
+  const patient =
+    request.cookies.get("mq_google_audience")?.value === "patient";
   function redirect(path: string) {
     const response = NextResponse.redirect(
       new URL(path, requestOrigin(request)),
@@ -50,6 +59,10 @@ export async function finishGoogle(request: NextRequest) {
     response.headers.set("Cache-Control", "no-store");
     response.headers.set("Referrer-Policy", "no-referrer");
     response.cookies.set(OAUTH_COOKIE, "", { ...cookieOptions, maxAge: 0 });
+    response.cookies.set("mq_google_audience", "", {
+      ...cookieOptions,
+      maxAge: 0,
+    });
     return response;
   }
   const code = request.nextUrl.searchParams.get("code");
@@ -82,7 +95,7 @@ export async function finishGoogle(request: NextRequest) {
     const session = authResultSchema.parse(await upstream.json());
     if (!session.access_token || !session.refresh_token)
       return redirect("/login?auth_error=googleFailed");
-    const response = redirect("/account");
+    const response = redirect(patient ? "/patient" : "/account");
     setSession(response, session);
     return response;
   } catch {

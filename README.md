@@ -32,8 +32,7 @@ No Supabase service key or database credentials belong in this application.
 - Framer Motion with reduced-motion support and keyboard-accessible forms/navigation.
 - Magic UI's Animated Shiny Text, selected from the 21st.dev community catalogue.
 
-The queue card is explicitly an **illustration**, not a live queue. Patient booking,
-reception/admin/doctor workspaces and live queue screens remain future slices.
+The queue card is explicitly an **illustration**, not a live queue. Patient booking, role-aware staff workspaces and live queue controls are implemented as described below.
 The account screen shows only the profile and memberships returned by the backend.
 
 ## Language and fonts
@@ -152,3 +151,24 @@ The 21st.dev direct registry requires authentication, so the official open-sourc
 distribution is used. Its MIT notice is retained in `THIRD_PARTY_LICENSES.md`.
 
 See [repository rules](../docs/AGENTS.md) for architecture and contribution rules.
+
+## Hospital and patient workspaces (2026-10-04)
+
+- `/login` and `/register`: staff/administrator identity screens; branch membership
+  determines permissions. Public registration never grants a privileged role.
+- `/patient/login`, `/patient/register`, `/patient`: patient sign-in/registration,
+  hospital enrollment, appointment booking/cancellation and owned records/bills.
+- `/dashboard`: role-aware management of setup, wards/beds/admissions, consultations,
+  prescriptions, laboratory orders, billing, stock, staff directory and reports.
+- Queue screens include check-in, call-next and token state controls. Appointment
+  screens include check-in, completion, no-show and cancellation controls.
+- `/account` lets staff select an active branch and all users access patient services.
+
+All actions call the same-origin backend proxy. It enforces Origin on mutations,
+forwards scope/idempotency headers and keeps session tokens in HttpOnly cookies.
+Reports use database totals rather than the table page size. Booking capacity,
+ownership and role permissions remain enforced by the API.
+
+Deploy the backend migration `0006_management` before this frontend. Configure the
+existing Supabase and backend environment variables; no separate patient identity
+provider is needed. Run `npm run build` and `npm test` for validation.

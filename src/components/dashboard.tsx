@@ -17,8 +17,12 @@ import {
 import { useLanguage } from "./providers";
 import { SiteHeader } from "./site-header";
 import { ResourcePanel } from "./resource-panel";
+import { WorkflowPanel } from "./workflow-panel";
+import { OperationsReport, reportSchema } from "./operations-report";
 import { resources, type ResourceKey } from "@/lib/dashboard-resources";
 import { resourceConfigs } from "@/lib/resource-config";
+import { profileSchema } from "@/lib/auth-contract";
+import { activeMembership, canRead, canWrite } from "@/lib/permissions";
 
 type Row = Record<string, unknown>;
 
@@ -27,6 +31,8 @@ type Row = Record<string, unknown>;
 function OverviewDashboard() {
   const { language } = useLanguage();
   const router = useRouter();
+
+  const [loadError, setLoadError] = useState(false);
 
   // Live stats from backend
   const [stats, setStats] = useState({
@@ -47,60 +53,29 @@ function OverviewDashboard() {
 
     async function load() {
       try {
-        const [doctorsRes, departmentsRes, patientsRes, queuesRes, appointmentsRes] =
-          await Promise.allSettled([
-            fetch("/api/backend/doctors?limit=200", {
-              cache: "no-store",
-              signal,
-            }),
-            fetch("/api/backend/departments?limit=10", {
-              cache: "no-store",
-              signal,
-            }),
-            fetch("/api/backend/patients?limit=200", {
-              cache: "no-store",
-              signal,
-            }),
-            fetch("/api/backend/queues?limit=200", {
-              cache: "no-store",
-              signal,
-            }),
-            fetch("/api/backend/appointments?limit=10", {
-              cache: "no-store",
-              signal,
-            }),
-          ]);
-
-        const doctorsData =
-          doctorsRes.status === "fulfilled" && doctorsRes.value.ok
-            ? await doctorsRes.value.json()
-            : [];
-        const departmentsData =
-          departmentsRes.status === "fulfilled" && departmentsRes.value.ok
-            ? await departmentsRes.value.json()
-            : [];
-        const patientsData =
-          patientsRes.status === "fulfilled" && patientsRes.value.ok
-            ? await patientsRes.value.json()
-            : [];
-        const queuesData =
-          queuesRes.status === "fulfilled" && queuesRes.value.ok
-            ? await queuesRes.value.json()
-            : [];
-        const appointmentsData =
-          appointmentsRes.status === "fulfilled" &&
-          appointmentsRes.value.ok
-            ? await appointmentsRes.value.json()
-            : [];
-
+        const responses = await Promise.all([
+          fetch("/api/backend/reports/overview", { cache: "no-store", signal }),
+          fetch("/api/backend/doctors?limit=10", { cache: "no-store", signal }),
+          fetch("/api/backend/departments?limit=10", {
+            cache: "no-store",
+            signal,
+          }),
+          fetch("/api/backend/appointments?limit=10", {
+            cache: "no-store",
+            signal,
+          }),
+        ]);
+        if (responses.some((response) => !response.ok))
+          throw new Error("Overview unavailable");
+        const [report, doctorsData, departmentsData, appointmentsData] =
+          await Promise.all(responses.map((response) => response.json()));
+        const totals = reportSchema.parse(report).totals;
         setStats({
-          doctors: Array.isArray(doctorsData) ? doctorsData.length : 0,
-          departments: Array.isArray(departmentsData) ? departmentsData.length : 0,
-          patients: Array.isArray(patientsData) ? patientsData.length : 0,
-          queues: Array.isArray(queuesData) ? queuesData.length : 0,
-          appointments: Array.isArray(appointmentsData)
-            ? appointmentsData.length
-            : 0,
+          doctors: totals.doctors,
+          departments: totals.departments,
+          patients: totals.patients,
+          queues: totals.queues,
+          appointments: totals.appointments,
           loading: false,
         });
 
@@ -111,6 +86,7 @@ function OverviewDashboard() {
         if (Array.isArray(departmentsData))
           setRecentDepartments(departmentsData.slice(0, 5));
       } catch {
+        if (!signal.aborted) setLoadError(true);
         setStats((prev) => ({ ...prev, loading: false }));
       }
     }
@@ -140,24 +116,40 @@ function OverviewDashboard() {
       label: si ? "රෝගීන්" : "Patients",
       value: stats.patients,
       icon: <Users size={18} />,
-      color: "bg-green-50 text-green-600 dark:bg-green-950/40 dark:text-green-400",
+      color:
+        "bg-green-50 text-green-600 dark:bg-green-950/40 dark:text-green-400",
       gradient: "from-green-50",
     },
     {
       label: si ? "සජීවී පෝලිම්" : "Active Queues",
       value: stats.queues,
       icon: <Activity size={18} />,
-      color: "bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400",
+      color:
+        "bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400",
       gradient: "from-amber-50",
     },
     {
       label: si ? "හමුවීම්" : "Appointments",
       value: stats.appointments,
       icon: <CalendarClock size={18} />,
-      color: "bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400",
+      color:
+        "bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400",
       gradient: "from-purple-50",
     },
   ];
+
+  if (loadError)
+    return (
+      <div className="account-error" role="alert">
+        {si ? "දත්ත පූරණය කළ නොහැක" : "Unable to load the operations overview."}
+        <button
+          className="button secondary"
+          onClick={() => window.location.reload()}
+        >
+          {si ? "නැවත උත්සාහ කරන්න" : "Retry"}
+        </button>
+      </div>
+    );
 
   return (
     <div className="flex flex-col gap-6">
@@ -172,9 +164,7 @@ function OverviewDashboard() {
               <span className="text-sm font-medium text-[#6b7280] dark:text-[#9ca3af]">
                 {card.label}
               </span>
-              <div className={`p-2 rounded-lg ${card.color}`}>
-                {card.icon}
-              </div>
+              <div className={`p-2 rounded-lg ${card.color}`}>{card.icon}</div>
             </div>
             {stats.loading ? (
               <Loader2 size={24} className="animate-spin text-[#d1d5db]" />
@@ -202,9 +192,7 @@ function OverviewDashboard() {
               {si ? "මෑත හමුවීම්" : "Recent Appointments"}
             </h3>
             <button
-              onClick={() =>
-                router.push("/dashboard?resource=appointments")
-              }
+              onClick={() => router.push("/dashboard?resource=appointments")}
               className="text-xs text-[#76aa32] font-semibold hover:underline"
             >
               {si ? "සියල්ල බලන්න →" : "View all →"}
@@ -213,9 +201,7 @@ function OverviewDashboard() {
           <div className="p-0">
             {recentAppointments.length === 0 ? (
               <div className="p-8 text-center text-[#9ca3af] text-sm">
-                {si
-                  ? "හමුවීම් හමු නොවීය"
-                  : "No appointments found"}
+                {si ? "හමුවීම් හමු නොවීය" : "No appointments found"}
               </div>
             ) : (
               <table className="w-full text-sm text-left">
@@ -280,9 +266,7 @@ function OverviewDashboard() {
               {si ? "වෛද්‍යවරු" : "Doctors"}
             </h3>
             <button
-              onClick={() =>
-                router.push("/dashboard?resource=doctors")
-              }
+              onClick={() => router.push("/dashboard?resource=doctors")}
               className="text-xs text-[#76aa32] font-semibold hover:underline"
             >
               {si ? "සියල්ල බලන්න →" : "View all →"}
@@ -353,11 +337,21 @@ function OverviewDashboard() {
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-[#6b7280] dark:text-[#9ca3af] uppercase bg-[#f9fafb]/50 dark:bg-gray-800/50">
                   <tr>
-                    <th className="px-5 py-3 font-medium">{si ? "අංශයේ නම" : "Department"}</th>
-                    <th className="px-5 py-3 font-medium">{si ? "සංකේතය" : "Code"}</th>
-                    <th className="px-5 py-3 font-medium">{si ? "ස්ථානය" : "Location"}</th>
-                    <th className="px-5 py-3 font-medium">{si ? "අංශ ප්‍රධානියා" : "Head of Dept"}</th>
-                    <th className="px-5 py-3 font-medium text-right">{si ? "තත්ත්වය" : "Status"}</th>
+                    <th className="px-5 py-3 font-medium">
+                      {si ? "අංශයේ නම" : "Department"}
+                    </th>
+                    <th className="px-5 py-3 font-medium">
+                      {si ? "සංකේතය" : "Code"}
+                    </th>
+                    <th className="px-5 py-3 font-medium">
+                      {si ? "ස්ථානය" : "Location"}
+                    </th>
+                    <th className="px-5 py-3 font-medium">
+                      {si ? "අංශ ප්‍රධානියා" : "Head of Dept"}
+                    </th>
+                    <th className="px-5 py-3 font-medium text-right">
+                      {si ? "තත්ත්වය" : "Status"}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
@@ -407,6 +401,34 @@ function OverviewDashboard() {
 
 export function Dashboard() {
   const { t, language } = useLanguage();
+  const router = useRouter();
+  const [role, setRole] = useState<string | null>(null);
+  const [accessError, setAccessError] = useState(false);
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch("/api/auth/me", { signal: controller.signal, cache: "no-store" })
+      .then(async (response) => {
+        if (response.status === 401) {
+          router.replace("/login");
+          return;
+        }
+        if (!response.ok) throw new Error("Profile unavailable");
+        const member = activeMembership(
+          profileSchema.parse(await response.json()),
+        );
+        if (!member) {
+          router.replace("/patient");
+          return;
+        }
+        document.cookie = `active_tenant_id=${member.tenant_id}; path=/; SameSite=Lax`;
+        document.cookie = `active_branch_id=${member.branch_id}; path=/; SameSite=Lax`;
+        setRole(member.role);
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setAccessError(true);
+      });
+    return () => controller.abort();
+  }, [router]);
   const searchParams = useSearchParams();
   const selected = searchParams.get("resource");
   const resource = (
@@ -418,6 +440,33 @@ export function Dashboard() {
   ) as ResourceKey | "overview";
 
   const si = language === "si";
+
+  if (accessError)
+    return (
+      <main className="container account-page" role="alert">
+        {t.unavailable}
+        <button
+          className="button secondary"
+          onClick={() => window.location.reload()}
+        >
+          {t.retry}
+        </button>
+      </main>
+    );
+  if (!role)
+    return (
+      <main className="container account-page" role="status">
+        {si ? "පූරණය වෙමින්..." : "Loading workspace..."}
+      </main>
+    );
+  if (resource !== "overview" && !canRead(resource, role))
+    return (
+      <main className="container account-page" role="alert">
+        {si
+          ? "මෙම කොටසට ප්‍රවේශ අවසර නැත"
+          : "Your role does not have access to this section."}
+      </main>
+    );
 
   return (
     <>
@@ -436,10 +485,14 @@ export function Dashboard() {
                   ? si
                     ? "ප්‍රධාන පුවරුව"
                     : "Operations Dashboard"
-                  : si
-                    ? resourceConfigs[resource]?.si.plural ??
-                      "ප්‍රධාන පුවරුව"
-                    : resourceConfigs[resource]?.en.plural ?? "Dashboard"}
+                  : resource === "reports"
+                    ? si
+                      ? "වාර්තා"
+                      : "Reports"
+                    : si
+                      ? (resourceConfigs[resource]?.si.plural ??
+                        "ප්‍රධාන පුවරුව")
+                      : (resourceConfigs[resource]?.en.plural ?? "Dashboard")}
               </h1>
               <p className="text-[#6b7280] dark:text-[#9ca3af] text-sm md:text-base">
                 {resource === "overview"
@@ -456,12 +509,27 @@ export function Dashboard() {
           </div>
 
           {/* Content */}
-          {resource === "overview" ? (
+          {(resource === "queues" || resource === "appointments") && (
+            <WorkflowPanel kind={resource} role={role} />
+          )}
+          {resource === "reports" ? (
+            <OperationsReport />
+          ) : resource === "overview" ? (
             <OverviewDashboard />
           ) : resourceConfigs[resource] ? (
             <ResourcePanel
               key={resource}
-              config={resourceConfigs[resource]}
+              config={{
+                ...resourceConfigs[resource],
+                canCreate:
+                  resourceConfigs[resource].canCreate &&
+                  canWrite(resource, role) &&
+                  !(resource === "prescriptions" && role === "staff"),
+                canEdit:
+                  resourceConfigs[resource].canEdit && canWrite(resource, role),
+                canDelete:
+                  resourceConfigs[resource].canDelete && role === "admin",
+              }}
             />
           ) : (
             <div className="p-12 text-center text-[#9ca3af]">

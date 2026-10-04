@@ -101,6 +101,16 @@ createServer(async (req, res) => {
     return req.headers.authorization === "Bearer fixture-access"
       ? send(200, profile)
       : send(401, { detail: "Expired" });
+  if (req.url === "/v1/queues/fixture/call-next" && req.method === "POST")
+    return req.headers.authorization === "Bearer fixture-access"
+      ? send(200, {
+          id: "fixture-token",
+          label: "001",
+          status: "CALLED",
+          version: 2,
+          received_key: req.headers["idempotency-key"],
+        })
+      : send(401, {});
   if (req.url === "/v1/auth/logout") {
     res.writeHead(204);
     return res.end();

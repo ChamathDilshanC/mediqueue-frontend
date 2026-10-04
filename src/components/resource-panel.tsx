@@ -57,7 +57,10 @@ import type { ResourceConfig, FieldDef } from "@/lib/resource-config";
 
 function getFieldIcon(key: string, type: string) {
   const k = key.toLowerCase();
-  const iconProps = { size: 14, className: "text-[#76aa32] dark:text-[#8bc34a] shrink-0" };
+  const iconProps = {
+    size: 14,
+    className: "text-[#76aa32] dark:text-[#8bc34a] shrink-0",
+  };
 
   if (k.includes("hospital")) return <Hospital {...iconProps} />;
   if (k.includes("branch")) return <Building2 {...iconProps} />;
@@ -66,20 +69,42 @@ function getFieldIcon(key: string, type: string) {
   if (k.includes("bed")) return <DoorOpen {...iconProps} />;
   if (k.includes("admission")) return <Activity {...iconProps} />;
   if (k.includes("room")) return <DoorOpen {...iconProps} />;
-  if (k.includes("doctor") || k.includes("staff")) return <Stethoscope {...iconProps} />;
-  if (k.includes("user") || k.includes("patient")) return <UserCheck {...iconProps} />;
+  if (k.includes("doctor") || k.includes("staff"))
+    return <Stethoscope {...iconProps} />;
+  if (k.includes("user") || k.includes("patient"))
+    return <UserCheck {...iconProps} />;
   if (k.includes("queue")) return <Users {...iconProps} />;
   if (k.includes("name")) return <Tag {...iconProps} />;
-  if (k.includes("code") || k.includes("number") || k.includes("token")) return <Hash {...iconProps} />;
-  if (k.includes("address") || k.includes("location") || k.includes("floor") || k.includes("building")) return <MapPin {...iconProps} />;
-  if (k.includes("phone") || k.includes("contact") || k.includes("extension")) return <Phone {...iconProps} />;
+  if (k.includes("code") || k.includes("number") || k.includes("token"))
+    return <Hash {...iconProps} />;
+  if (
+    k.includes("address") ||
+    k.includes("location") ||
+    k.includes("floor") ||
+    k.includes("building")
+  )
+    return <MapPin {...iconProps} />;
+  if (k.includes("phone") || k.includes("contact") || k.includes("extension"))
+    return <Phone {...iconProps} />;
   if (k.includes("email")) return <Mail {...iconProps} />;
-  if (k.includes("capacity") || k.includes("count")) return <Users {...iconProps} />;
-  if (k.includes("status") || k.includes("active")) return <Activity {...iconProps} />;
+  if (k.includes("capacity") || k.includes("count"))
+    return <Users {...iconProps} />;
+  if (k.includes("status") || k.includes("active"))
+    return <Activity {...iconProps} />;
   if (k.includes("role")) return <ShieldCheck {...iconProps} />;
-  if (k.includes("time") || k.includes("date") || k.includes("start") || k.includes("end") || k.includes("admitted") || k.includes("discharged")) return <CalendarClock {...iconProps} />;
-  if (k.includes("note") || k.includes("desc")) return <AlignLeft {...iconProps} />;
-  if (k.includes("fee") || k.includes("price") || k.includes("cost")) return <CreditCard {...iconProps} />;
+  if (
+    k.includes("time") ||
+    k.includes("date") ||
+    k.includes("start") ||
+    k.includes("end") ||
+    k.includes("admitted") ||
+    k.includes("discharged")
+  )
+    return <CalendarClock {...iconProps} />;
+  if (k.includes("note") || k.includes("desc"))
+    return <AlignLeft {...iconProps} />;
+  if (k.includes("fee") || k.includes("price") || k.includes("cost"))
+    return <CreditCard {...iconProps} />;
 
   if (type === "number") return <Hash {...iconProps} />;
   if (type === "boolean") return <ToggleLeft {...iconProps} />;
@@ -100,19 +125,44 @@ const PAGE_SIZE = 20;
 
 function statusColor(status: string) {
   const s = status.toUpperCase();
-  if (["ACTIVE", "BOOKED", "WAITING", "TRUE", "AVAILABLE", "ADMITTED"].includes(s))
+  if (
+    ["ACTIVE", "BOOKED", "WAITING", "TRUE", "AVAILABLE", "ADMITTED"].includes(s)
+  )
     return "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/40 dark:text-green-400 dark:border-green-800";
-  if (["CHECKED_IN", "SERVING", "CALLED", "RESERVED", "CLEANING", "TRANSFERRED"].includes(s))
+  if (
+    [
+      "CHECKED_IN",
+      "SERVING",
+      "CALLED",
+      "RESERVED",
+      "CLEANING",
+      "TRANSFERRED",
+    ].includes(s)
+  )
     return "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800";
   if (["COMPLETED", "DISCHARGED", "OCCUPIED"].includes(s))
     return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800";
-  if (["CANCELLED", "NO_SHOW", "FALSE", "INACTIVE", "REJECTED", "MAINTENANCE"].includes(s))
+  if (
+    [
+      "CANCELLED",
+      "NO_SHOW",
+      "FALSE",
+      "INACTIVE",
+      "REJECTED",
+      "MAINTENANCE",
+    ].includes(s)
+  )
     return "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-800";
   return "bg-[#f9fafb] dark:bg-gray-800 text-[#4b5563] dark:text-[#9ca3af] border-[#e5e7eb] dark:border-gray-700";
 }
 
 function StatusBadge({ value }: { value: string }) {
-  const display = value === "TRUE" ? "ACTIVE" : value === "FALSE" ? "INACTIVE" : value.replace(/_/g, " ");
+  const display =
+    value === "TRUE"
+      ? "ACTIVE"
+      : value === "FALSE"
+        ? "INACTIVE"
+        : value.replace(/_/g, " ");
   return (
     <span
       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold border uppercase tracking-wider ${statusColor(value)}`}
@@ -122,7 +172,11 @@ function StatusBadge({ value }: { value: string }) {
   );
 }
 
-function formatRefDisplay(refResource: string, refLabel: string, opt: Row): string {
+function formatRefDisplay(
+  refResource: string,
+  refLabel: string,
+  opt: Row,
+): string {
   const primary = opt[refLabel];
   if (refLabel === "starts_at" && typeof primary === "string") {
     return new Date(primary).toLocaleString();
@@ -186,10 +240,16 @@ function cellValue(
 
   if (typeof value === "object")
     return (
-      <span className="text-xs text-[#6b7280] dark:text-[#9ca3af]">{JSON.stringify(value)}</span>
+      <span className="text-xs text-[#6b7280] dark:text-[#9ca3af]">
+        {JSON.stringify(value)}
+      </span>
     );
 
-  return <span className="text-sm text-[#111827] dark:text-gray-100">{String(value)}</span>;
+  return (
+    <span className="text-sm text-[#111827] dark:text-gray-100">
+      {String(value)}
+    </span>
+  );
 }
 
 /* ─────────────────── Create / Edit Dialog ─────────────────── */
@@ -219,7 +279,7 @@ function FormDialog({
     (f) =>
       f.type !== "readonly" &&
       config.inputFields.includes(f.key) &&
-      (editing ? !f.createOnly : !f.editOnly)
+      (editing ? !f.createOnly : !f.editOnly),
   );
 
   // Group fields into steps (up to 3 fields per step for multi-step UX)
@@ -237,7 +297,17 @@ function FormDialog({
       if (editing) {
         initial[f.key] = String(editing[f.key] ?? "");
       } else {
-        initial[f.key] = f.type === "number" ? "20" : f.type === "boolean" ? "true" : "";
+        initial[f.key] =
+          f.defaultValue ??
+          (f.type === "select"
+            ? (f.options?.[0]?.value ?? "")
+            : f.type === "number"
+              ? f.required
+                ? "0"
+                : ""
+              : f.type === "boolean"
+                ? "true"
+                : "");
       }
     }
     setFormData(initial);
@@ -250,7 +320,9 @@ function FormDialog({
     for (const f of fieldsInStep) {
       const val = formData[f.key] ?? "";
       if (f.required && !val.trim()) {
-        setError(`${language === "si" ? f.si : f.en} ${language === "si" ? "අවශ්‍ය වේ" : "is required"}`);
+        setError(
+          `${language === "si" ? f.si : f.en} ${language === "si" ? "අවශ්‍ය වේ" : "is required"}`,
+        );
         return false;
       }
     }
@@ -295,12 +367,22 @@ function FormDialog({
     const body: Record<string, unknown> = {};
     for (const f of editableFields) {
       const val = formData[f.key] ?? "";
-      if (f.type === "number") body[f.key] = Number(val);
-      else if (f.type === "datetime") body[f.key] = val;
+      if (f.type === "number")
+        body[f.key] = val === "" && !f.required ? null : Number(val);
+      else if (f.type === "datetime")
+        body[f.key] = val ? new Date(val).toISOString() : null;
+      else if (f.type === "uuid-ref" && !val && !f.required) body[f.key] = null;
       else if (f.type === "boolean") body[f.key] = val === "true";
       else body[f.key] = val;
     }
 
+    if (editing?.version !== undefined) body.version = editing.version;
+    // References marked create-only remain part of complete replacement bodies.
+    if (editing)
+      for (const f of config.fields) {
+        if (f.createOnly && config.inputFields.includes(f.key))
+          body[f.key] = editing[f.key];
+      }
     try {
       const url = editing
         ? `/api/backend/${config.endpoint}/${editing.id}`
@@ -316,7 +398,15 @@ function FormDialog({
       }
       if (!resp.ok) {
         const data = await resp.json().catch(() => null);
-        setError(data?.detail ?? `Error ${resp.status}`);
+        setError(
+          typeof data?.detail === "string"
+            ? data.detail
+            : Array.isArray(data?.detail)
+              ? data.detail
+                  .map((item: { msg?: string }) => item.msg || "Invalid field")
+                  .join("; ")
+              : `Error ${resp.status}`,
+        );
         setSubmitting(false);
         return;
       }
@@ -369,7 +459,9 @@ function FormDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md p-4 overflow-y-auto">
-      <div className={`w-full ${modalWidthClass} max-h-[90vh] bg-white dark:bg-[#18181b] rounded-3xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border border-gray-200/50 dark:border-gray-800/50 overflow-hidden animate-in fade-in zoom-in-95 duration-300 flex flex-col my-auto`}>
+      <div
+        className={`w-full ${modalWidthClass} max-h-[90vh] bg-white dark:bg-[#18181b] rounded-3xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border border-gray-200/50 dark:border-gray-800/50 overflow-hidden animate-in fade-in zoom-in-95 duration-300 flex flex-col my-auto`}
+      >
         {/* Multistep Header */}
         <div className="flex flex-col px-6 pt-5 pb-4 border-b border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#18181b] shrink-0">
           <div className="flex items-center justify-between mb-3">
@@ -378,7 +470,9 @@ function FormDialog({
                 {editing ? <Pencil size={20} /> : <Sparkles size={20} />}
               </div>
               <div>
-                <h3 className="text-lg font-bold text-[#111827] dark:text-gray-100">{title}</h3>
+                <h3 className="text-lg font-bold text-[#111827] dark:text-gray-100">
+                  {title}
+                </h3>
                 {steps.length > 1 && (
                   <p className="text-xs text-[#76aa32] dark:text-[#8bc34a] font-semibold mt-0.5 flex items-center gap-1.5">
                     <Sparkles size={12} className="shrink-0 animate-pulse" />
@@ -429,7 +523,9 @@ function FormDialog({
                     </span>
                     <span className="flex items-center gap-1 whitespace-nowrap">
                       {stepIcons[idx] ?? <Sparkles size={12} />}
-                      {language === "si" ? stepTitlesSi[idx] ?? `පියවර ${idx + 1}` : stepTitlesEn[idx] ?? `Step ${idx + 1}`}
+                      {language === "si"
+                        ? (stepTitlesSi[idx] ?? `පියවර ${idx + 1}`)
+                        : (stepTitlesEn[idx] ?? `Step ${idx + 1}`)}
                     </span>
                   </button>
                 ))}
@@ -454,14 +550,19 @@ function FormDialog({
 
             return (
               <div key={f.key} className="flex flex-col gap-2 relative">
-                <label className="text-[13px] font-semibold tracking-wide text-gray-700 dark:text-gray-300 ml-1 flex items-center justify-between">
+                <label
+                  htmlFor={`${config.key}-${f.key}`}
+                  className="text-[13px] font-semibold tracking-wide text-gray-700 dark:text-gray-300 ml-1 flex items-center justify-between"
+                >
                   <span className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-lg bg-[#76aa32]/10 dark:bg-[#76aa32]/20 flex items-center justify-center shrink-0 border border-[#76aa32]/20">
                       {getFieldIcon(f.key, f.type)}
                     </span>
                     <span>
                       {label(f)}
-                      {f.required && <span className="text-red-500 ml-1">*</span>}
+                      {f.required && (
+                        <span className="text-red-500 ml-1">*</span>
+                      )}
                     </span>
                   </span>
                   {placeholderText && (
@@ -472,17 +573,30 @@ function FormDialog({
                 </label>
                 {f.type === "uuid-ref" ? (
                   <MorphSelect
+                    id={`${config.key}-${f.key}`}
                     value={formData[f.key] ?? undefined}
                     onValueChange={(val) =>
                       setFormData((prev) => ({ ...prev, [f.key]: val }))
                     }
                   >
-                    <MorphSelectTrigger className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] w-full flex items-center justify-between focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm">
-                      <MorphSelectValue placeholder={`— ${language === "si" ? "තෝරන්න" : "Select"} —`} />
+                    <MorphSelectTrigger
+                      className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] w-full flex items-center justify-between focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm"
+                    >
+                      <MorphSelectValue
+                        placeholder={`— ${language === "si" ? "තෝරන්න" : "Select"} —`}
+                      />
                     </MorphSelectTrigger>
-                    <MorphSelectContent searchable searchPlaceholder={language === "si" ? "සොයන්න..." : "Search..."}>
+                    <MorphSelectContent
+                      searchable
+                      searchPlaceholder={
+                        language === "si" ? "සොයන්න..." : "Search..."
+                      }
+                    >
                       {(refCache[f.refResource!] ?? []).map((opt) => (
-                        <MorphSelectItem key={String(opt.id)} value={String(opt.id)}>
+                        <MorphSelectItem
+                          key={String(opt.id)}
+                          value={String(opt.id)}
+                        >
                           {formatRefDisplay(f.refResource!, f.refLabel!, opt)}
                         </MorphSelectItem>
                       ))}
@@ -490,15 +604,25 @@ function FormDialog({
                   </MorphSelect>
                 ) : f.type === "select" ? (
                   <MorphSelect
+                    id={`${config.key}-${f.key}`}
                     value={formData[f.key] ?? undefined}
                     onValueChange={(val) =>
                       setFormData((prev) => ({ ...prev, [f.key]: val }))
                     }
                   >
-                    <MorphSelectTrigger className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] w-full flex items-center justify-between focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm">
-                      <MorphSelectValue placeholder={`— ${language === "si" ? "තෝරන්න" : "Select"} —`} />
+                    <MorphSelectTrigger
+                      className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] w-full flex items-center justify-between focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm"
+                    >
+                      <MorphSelectValue
+                        placeholder={`— ${language === "si" ? "තෝරන්න" : "Select"} —`}
+                      />
                     </MorphSelectTrigger>
-                    <MorphSelectContent searchable searchPlaceholder={language === "si" ? "සොයන්න..." : "Search..."}>
+                    <MorphSelectContent
+                      searchable
+                      searchPlaceholder={
+                        language === "si" ? "සොයන්න..." : "Search..."
+                      }
+                    >
                       {(f.options ?? []).map((opt) => (
                         <MorphSelectItem key={opt.value} value={opt.value}>
                           {language === "si" ? opt.si : opt.en}
@@ -508,25 +632,41 @@ function FormDialog({
                   </MorphSelect>
                 ) : f.type === "boolean" ? (
                   <MorphSelect
+                    id={`${config.key}-${f.key}`}
                     value={formData[f.key] ?? "true"}
                     onValueChange={(val) =>
                       setFormData((prev) => ({ ...prev, [f.key]: val }))
                     }
                   >
-                    <MorphSelectTrigger className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] w-full flex items-center justify-between focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm">
-                      <MorphSelectValue placeholder={`— ${language === "si" ? "තෝරන්න" : "Select"} —`} />
+                    <MorphSelectTrigger
+                      className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] w-full flex items-center justify-between focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm"
+                    >
+                      <MorphSelectValue
+                        placeholder={`— ${language === "si" ? "තෝරන්න" : "Select"} —`}
+                      />
                     </MorphSelectTrigger>
                     <MorphSelectContent>
-                      <MorphSelectItem value="true">{language === "si" ? "සක්‍රිය" : "Active"}</MorphSelectItem>
-                      <MorphSelectItem value="false">{language === "si" ? "අක්‍රිය" : "Inactive"}</MorphSelectItem>
+                      <MorphSelectItem value="true">
+                        {language === "si" ? "සක්‍රිය" : "Active"}
+                      </MorphSelectItem>
+                      <MorphSelectItem value="false">
+                        {language === "si" ? "අක්‍රිය" : "Inactive"}
+                      </MorphSelectItem>
                     </MorphSelectContent>
                   </MorphSelect>
                 ) : f.type === "datetime" ? (
                   <input
+                    id={`${config.key}-${f.key}`}
                     type="datetime-local"
                     value={
                       formData[f.key]
-                        ? formData[f.key].slice(0, 16)
+                        ? new Date(
+                            new Date(formData[f.key]).getTime() -
+                              new Date(formData[f.key]).getTimezoneOffset() *
+                                60000,
+                          )
+                            .toISOString()
+                            .slice(0, 16)
                         : ""
                     }
                     onChange={(e) => {
@@ -541,21 +681,30 @@ function FormDialog({
                   />
                 ) : f.type === "number" ? (
                   <input
+                    id={`${config.key}-${f.key}`}
                     type="number"
                     value={formData[f.key] ?? ""}
                     onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, [f.key]: e.target.value }))
+                      setFormData((prev) => ({
+                        ...prev,
+                        [f.key]: e.target.value,
+                      }))
                     }
                     className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] focus:outline-none focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm"
                     required={f.required}
-                    min={1}
+                    min={f.min ?? 0}
+                    step={f.step ?? "any"}
                   />
                 ) : (
                   <input
+                    id={`${config.key}-${f.key}`}
                     type="text"
                     value={formData[f.key] ?? ""}
                     onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, [f.key]: e.target.value }))
+                      setFormData((prev) => ({
+                        ...prev,
+                        [f.key]: e.target.value,
+                      }))
                     }
                     placeholder={placeholderText ?? ""}
                     maxLength={f.maxLength}
@@ -578,11 +727,18 @@ function FormDialog({
                         const curYear = new Date().getFullYear();
                         const rand = Math.floor(1000 + Math.random() * 9000);
                         let sampleCode = "";
-                        if (f.key === "mrn") sampleCode = `MRN-${curYear}-${rand}`;
-                        else if (f.key === "ward_code") sampleCode = `WARD-${rand.toString().slice(0, 3)}`;
-                        else if (f.key === "bed_number") sampleCode = `BED-${rand.toString().slice(0, 3)}`;
-                        else if (f.key === "code") sampleCode = `DEPT-${rand.toString().slice(0, 2)}`;
-                        setFormData((prev) => ({ ...prev, [f.key]: sampleCode }));
+                        if (f.key === "mrn")
+                          sampleCode = `MRN-${curYear}-${rand}`;
+                        else if (f.key === "ward_code")
+                          sampleCode = `WARD-${rand.toString().slice(0, 3)}`;
+                        else if (f.key === "bed_number")
+                          sampleCode = `BED-${rand.toString().slice(0, 3)}`;
+                        else if (f.key === "code")
+                          sampleCode = `DEPT-${rand.toString().slice(0, 2)}`;
+                        setFormData((prev) => ({
+                          ...prev,
+                          [f.key]: sampleCode,
+                        }));
                       }}
                       className="text-[10px] font-bold underline hover:opacity-80 transition-opacity ml-2 uppercase tracking-wide cursor-pointer shrink-0"
                     >
@@ -682,10 +838,9 @@ function DeleteConfirm({
     setDeleting(true);
     setError("");
     try {
-      const resp = await fetch(
-        `/api/backend/${config.endpoint}/${row.id}`,
-        { method: "DELETE" },
-      );
+      const resp = await fetch(`/api/backend/${config.endpoint}/${row.id}`, {
+        method: "DELETE",
+      });
       if (resp.status === 401) {
         router.replace("/login");
         return;
@@ -733,17 +888,18 @@ function DeleteConfirm({
             </div>
           )}
           <div className="flex items-center gap-3">
-            <button
-              onClick={onClose}
-              className="button secondary"
-            >
+            <button onClick={onClose} className="button secondary">
               {language === "si" ? "අවලංගු කරන්න" : "Cancel"}
             </button>
             <button
               onClick={handleDelete}
               disabled={deleting}
               className="button primary flex items-center gap-2"
-              style={{ background: "#dc2626", borderColor: "#b91c1c", color: "white" }}
+              style={{
+                background: "#dc2626",
+                borderColor: "#b91c1c",
+                color: "white",
+              }}
             >
               {deleting && <Loader2 size={16} className="animate-spin" />}
               {language === "si" ? "මකන්න" : "Delete"}
@@ -774,10 +930,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
 
   // Fetch ref data for uuid-ref fields
   const refFields = useMemo(
-    () =>
-      config.fields.filter(
-        (f) => f.type === "uuid-ref" && f.refResource,
-      ),
+    () => config.fields.filter((f) => f.type === "uuid-ref" && f.refResource),
     [config.fields],
   );
 
@@ -786,10 +939,9 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
     await Promise.all(
       refFields.map(async (f) => {
         try {
-          const resp = await fetch(
-            `/api/backend/${f.refResource}?limit=200`,
-            { cache: "no-store" },
-          );
+          const resp = await fetch(`/api/backend/${f.refResource}?limit=200`, {
+            cache: "no-store",
+          });
           if (resp.ok) {
             cache[f.refResource!] = await resp.json();
           }
@@ -801,28 +953,40 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
     setRefCache(cache);
   }, [refFields]);
 
-  const fetcher = useCallback(async (url: string) => {
-    const resp = await fetch(url);
-    if (resp.status === 401) {
-      router.replace("/login");
-      throw new Error("401");
-    }
-    if (resp.status === 403) throw new Error("403");
-    if (!resp.ok) throw new Error("Unable to load");
-    const data = await resp.json();
-    if (!Array.isArray(data)) throw new Error("Invalid response");
-    return data;
-  }, [router]);
+  const fetcher = useCallback(
+    async (url: string) => {
+      const resp = await fetch(url);
+      if (resp.status === 401) {
+        router.replace("/login");
+        throw new Error("401");
+      }
+      if (resp.status === 403) throw new Error("403");
+      if (!resp.ok) throw new Error("Unable to load");
+      const data = await resp.json();
+      if (!Array.isArray(data)) throw new Error("Invalid response");
+      return data;
+    },
+    [router],
+  );
 
-  const { data: rowsData, error: swrError, mutate: mutateRows, isLoading } = useSWR(
+  const {
+    data: rowsData,
+    error: swrError,
+    mutate: mutateRows,
+    isLoading,
+  } = useSWR(
     `/api/backend/${config.endpoint}?limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}`,
-    fetcher
+    fetcher,
   );
 
   const rows: Row[] = rowsData ?? [];
   const loading = isLoading;
-  const error = swrError?.message === "403" ? t.accessDenied : (swrError ? t.unavailable : "");
-
+  const error =
+    swrError?.message === "403"
+      ? t.accessDenied
+      : swrError
+        ? t.unavailable
+        : "";
 
   useEffect(() => {
     void loadRefs();
@@ -887,7 +1051,9 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
               <h2 className="text-xl font-bold text-[#111827] dark:text-gray-100">
                 {meta.plural}
               </h2>
-              <p className="text-sm text-[#6b7280] dark:text-[#9ca3af] mt-1">{meta.description}</p>
+              <p className="text-sm text-[#6b7280] dark:text-[#9ca3af] mt-1">
+                {meta.description}
+              </p>
             </div>
             {config.canCreate && config.inputFields.length > 0 && (
               <button
@@ -938,7 +1104,9 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
                   ? "දත්ත පූරණය කළ නොහැක"
                   : "Unable to load data"}
               </h3>
-              <p className="text-[#6b7280] dark:text-[#9ca3af] text-sm mb-6 max-w-md">{error}</p>
+              <p className="text-[#6b7280] dark:text-[#9ca3af] text-sm mb-6 max-w-md">
+                {error}
+              </p>
               <button
                 className="button secondary"
                 onClick={() => void mutateRows()}
@@ -948,10 +1116,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
             </div>
           ) : loading ? (
             <div className="p-16 flex flex-col items-center justify-center">
-              <Loader2
-                size={32}
-                className="animate-spin text-[#76aa32] mb-4"
-              />
+              <Loader2 size={32} className="animate-spin text-[#76aa32] mb-4" />
               <p className="text-[#6b7280] dark:text-[#9ca3af] text-sm">
                 {language === "si" ? "පූරණය වෙමින්…" : "Loading…"}
               </p>
@@ -1008,16 +1173,15 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
                     {(config.canEdit || config.canDelete) && (
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          {config.canEdit &&
-                            config.inputFields.length > 0 && (
-                              <button
-                                onClick={() => setEditRow(row)}
-                                className="p-2 text-[#9ca3af] hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
-                                title={language === "si" ? "සංස්කරණය" : "Edit"}
-                              >
-                                <Pencil size={15} />
-                              </button>
-                            )}
+                          {config.canEdit && config.inputFields.length > 0 && (
+                            <button
+                              onClick={() => setEditRow(row)}
+                              className="p-2 text-[#9ca3af] hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+                              title={language === "si" ? "සංස්කරණය" : "Edit"}
+                            >
+                              <Pencil size={15} />
+                            </button>
+                          )}
                           {config.canDelete && (
                             <button
                               onClick={() => setDeleteRow(row)}

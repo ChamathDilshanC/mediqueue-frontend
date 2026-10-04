@@ -4581,3 +4581,22 @@ html[data-theme="dark"] .queue-card h3 {
 html[data-theme="dark"] .queue-card p {
   color: var(--content-secondary);
 }
+
+.patient-portal { padding-top: 40px; padding-bottom: 64px; }
+.patient-heading { display: flex; justify-content: space-between; gap: 24px; align-items: center; margin-bottom: 32px; }
+.patient-heading h1 { font-size: clamp(26px, 4vw, 42px); font-weight: 700; margin: 12px 0; }
+.patient-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.patient-records { grid-column: 1 / -1; }
+.patient-portal select, .patient-portal input { width: 100%; padding: 12px; border: 1px solid var(--border, #d1d5db); border-radius: 12px; background: transparent; margin: 8px 0 16px; }
+.patient-portal label { display: block; font-size: 14px; font-weight: 500; }
+.patient-list article { padding: 20px 0; border-bottom: 1px solid #9ca3af40; }
+.patient-list article:last-child { border-bottom: 0; }
+.patient-list article p { margin: 8px 0 16px; }
+.patient-list article .button { margin: 10px 8px 0 0; }
+.patient-list dl > div { display: grid; grid-template-columns: 150px 1fr; gap: 16px; padding: 6px 0; }
+.patient-list dt { text-transform: capitalize; opacity: .7; }
+.patient-list dd { white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (max-width: 700px) { .patient-grid { grid-template-columns: 1fr; } .patient-heading { align-items: flex-start; flex-direction: column; } .patient-list dl > div { grid-template-columns: 100px 1fr; } }
+.report-values > div { display: flex; gap: 24px; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #9ca3af30; }
+.report-values dt { text-transform: capitalize; }
+.report-values dd { font-weight: 700; }

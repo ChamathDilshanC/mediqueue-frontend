@@ -1,4 +1,5 @@
 export const resources = [
+  { key: "reports", label: "Reports", si: "වාර්තා" },
   { key: "hospitals", label: "Hospitals", si: "රෝහල්" },
   { key: "branches", label: "Branches", si: "ශාඛා" },
   { key: "users", label: "Users", si: "පරිශීලකයන්" },
@@ -7,7 +8,11 @@ export const resources = [
   { key: "rooms", label: "Rooms", si: "කාමර" },
   { key: "wards", label: "Wards", si: "වෝඩ්" },
   { key: "beds", label: "Beds", si: "ඇඳන්" },
-  { key: "ward-admissions", label: "Ward Admissions", si: "වෝඩ් ඇතුළත් කිරීම්" },
+  {
+    key: "ward-admissions",
+    label: "Ward Admissions",
+    si: "වෝඩ් ඇතුළත් කිරීම්",
+  },
   { key: "doctors", label: "Doctors", si: "වෛද්‍යවරු" },
   { key: "schedules", label: "Schedules", si: "කාලසටහන්" },
   { key: "patients", label: "Patients", si: "රෝගීන්" },
@@ -15,6 +20,11 @@ export const resources = [
   { key: "visits", label: "Visits", si: "රෝහල් පැමිණීම්" },
   { key: "appointments", label: "Appointments", si: "හමුවීම්" },
   { key: "audit-events", label: "Audit events", si: "විගණන සටහන්" },
+  { key: "clinical-records", label: "Clinical records", si: "සායනික වාර්තා" },
+  { key: "prescriptions", label: "Prescriptions", si: "ඖෂධ වට්ටෝරු" },
+  { key: "lab-orders", label: "Lab orders", si: "පරීක්ෂණ ඉල්ලීම්" },
+  { key: "invoices", label: "Invoices", si: "බිල්පත්" },
+  { key: "inventory", label: "Inventory", si: "තොග කළමනාකරණය" },
+  { key: "staff-directory", label: "Staff directory", si: "කාර්ය මණ්ඩලය" },
 ] as const;
 export type ResourceKey = (typeof resources)[number]["key"];
-

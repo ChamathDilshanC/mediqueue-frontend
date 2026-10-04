@@ -75,7 +75,14 @@ export function Account() {
       <SiteHeader simple />
       <main className="account-page container">
         <div className="account-toolbar">
-          <Link href="/dashboard" className="button primary">
+          <Link
+            href={
+              profile?.memberships.some((m) => m.active)
+                ? "/dashboard"
+                : "/patient"
+            }
+            className="button primary"
+          >
             <LayoutGrid size={16} />
             {t.backToDashboard}
           </Link>
@@ -112,6 +119,9 @@ export function Account() {
               <h1>{t.accountTitle}</h1>
               <p>{t.accountIntro}</p>
             </div>
+            <Link className="button secondary mb-6" href="/patient">
+              Patient portal / රෝගී සේවා
+            </Link>
             <div className="account-grid">
               <section className="account-card">
                 <UserRound size={23} />
@@ -142,6 +152,18 @@ export function Account() {
                           {t.branch}:{" "}
                           <span className="latin">{m.branch_id}</span>
                         </small>
+                        {m.active && (
+                          <button
+                            className="button secondary"
+                            onClick={() => {
+                              document.cookie = `active_tenant_id=${m.tenant_id}; path=/; SameSite=Lax`;
+                              document.cookie = `active_branch_id=${m.branch_id}; path=/; SameSite=Lax`;
+                              window.location.assign("/dashboard");
+                            }}
+                          >
+                            {t.backToDashboard}
+                          </button>
+                        )}
                       </li>
                     ))}
                   </ul>

@@ -63,6 +63,7 @@ function useMorphContext(component: string) {
 }
 
 export interface MorphSelectProps {
+  id?: string;
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
@@ -72,6 +73,7 @@ export interface MorphSelectProps {
 }
 
 export function MorphSelect({
+  id,
   value,
   defaultValue,
   onValueChange,
@@ -154,7 +156,7 @@ export function MorphSelect({
       setSearchQuery,
       reduce,
       layoutId: `${baseId}-surface`,
-      triggerId: `${baseId}-trigger`,
+      triggerId: id ?? `${baseId}-trigger`,
       listId: `${baseId}-list`,
       disabled,
     }),
@@ -169,6 +171,7 @@ export function MorphSelect({
       searchQuery,
       reduce,
       baseId,
+      id,
       disabled,
     ],
   );
