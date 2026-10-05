@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  CalendarDays,
+  FileText,
+  Ticket,
   ArrowLeft,
   ArrowRight,
   Check,
@@ -15,7 +18,6 @@ import {
 } from "lucide-react";
 import { gooeyToast } from "goey-toast";
 import { SiteHeader } from "./site-header";
-import { QueuePreview } from "./queue-preview";
 import { Loader } from "./loader";
 import { useLanguage } from "./providers";
 import type { Messages } from "@/lib/translations";
@@ -161,15 +163,17 @@ export function AuthForm({
               </span>
               <p className="eyebrow">MEDIQUEUE</p>
               {!recovery && (
-                <nav className="flex gap-3 mb-4" aria-label="Sign in options">
+                <nav className="auth-audience" aria-label="Sign in options">
                   <Link
-                    className={`button ${audience === "patient" ? "primary" : "secondary"}`}
+                    aria-current={audience === "patient" ? "page" : undefined}
+                    className="auth-audience-option"
                     href={`/patient/${register ? "register" : "login"}`}
                   >
                     {language === "si" ? "රෝගී" : "Patient"}
                   </Link>
                   <Link
-                    className={`button ${audience === "staff" ? "primary" : "secondary"}`}
+                    aria-current={audience === "staff" ? "page" : undefined}
+                    className="auth-audience-option"
                     href={`/${register ? "register" : "login"}`}
                   >
                     {language === "si"
@@ -232,7 +236,7 @@ export function AuthForm({
                         required
                         maxLength={200}
                         placeholder={t.namePlaceholder}
-                        disabled={busy}
+                        disabled={busy || googleBusy}
                       />
                     </span>
                   </label>
@@ -248,7 +252,7 @@ export function AuthForm({
                       required
                       maxLength={254}
                       placeholder="you@example.com"
-                      disabled={busy}
+                      disabled={busy || googleBusy}
                       spellCheck={false}
                     />
                   </span>
@@ -274,7 +278,7 @@ export function AuthForm({
                         minLength={8}
                         maxLength={128}
                         placeholder="••••••••"
-                        disabled={busy}
+                        disabled={busy || googleBusy}
                         aria-describedby={
                           register ? "password-hint" : undefined
                         }
@@ -282,6 +286,7 @@ export function AuthForm({
                       <button
                         type="button"
                         className="password-toggle"
+                        disabled={busy || googleBusy}
                         onClick={() => setVisible(!visible)}
                         aria-label={visible ? t.hidePassword : t.showPassword}
                         aria-pressed={visible}
@@ -365,7 +370,56 @@ export function AuthForm({
             <br />
             <span>{t.hero2}</span>
           </h2>
-          <QueuePreview compact />
+          <div className="auth-care-preview">
+            <span className="auth-preview-label">
+              {language === "si"
+                ? "ඔබේ සේවා එකම තැනකින්"
+                : "Everything you need for your visit"}
+            </span>
+            {[
+              {
+                Icon: CalendarDays,
+                title:
+                  language === "si"
+                    ? "පහසු හමුවීම්"
+                    : "Appointments made simple",
+                body:
+                  language === "si"
+                    ? "ඔබට ගැළපෙන රෝහලක් සහ සැසියක් සොයන්න."
+                    : "Find a hospital and a session that works for you.",
+              },
+              {
+                Icon: Ticket,
+                title:
+                  language === "si" ? "ඔබේ වාරය දැනගන්න" : "Stay up to date",
+                body:
+                  language === "si"
+                    ? "ඔබේ ටිකට්පත සහ පෝලිම් තොරතුරු බලන්න."
+                    : "Keep your ticket and queue updates close at hand.",
+              },
+              {
+                Icon: FileText,
+                title:
+                  language === "si"
+                    ? "සෞඛ්‍ය තොරතුරු"
+                    : "Your care in one place",
+                body:
+                  language === "si"
+                    ? "හමුවීම් සහ වාර්තා පහසුවෙන් බලන්න."
+                    : "View your appointments and health records.",
+              },
+            ].map(({ Icon, title, body }) => (
+              <div className="auth-feature" key={title}>
+                <span>
+                  <Icon size={22} />
+                </span>
+                <div>
+                  <h3>{title}</h3>
+                  <p>{body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
           <p className="auth-visual-caption">{t.built}</p>
         </aside>
       </main>

@@ -10,6 +10,8 @@ import {
   MapPin,
   X,
 } from "lucide-react";
+import { appointmentLabels } from "./appointment-inbox";
+import { ModalSurface } from "./ui/modal-surface";
 import { PatientShell } from "./patient-shell";
 import { PatientQueue } from "./patient-queue";
 import { useLanguage } from "./providers";
@@ -47,6 +49,7 @@ type Overview = {
   appointments: {
     id: string;
     status: string;
+    review_reason?: string;
     doctor: string;
     starts_at: string;
     center?: string;
@@ -116,6 +119,14 @@ export function PatientPortal() {
     void load();
   }, [load]);
   useEffect(() => {
+    const timer = window.setInterval(() => {
+      void request("overview")
+        .then(setOverview)
+        .catch(() => undefined);
+    }, 15000);
+    return () => window.clearInterval(timer);
+  }, [request]);
+  useEffect(() => {
     setSlots([]);
     setSessionsError("");
     setConfirmSlot(null);
@@ -151,8 +162,8 @@ export function PatientPortal() {
       setNotice(
         path === "appointments"
           ? si
-            ? "හමුවීම සාර්ථකව වෙන්කරන ලදී. මගේ හමුවීම් යටතේ විස්තර බලන්න."
-            : "Appointment confirmed. Your booking is listed under My appointments."
+            ? "හමුවීම ඉල්ලා ඇත. රෝහලේ අනුමැතිය මගේ හමුවීම් යටතේ බලන්න."
+            : "Appointment requested. The hospital will review it. Track the status under My appointments."
           : si
             ? "සාර්ථකව සුරකින ලදී"
             : "Saved successfully",
@@ -208,8 +219,9 @@ export function PatientPortal() {
             <CalendarDays size={22} />
             <span>{si ? "ඉදිරි හමුවීම්" : "Upcoming appointments"}</span>
             <strong>
-              {overview?.appointments.filter((a) => a.status === "BOOKED")
-                .length ?? "—"}
+              {overview?.appointments.filter((a) =>
+                ["PENDING", "BOOKED", "CHECKED_IN"].includes(a.status),
+              ).length ?? "—"}
             </strong>
           </article>
           <article>
@@ -430,8 +442,13 @@ export function PatientPortal() {
                     </p>
                   )}
                   {a.address && <small>{a.address}</small>}
-                  <span className="eyebrow-pill">{a.status}</span>
-                  {a.status === "BOOKED" && (
+                  <span
+                    className={`appointment-status status-${a.status.toLowerCase()}`}
+                  >
+                    {appointmentLabels[a.status]?.[si ? 1 : 0] || a.status}
+                  </span>
+                  {a.review_reason && <p>{a.review_reason}</p>}
+                  {["PENDING", "BOOKED"].includes(a.status) && (
                     <button
                       disabled={busy}
                       className="button secondary"
@@ -526,33 +543,12 @@ export function PatientPortal() {
         </div>
       </main>
       {confirmSlot && (
-        <div className="booking-dialog-backdrop">
-          <section
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="booking-confirm-title"
-            className="booking-dialog"
-            tabIndex={-1}
-            onKeyDown={(e) => {
-              if (e.key === "Escape" && !busy) setConfirmSlot(null);
-              if (e.key === "Tab") {
-                const controls = Array.from(
-                  e.currentTarget.querySelectorAll<HTMLElement>(
-                    "button:not(:disabled), a[href], input:not(:disabled)",
-                  ),
-                );
-                const first = controls[0],
-                  last = controls[controls.length - 1];
-                if (e.shiftKey && document.activeElement === first) {
-                  e.preventDefault();
-                  last?.focus();
-                } else if (!e.shiftKey && document.activeElement === last) {
-                  e.preventDefault();
-                  first?.focus();
-                }
-              }
-            }}
-          >
+        <ModalSurface
+          label={si ? "හමුවීම තහවුරු කරන්න" : "Confirm your appointment"}
+          onClose={() => setConfirmSlot(null)}
+          busy={busy}
+        >
+          <section className="booking-dialog">
             <button
               className="care-icon-button booking-dialog-close"
               aria-label={si ? "වසන්න" : "Close confirmation"}
@@ -618,7 +614,7 @@ export function PatientPortal() {
               </button>
             </div>
           </section>
-        </div>
+        </ModalSurface>
       )}
     </PatientShell>
   );

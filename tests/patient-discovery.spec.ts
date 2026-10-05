@@ -92,7 +92,7 @@ test("patient finds nearest hospital, enrolls, confirms a session and sees live 
             ? [
                 {
                   id: "appointment",
-                  status: "BOOKED",
+                  status: "PENDING",
                   doctor: "Dr. Perera",
                   starts_at: "2026-12-01T04:00:00Z",
                   center: centers[0].name,
@@ -170,7 +170,7 @@ test("patient finds nearest hospital, enrolls, confirms a session and sees live 
       booked = true;
       return route.fulfill({
         status: 201,
-        json: { id: "appointment", status: "BOOKED" },
+        json: { id: "appointment", status: "PENDING" },
       });
     }
     return route.fulfill({
@@ -229,7 +229,7 @@ test("patient finds nearest hospital, enrolls, confirms a session and sees live 
     .click();
   await expect(
     page.getByText(
-      "Appointment confirmed. Your booking is listed under My appointments.",
+      "Appointment requested. The hospital will review it. Track the status under My appointments.",
     ),
   ).toBeVisible();
   await expect(page.locator("#my-appointments")).toContainText("Dr. Perera");

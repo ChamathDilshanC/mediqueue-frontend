@@ -1,13 +1,7 @@
 "use client";
 
 import { Check, ChevronDown } from "lucide-react";
-import {
-  AnimatePresence,
-  motion,
-  type Transition,
-  useReducedMotion,
-  type Variants,
-} from "motion/react";
+import { useReducedMotion } from "motion/react";
 import {
   createContext,
   type ReactNode,
@@ -21,18 +15,6 @@ import {
   useState,
 } from "react";
 import { cn } from "@/lib/utils";
-
-const MORPH: Transition = { type: "spring", duration: 0.5, bounce: 0.22 };
-const ROW =
-  "flex w-full items-center justify-between gap-2 px-3.5 py-2.5 text-sm";
-const LIST: Variants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.035, delayChildren: 0.08 } },
-};
-const ITEM: Variants = {
-  hidden: { opacity: 0, y: -6, filter: "blur(3px)" },
-  show: { opacity: 1, y: 0, filter: "blur(0px)" },
-};
 
 interface MorphContextValue {
   value: string | undefined;
@@ -51,6 +33,7 @@ interface MorphContextValue {
   triggerId: string;
   listId: string;
   disabled: boolean;
+  options: { label: string }[];
 }
 
 const MorphContext = createContext<MorphContextValue | null>(null);
@@ -142,6 +125,7 @@ export function MorphSelect({
 
   const context = useMemo<MorphContextValue>(
     () => ({
+      options: Array.from(labels.values()),
       value: current,
       open,
       setOpen,
@@ -178,7 +162,14 @@ export function MorphSelect({
 
   return (
     <MorphContext.Provider value={context}>
-      <div ref={rootRef} className={cn("relative", className)}>
+      <div
+        ref={rootRef}
+        className={cn("relative mq-select", className)}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node))
+            setOpen(false);
+        }}
+      >
         {children}
       </div>
     </MorphContext.Provider>
@@ -218,47 +209,29 @@ export function MorphSelectTrigger({
 }) {
   const context = useMorphContext("MorphSelectTrigger");
   return (
-    <>
-      <div
+    <button
+      type="button"
+      id={context.triggerId}
+      disabled={context.disabled}
+      aria-haspopup="listbox"
+      aria-expanded={context.open}
+      aria-controls={context.listId}
+      onClick={() => context.setOpen(!context.open)}
+      onKeyDown={(event) => {
+        if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+          event.preventDefault();
+          context.setOpen(true);
+        }
+      }}
+      className={cn("mq-select-trigger", className)}
+    >
+      <span className="min-w-0 truncate">{children}</span>
+      <ChevronDown
+        size={17}
         aria-hidden
-        inert
-        className={cn(ROW, "invisible rounded-xl border border-border")}
-      >
-        {children}
-        <ChevronDown className="h-4 w-4" />
-      </div>
-      <AnimatePresence initial={false} mode="popLayout">
-        {!context.open ? (
-          <motion.button
-            key="trigger"
-            layoutId={context.layoutId}
-            type="button"
-            id={context.triggerId}
-            disabled={context.disabled}
-            aria-haspopup="listbox"
-            aria-expanded={false}
-            aria-controls={context.listId}
-            onClick={() => context.setOpen(true)}
-            transition={context.reduce ? { duration: 0 } : MORPH}
-            style={{ borderRadius: 12 }}
-            className={cn(
-              ROW,
-              "absolute inset-x-0 top-0 z-10 border border-border bg-background text-foreground outline-none",
-              "hover:border-(--color-border-strong) focus-visible:ring-2 focus-visible:ring-foreground/20",
-              "disabled:pointer-events-none disabled:opacity-50",
-              className,
-            )}
-          >
-            <motion.span layout="position" className="min-w-0 truncate">
-              {children}
-            </motion.span>
-            <motion.span layout="position" className="text-muted-foreground">
-              <ChevronDown className="h-4 w-4" />
-            </motion.span>
-          </motion.button>
-        ) : null}
-      </AnimatePresence>
-    </>
+        className={context.open ? "rotate-180" : ""}
+      />
+    </button>
   );
 }
 
@@ -274,82 +247,88 @@ export function MorphSelectContent({
   searchPlaceholder?: string;
 }) {
   const context = useMorphContext("MorphSelectContent");
-  const label = context.labelFor(context.value);
-  
-  // Clear search when opening/closing
+  const panel = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!context.open) {
       context.setSearchQuery("");
+      return;
     }
-  }, [context.open, context.setSearchQuery]);
+    panel.current
+      ?.querySelector<HTMLElement>(
+        searchable ? "input" : '[role="option"]:not(:disabled)',
+      )
+      ?.focus();
+  }, [context.open, context.setSearchQuery, searchable]);
+  const empty = !context.options.some(({ label }) =>
+    label
+      .toLocaleLowerCase()
+      .includes(context.searchQuery.trim().toLocaleLowerCase()),
+  );
   return (
     <>
-      <div className="hidden">{children}</div>
-      <AnimatePresence initial={false} mode="popLayout">
-        {context.open ? (
-          <motion.div
-            key="panel"
-            layoutId={context.layoutId}
+      <div hidden aria-hidden>
+        {children}
+      </div>
+      {context.open && (
+        <div
+          ref={panel}
+          className={cn("mq-select-panel", className)}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              event.preventDefault();
+              event.stopPropagation();
+              context.setOpen(false);
+              document.getElementById(context.triggerId)?.focus();
+              return;
+            }
+            const options = Array.from(
+              panel.current?.querySelectorAll<HTMLButtonElement>(
+                '[role="option"]:not(:disabled)',
+              ) ?? [],
+            );
+            const index = options.indexOf(
+              document.activeElement as HTMLButtonElement,
+            );
+            let next = -1;
+            if (event.key === "ArrowDown") next = (index + 1) % options.length;
+            if (event.key === "ArrowUp")
+              next = (index - 1 + options.length) % options.length;
+            if (event.key === "Home" && index >= 0) next = 0;
+            if (event.key === "End" && index >= 0) next = options.length - 1;
+            if (next >= 0) {
+              event.preventDefault();
+              options[next]?.focus();
+            }
+          }}
+        >
+          {searchable && (
+            <div className="mq-select-search">
+              <input
+                type="search"
+                aria-label={searchPlaceholder}
+                placeholder={searchPlaceholder}
+                value={context.searchQuery}
+                onChange={(event) => context.setSearchQuery(event.target.value)}
+              />
+            </div>
+          )}
+          <ul
             id={context.listId}
             role="listbox"
             aria-labelledby={context.triggerId}
-            transition={context.reduce ? { duration: 0 } : MORPH}
-            style={{ borderRadius: 12 }}
-            className={cn(
-              "absolute inset-x-0 top-0 z-30 overflow-hidden border border-border bg-background shadow-lg",
-              className,
-            )}
+            className="mq-select-options"
           >
-            <motion.button
-              type="button"
-              layout="position"
-              aria-expanded
-              onClick={() => context.setOpen(false)}
-              className={cn(ROW, "outline-none")}
-            >
-              <span
-                className={cn(
-                  "min-w-0 truncate",
-                  label ? "text-foreground" : "text-muted-foreground",
-                )}
-              >
-                {label ?? context.placeholder}
-              </span>
-              <motion.span
-                animate={{ rotate: 180 }}
-                transition={context.reduce ? { duration: 0 } : MORPH}
-                className="text-muted-foreground"
-              >
-                <ChevronDown className="h-4 w-4" />
-              </motion.span>
-            </motion.button>
-            <div className="h-px bg-border" />
-            {searchable && (
-              <>
-                <div className="px-3 py-2.5">
-                  <input
-                    autoFocus
-                    type="text"
-                    placeholder={searchPlaceholder}
-                    value={context.searchQuery}
-                    onChange={(e) => context.setSearchQuery(e.target.value)}
-                    className="w-full bg-transparent text-sm outline-none border-none focus:ring-0 focus:outline-none placeholder:text-muted-foreground"
-                  />
-                </div>
-                <div className="h-px bg-border" />
-              </>
-            )}
-            <motion.ul
-              initial="hidden"
-              animate="show"
-              variants={context.reduce ? undefined : LIST}
-              className="p-1 max-h-[200px] overflow-y-auto custom-scrollbar"
-            >
-              {children}
-            </motion.ul>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+            {children}
+          </ul>
+          {empty && (
+            <p className="mq-select-empty" role="status">
+              {document.documentElement.lang === "si"
+                ? "තේරීම් හමු නොවීය"
+                : "No options found"}
+            </p>
+          )}
+        </div>
+      )}
     </>
   );
 }
@@ -372,33 +351,30 @@ export function MorphSelectItem({
     context.register(value, label);
     return () => context.unregister(value);
   }, [context.register, context.unregister, value, label]);
-
-  if (context.searchQuery && !label.toLowerCase().includes(context.searchQuery.toLowerCase())) {
+  if (
+    context.searchQuery &&
+    !label
+      .toLocaleLowerCase()
+      .includes(context.searchQuery.trim().toLocaleLowerCase())
+  )
     return null;
-  }
-
   return (
-    <motion.li variants={context.reduce ? undefined : ITEM}>
+    <li>
       <button
         type="button"
         role="option"
         aria-selected={selected}
         disabled={disabled}
-        onClick={() => context.select(value)}
-        className={cn(
-          "flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-left text-sm outline-none",
-          selected
-            ? "bg-muted text-foreground"
-            : "text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:bg-muted",
-          "disabled:pointer-events-none disabled:opacity-50",
-          className,
-        )}
+        onClick={() => {
+          context.select(value);
+          document.getElementById(context.triggerId)?.focus();
+        }}
+        className={cn("mq-select-option", className)}
       >
-        {children}
-        {selected ? <Check className="h-3.5 w-3.5 shrink-0" /> : null}
+        <span>{children}</span>
+        {selected && <Check size={17} aria-hidden />}
       </button>
-    </motion.li>
+    </li>
   );
 }
-
 export default MorphSelect;

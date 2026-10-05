@@ -1,5 +1,6 @@
 "use client";
 
+import { AppointmentInbox } from "./appointment-inbox";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -474,7 +475,7 @@ export function Dashboard() {
   return (
     <>
       <SiteHeader simple />
-      <main className="flex-1 w-full bg-[#f8f9fa] dark:bg-[#121619] min-h-screen pb-12">
+      <main className="staff-workspace flex-1 w-full bg-[#f8f9fa] dark:bg-[#121619] min-h-screen pb-12">
         <div className="px-6 md:px-10 lg:px-12 pt-6">
           {/* Page Header */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 mt-4">
@@ -524,7 +525,7 @@ export function Dashboard() {
               {si ? "වෝඩ් ඇඳන් දෘශ්‍ය පුවරුව" : "Open visual bed board"}
             </Link>
           )}
-          {(resource === "queues" || resource === "appointments") && (
+          {resource === "queues" && (
             <WorkflowPanel kind={resource} role={role} />
           )}
           {resource === "bed-board" || resource === "beds" ? (
@@ -542,6 +543,29 @@ export function Dashboard() {
                         canCreate: canWrite("beds", role),
                         canEdit: canWrite("beds", role),
                         canDelete: role === "admin",
+                      }}
+                    />
+                  </div>
+                </details>
+              )}
+            </>
+          ) : resource === "appointments" ? (
+            <>
+              <AppointmentInbox role={role} />
+              {canWrite("appointments", role) && (
+                <details className="mt-6">
+                  <summary className="button secondary">
+                    {si
+                      ? "කාර්ය මණ්ඩල හමුවීමක් වෙන්කරන්න"
+                      : "Create a staff booking"}
+                  </summary>
+                  <div className="mt-4">
+                    <ResourcePanel
+                      config={{
+                        ...resourceConfigs.appointments,
+                        canCreate: true,
+                        canEdit: false,
+                        canDelete: false,
                       }}
                     />
                   </div>

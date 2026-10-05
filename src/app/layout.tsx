@@ -9,6 +9,7 @@ import "goey-toast/styles.css";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
 import "./patient-discovery.css";
+import "./modern-ui.css";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 

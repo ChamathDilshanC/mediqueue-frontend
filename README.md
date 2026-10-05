@@ -1,5 +1,16 @@
 # MediQueue Frontend
 
+The appointment inbox at `/dashboard?resource=appointments` shows the active
+branch's patient requests and booking history with search, status filters and
+server-side pagination. Staff review requests and record attendance; patients
+track approval/rejection and cancellation in their own portal. Both refresh every
+15 seconds. Deploy with backend migration `0010_appointment_review` applied.
+
+Shared login, dropdown and dialog controls support mobile, keyboard interaction,
+Sinhala/English and light/dark themes. `npm test` includes reference-load recovery,
+keyboard/focus checks and appointment review/attendance coverage. Visual captures
+are written to the ignored `artifacts/ui/` directory.
+
 Patient hospital discovery uses Leaflet and OpenStreetMap (no API key required).
 Admins add public address/contact and map coordinates under **Branches** using
 the map picker. Branches without coordinates remain in the patient directory.

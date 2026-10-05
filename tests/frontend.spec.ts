@@ -87,7 +87,9 @@ test("mobile navigation, FAQ disclosure and both languages fit the viewport", as
   await page.locator("summary").first().click();
   await expect(page.locator("details").first()).toHaveAttribute("open", "");
   await page.goto("/register");
-  await expect(page.getByLabel("Full name")).toBeVisible();
+  await expect(
+    page.getByRole("textbox", { name: "Full name", exact: true }),
+  ).toBeVisible();
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,

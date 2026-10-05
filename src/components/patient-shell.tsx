@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Brand, LanguageSelect } from "./site-header";
 import { ThemeToggle } from "./theme-provider";
@@ -35,6 +35,15 @@ export function PatientShell({
   const [active, setActive] = useState("care-home");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  useEffect(() => {
+    const syncHash = () => {
+      const id = window.location.hash.slice(1);
+      if (links.some(([key]) => key === id)) setActive(id);
+    };
+    syncHash();
+    window.addEventListener("hashchange", syncHash);
+    return () => window.removeEventListener("hashchange", syncHash);
+  }, []);
   async function logout() {
     setBusy(true);
     try {

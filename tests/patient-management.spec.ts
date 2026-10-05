@@ -47,7 +47,7 @@ test("patient sign in, enrollment, booking, records and cancellation", async ({
                 {
                   id: "booking",
                   doctor: "Dr. Test",
-                  status: cancelled ? "CANCELLED" : "BOOKED",
+                  status: cancelled ? "CANCELLED" : "PENDING",
                   starts_at: "2026-11-01T03:30:00Z",
                 },
               ]
@@ -129,7 +129,7 @@ test("patient sign in, enrollment, booking, records and cancellation", async ({
     fullPage: true,
   });
   await page.getByRole("button", { name: "Cancel appointment" }).click();
-  await expect(page.getByText("CANCELLED", { exact: true })).toBeVisible();
+  await expect(page.getByText("Cancelled", { exact: true })).toBeVisible();
   await page.setViewportSize({ width: 390, height: 844 });
   expect(
     await page.evaluate(

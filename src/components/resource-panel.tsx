@@ -1,4 +1,5 @@
 "use client";
+import { ModalSurface } from "./ui/modal-surface";
 import { hospitalDate } from "./ward-stay";
 import { BranchLocationPicker } from "./branch-location-picker";
 
@@ -7,6 +8,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { useRouter } from "next/navigation";
@@ -264,6 +266,9 @@ function FormDialog({
   language,
   editing,
   refCache,
+  refsLoading,
+  refsError,
+  onRetryRefs,
   onClose,
   onSaved,
 }: {
@@ -271,6 +276,9 @@ function FormDialog({
   language: string;
   editing: Row | null; // null = create
   refCache: RefCache;
+  refsLoading: boolean;
+  refsError: string;
+  onRetryRefs: () => void;
   onClose: () => void;
   onSaved: () => void;
 }) {
@@ -328,6 +336,14 @@ function FormDialog({
     const fieldsInStep = steps[stepIdx] ?? [];
     for (const f of fieldsInStep) {
       const val = formData[f.key] ?? "";
+      const control = document.getElementById(`${config.key}-${f.key}`);
+      if (control instanceof HTMLInputElement && !control.checkValidity()) {
+        control.reportValidity();
+        setError(
+          `${language === "si" ? f.si : f.en}: ${control.validationMessage}`,
+        );
+        return false;
+      }
       if (f.required && !val.trim()) {
         setError(
           `${language === "si" ? f.si : f.en} ${language === "si" ? "අවශ්‍ය වේ" : "is required"}`,
@@ -354,6 +370,7 @@ function FormDialog({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting) return;
 
     // If not on the last step, move to next step instead of submitting
     if (currentStep < steps.length - 1) {
@@ -495,7 +512,7 @@ function FormDialog({
       : "max-w-lg";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md p-4 overflow-y-auto">
+    <ModalSurface label={title} onClose={onClose} busy={submitting}>
       <div
         className={`w-full ${modalWidthClass} max-h-[90vh] bg-white dark:bg-[#18181b] rounded-3xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border border-gray-200/50 dark:border-gray-800/50 overflow-hidden animate-in fade-in zoom-in-95 duration-300 flex flex-col my-auto`}
       >
@@ -521,6 +538,9 @@ function FormDialog({
               </div>
             </div>
             <button
+              type="button"
+              aria-label={language === "si" ? "වසන්න" : "Close dialog"}
+              disabled={submitting}
               onClick={onClose}
               className="p-2 hover:bg-[#f3f4f6] dark:hover:bg-gray-800 rounded-lg transition-colors"
             >
@@ -576,6 +596,25 @@ function FormDialog({
           onSubmit={handleSubmit}
           className={`p-6 gap-4 overflow-y-auto ${config.key === "wards" ? "grid grid-cols-1 md:grid-cols-2" : "flex flex-col"}`}
         >
+          {refsLoading && (
+            <p role="status">
+              {language === "si"
+                ? "තේරීම් පූරණය වෙමින්..."
+                : "Loading available options..."}
+            </p>
+          )}
+          {refsError && (
+            <div className="form-error" role="alert">
+              {refsError}{" "}
+              <button
+                type="button"
+                className="button secondary"
+                onClick={onRetryRefs}
+              >
+                {language === "si" ? "නැවත උත්සාහ කරන්න" : "Retry options"}
+              </button>
+            </div>
+          )}
           {config.key === "branches" && (
             <BranchLocationPicker
               latitude={formData.latitude || ""}
@@ -623,6 +662,7 @@ function FormDialog({
                 {f.type === "uuid-ref" ? (
                   <MorphSelect
                     id={`${config.key}-${f.key}`}
+                    disabled={submitting || refsLoading}
                     value={formData[f.key] ?? undefined}
                     onValueChange={(val) =>
                       setFormData((prev) => ({
@@ -646,6 +686,11 @@ function FormDialog({
                         language === "si" ? "සොයන්න..." : "Search..."
                       }
                     >
+                      {!f.required && (
+                        <MorphSelectItem value="">
+                          {language === "si" ? "කිසිවක් නැත" : "None"}
+                        </MorphSelectItem>
+                      )}
                       {(refCache[f.refResource!] ?? [])
                         .filter((opt) => {
                           if (
@@ -886,7 +931,7 @@ function FormDialog({
           </div>
         </form>
       </div>
-    </div>
+    </ModalSurface>
   );
 }
 
@@ -931,7 +976,11 @@ function DeleteConfirm({
       }
       if (!resp.ok && resp.status !== 204) {
         const data = await resp.json().catch(() => null);
-        setError(data?.detail ?? `Error ${resp.status}`);
+        setError(
+          typeof data?.detail === "string"
+            ? data.detail
+            : `Error ${resp.status}`,
+        );
         setDeleting(false);
         return;
       }
@@ -943,7 +992,11 @@ function DeleteConfirm({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+    <ModalSurface
+      label={language === "si" ? "මකා දැමීම තහවුරු කරන්න" : "Confirm Delete"}
+      onClose={onClose}
+      busy={deleting}
+    >
       <div className="w-full max-w-md bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-2xl border border-[#f3f4f6] dark:border-gray-800 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         <div className="p-6 flex flex-col items-center text-center">
           <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mb-4">
@@ -963,7 +1016,11 @@ function DeleteConfirm({
             </div>
           )}
           <div className="flex items-center gap-3">
-            <button onClick={onClose} className="button secondary">
+            <button
+              onClick={onClose}
+              disabled={deleting}
+              className="button secondary"
+            >
               {language === "si" ? "අවලංගු කරන්න" : "Cancel"}
             </button>
             <button
@@ -982,7 +1039,7 @@ function DeleteConfirm({
           </div>
         </div>
       </div>
-    </div>
+    </ModalSurface>
   );
 }
 
@@ -994,6 +1051,9 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
   const [page, setPage] = useState(0);
   const [query, setQuery] = useState("");
   const [refCache, setRefCache] = useState<RefCache>({});
+  const refRequest = useRef(0);
+  const [refsLoading, setRefsLoading] = useState(false);
+  const [refsError, setRefsError] = useState("");
 
   // Dialogs
   const [showCreate, setShowCreate] = useState(false);
@@ -1013,29 +1073,48 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
   );
 
   const loadRefs = useCallback(async () => {
-    const cache: RefCache = {};
-    await Promise.all(
-      refFields.map(async (f) => {
-        try {
-          const records: Row[] = [];
-          for (let offset = 0; ; offset += 200) {
-            const resp = await fetch(
-              `/api/backend/${f.refResource}?limit=200&offset=${offset}`,
-              { cache: "no-store" },
-            );
-            if (!resp.ok) break;
-            const batch: Row[] = await resp.json();
-            records.push(...batch);
-            if (batch.length < 200) break;
-          }
-          cache[f.refResource!] = records;
-        } catch {
-          /* ignore ref load failures */
+    const request = ++refRequest.current;
+    setRefsLoading(true);
+    setRefsError("");
+    const resources = [
+      ...new Set(refFields.map((field) => field.refResource!)),
+    ];
+    const results = await Promise.allSettled(
+      resources.map(async (resource) => {
+        const records: Row[] = [];
+        for (let offset = 0; ; offset += 200) {
+          const response = await fetch(
+            `/api/backend/${resource}?limit=200&offset=${offset}`,
+            {
+              cache: "no-store",
+              signal: AbortSignal.timeout(20000),
+            },
+          );
+          if (!response.ok) throw new Error(resource);
+          const batch = await response.json();
+          if (!Array.isArray(batch)) throw new Error(resource);
+          records.push(...batch);
+          if (batch.length < 200) break;
         }
+        return { resource, records };
       }),
     );
-    setRefCache(cache);
-  }, [refFields]);
+    if (request !== refRequest.current) return;
+    setRefCache((previous) => {
+      const next = { ...previous };
+      for (const result of results)
+        if (result.status === "fulfilled")
+          next[result.value.resource] = result.value.records;
+      return next;
+    });
+    if (results.some((result) => result.status === "rejected"))
+      setRefsError(
+        language === "si"
+          ? "සමහර තේරීම් පූරණය කළ නොහැකි විය."
+          : "Some options could not be loaded. Please retry.",
+      );
+    setRefsLoading(false);
+  }, [refFields, language]);
 
   const fetcher = useCallback(
     async (url: string) => {
@@ -1102,16 +1181,15 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
   };
 
   return (
-    <div className="flex-1">
+    <div className="flex-1 resource-workspace">
       {/* Dialogs */}
       {dischargeRow && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label="Discharge patient"
-            className="bg-white dark:bg-[#18181b] rounded-3xl p-6 max-w-md w-full space-y-4"
-          >
+        <ModalSurface
+          label={language === "si" ? "රෝගියා පිටත් කරන්න" : "Discharge patient"}
+          onClose={() => setDischargeRow(null)}
+          busy={discharging}
+        >
+          <div className="bg-white dark:bg-[#18181b] rounded-3xl p-6 max-w-md w-full space-y-4">
             <h3>
               {language === "si" ? "රෝගියා පිටත් කරන්න" : "Discharge patient"}
             </h3>
@@ -1169,7 +1247,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
               </button>
             </div>
           </div>
-        </div>
+        </ModalSurface>
       )}
       {(showCreate || editRow) && (
         <FormDialog
@@ -1177,6 +1255,9 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
           language={language}
           editing={editRow}
           refCache={refCache}
+          refsLoading={refsLoading}
+          refsError={refsError}
+          onRetryRefs={() => void loadRefs()}
           onClose={() => {
             setShowCreate(false);
             setEditRow(null);
@@ -1326,7 +1407,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
                     ))}
                     {(config.canEdit || config.canDelete) && (
                       <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center justify-end gap-1 resource-row-actions transition-opacity">
                           {config.key === "ward-admissions" &&
                             config.canEdit &&
                             row.admission_status === "ADMITTED" && (
@@ -1347,7 +1428,10 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
                             (config.key !== "ward-admissions" ||
                               row.admission_status === "ADMITTED") && (
                               <button
-                                onClick={() => setEditRow(row)}
+                                onClick={() => {
+                                  void loadRefs();
+                                  setEditRow(row);
+                                }}
                                 className="p-2 text-[#9ca3af] hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
                                 title={language === "si" ? "සංස්කරණය" : "Edit"}
                               >
