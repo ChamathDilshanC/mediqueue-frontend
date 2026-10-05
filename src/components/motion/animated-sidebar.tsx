@@ -24,7 +24,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { createPortal } from "react-dom";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { SharedLayoutBg } from "@/components/motion/shared-layout-bg";
 import { EASE_DRAWER, EASE_OUT, SPRING_LAYOUT, SPRING_PRESS } from "@/lib/ease";
 import { cn } from "@/lib/utils";
@@ -109,6 +109,8 @@ const REDUCED_TRANSITION = {
   duration: 0.16,
   ease: EASE_OUT,
 } as const;
+
+const MotionLink = motion(Link);
 
 const FOCUSABLE_SELECTOR = [
   "a[href]",
@@ -1013,7 +1015,6 @@ export function AnimatedSidebarMenuButton({
 }: AnimatedSidebarMenuButtonProps) {
   const context = useAnimatedSidebar();
   const panel = useAnimatedSidebarPanel();
-  const router = useRouter();
   const textLabel = typeof children === "string" ? children : undefined;
 
   const select = (
@@ -1022,10 +1023,6 @@ export function AnimatedSidebarMenuButton({
     if (disabled) {
       event.preventDefault();
       return;
-    }
-    if (href?.startsWith("/") && target !== "_blank") {
-      event.preventDefault();
-      router.push(href);
     }
     onSelect?.();
     const shouldCloseOnSelect = closeOnSelect ?? ariaExpanded === undefined;
@@ -1112,7 +1109,7 @@ export function AnimatedSidebarMenuButton({
   );
 
   return href ? (
-    <motion.a
+    <MotionLink
       href={href}
       target={target}
       rel={rel ?? (target === "_blank" ? "noreferrer noopener" : undefined)}
@@ -1128,7 +1125,7 @@ export function AnimatedSidebarMenuButton({
       className={interactiveClassName}
     >
       {content}
-    </motion.a>
+    </MotionLink>
   ) : (
     <motion.button
       type="button"
