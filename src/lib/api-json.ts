@@ -1,4 +1,6 @@
-/** Normalize upstream outages without leaking HTML, SQL or parser diagnostics. */
+import { messageForStatus } from "./error-messages";
+
+/** Normalize API failures without leaking HTML, SQL or parser diagnostics. */
 export async function apiJson(
   response: Response,
   fallback: string,
@@ -10,7 +12,7 @@ export async function apiJson(
         response.headers.get("x-expose-backend-error") === "true") &&
       typeof data?.detail === "string"
         ? data.detail
-        : fallback,
+        : messageForStatus(response.status, fallback),
     );
   }
   return data;

@@ -22,6 +22,66 @@ body {
   overflow-x: hidden;
 }
 
+.global-error-page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--ui-canvas, #ffffff);
+  color: var(--ui-text, #000000);
+}
+.global-error-card {
+  width: min(620px, 100%);
+  padding: clamp(28px, 5vw, 56px);
+  border: 1px solid var(--ui-border, #e5e7eb);
+  border-radius: 24px;
+  background: var(--ui-surface, #ffffff);
+  box-shadow: 0 20px 70px #00000012;
+  text-align: center;
+}
+.global-error-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  background: #00caff18;
+  color: #009cc4;
+}
+.global-error-kicker {
+  margin-bottom: 8px;
+  color: #009cc4;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.global-error-card h1 {
+  margin-bottom: 14px;
+  font-size: clamp(24px, 4vw, 36px);
+}
+.global-error-message {
+  max-width: 480px;
+  margin: 0 auto;
+  color: var(--ui-muted, #6a6a6a);
+  line-height: 1.7;
+}
+.global-error-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+.global-error-actions .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 140px;
+}
+
 html,
 body,
 * {
