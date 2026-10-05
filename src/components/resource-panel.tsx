@@ -1363,6 +1363,14 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
     void mutateRows();
   };
 
+  const verifyRow = async (row: Row) => {
+    const response = await fetch(
+      `/api/backend/${config.endpoint}/${row.id}/verify`,
+      { method: "POST" },
+    );
+    if (response.ok) void mutateRows();
+  };
+
   return (
     <div className="flex-1 resource-workspace">
       {/* Dialogs */}
@@ -1636,6 +1644,18 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
                                 {language === "si"
                                   ? "පිටත් කරන්න"
                                   : "Discharge"}
+                              </button>
+                            )}
+                          {["ward-tasks", "staff-attendance"].includes(config.key) &&
+                            row.verified_at == null &&
+                            (row.status === "COMPLETED" ||
+                              row.attendance_status === "PRESENT" ||
+                              row.attendance_status === "LATE") && (
+                              <button
+                                className="button secondary"
+                                onClick={() => void verifyRow(row)}
+                              >
+                                {language === "si" ? "සත්‍යාපනය" : "Verify"}
                               </button>
                             )}
                           {config.canEdit &&

@@ -21,6 +21,11 @@ const writes: Record<string, string[]> = {
   visits: ["admin", "staff", "reception"],
   appointments: ["admin", "staff", "reception"],
   "ward-admissions": ["admin", "staff", "reception"],
+  nurses: ["admin", "staff"],
+  attendants: ["admin", "staff"],
+  "staff-shifts": ["admin", "staff"],
+  "staff-attendance": ["admin", "staff"],
+  "ward-tasks": ["admin", "staff"],
 };
 export function activeMembership(profile: Profile) {
   const branch =

@@ -27,5 +27,10 @@ export const resources = [
   { key: "invoices", label: "Invoices", si: "බිල්පත්" },
   { key: "inventory", label: "Inventory", si: "තොග කළමනාකරණය" },
   { key: "staff-directory", label: "Staff directory", si: "කාර්ය මණ්ඩලය" },
+  { key: "nurses", label: "Nurses", si: "හෙදියන්" },
+  { key: "attendants", label: "Attendants", si: "උපස්ථායකයන්" },
+  { key: "staff-shifts", label: "Staff shifts", si: "කාර්ය මණ්ඩල මුර" },
+  { key: "staff-attendance", label: "Staff attendance", si: "කාර්ය මණ්ඩල පැමිණීම" },
+  { key: "ward-tasks", label: "Ward tasks", si: "වෝඩ් කාර්යයන්" },
 ] as const;
 export type ResourceKey = (typeof resources)[number]["key"];

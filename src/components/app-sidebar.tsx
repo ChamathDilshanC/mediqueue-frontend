@@ -23,6 +23,7 @@ import {
   Sparkles,
   Stethoscope,
   UserRound,
+  UserCheck,
   UsersRound,
   X,
 } from "lucide-react";
@@ -266,6 +267,16 @@ export function AppSidebar() {
                       ].includes(r.key),
                     )
                     .map((r) => ({ ...r, icon: ClipboardList })),
+                },
+                {
+                  title: "Workforce Operations",
+                  items: [
+                    { key: "nurses", label: "Nurses", si: "හෙදියන්", icon: Stethoscope },
+                    { key: "attendants", label: "Attendants", si: "උපස්ථායකයන්", icon: UserRound },
+                    { key: "staff-shifts", label: "Staff shifts", si: "කාර්ය මණ්ඩල මුර", icon: CalendarClock },
+                    { key: "staff-attendance", label: "Staff attendance", si: "කාර්ය මණ්ඩල පැමිණීම", icon: UserCheck },
+                    { key: "ward-tasks", label: "Ward tasks", si: "වාට්ටු කාර්යයන්", icon: ClipboardList },
+                  ],
                 },
                 {
                   title: "Queue Operations",

@@ -1874,6 +1874,54 @@ Object.assign(resourceConfigs, {
   },
 });
 
+const workforceFields = {
+  nurses: [
+    { key: "employee_id", en: "Employee ID", si: "සේවක අංකය", type: "text", required: true, showInTable: true },
+    { key: "name", en: "Name", si: "නම", type: "text", required: true, showInTable: true },
+    { key: "phone", en: "Phone", si: "දුරකථනය", type: "text", showInTable: true },
+    { key: "status", en: "Status", si: "තත්ත්වය", type: "select", showInTable: true, options: [{ value: "ACTIVE", en: "Active", si: "සක්‍රිය" }, { value: "INACTIVE", en: "Inactive", si: "අක්‍රිය" }] },
+  ] satisfies FieldDef[],
+  attendants: [
+    { key: "employee_id", en: "Employee ID", si: "සේවක අංකය", type: "text", required: true, showInTable: true },
+    { key: "name", en: "Name", si: "නම", type: "text", required: true, showInTable: true },
+    { key: "phone", en: "Phone", si: "දුරකථනය", type: "text", showInTable: true },
+    { key: "status", en: "Status", si: "තත්ත්වය", type: "select", showInTable: true, options: [{ value: "ACTIVE", en: "Active", si: "සක්‍රිය" }, { value: "INACTIVE", en: "Inactive", si: "අක්‍රිය" }] },
+  ] satisfies FieldDef[],
+};
+resourceConfigs.nurses = { key: "nurses", endpoint: "nurses", en: { singular: "Nurse", plural: "Nurses", description: "Manage ward nurses." }, si: { singular: "හෙදිය", plural: "හෙදියන්", description: "වාට්ටු හෙදියන් කළමනාකරණය." }, fields: workforceFields.nurses, inputFields: ["employee_id", "name", "phone", "status"], canCreate: true, canEdit: true, canDelete: true };
+resourceConfigs.attendants = { key: "attendants", endpoint: "attendants", en: { singular: "Attendant", plural: "Attendants", description: "Manage ward attendants." }, si: { singular: "උපස්ථායක", plural: "උපස්ථායකයන්", description: "වාට්ටු උපස්ථායකයන් කළමනාකරණය." }, fields: workforceFields.attendants, inputFields: ["employee_id", "name", "phone", "status"], canCreate: true, canEdit: true, canDelete: true };
+resourceConfigs["staff-shifts"] = { key: "staff-shifts", endpoint: "staff-shifts", en: { singular: "Staff shift", plural: "Staff shifts", description: "Schedule morning, afternoon, evening and night shifts." }, si: { singular: "මුරය", plural: "කාර්ය මණ්ඩල මුර", description: "කාර්ය මණ්ඩල මුර සැලසුම් කරන්න." }, fields: [
+  { key: "doctor_id", en: "Doctor", si: "වෛද්‍යවරයා", type: "uuid-ref", refResource: "doctors", refLabel: "name", showInTable: true },
+  { key: "nurse_id", en: "Nurse", si: "හෙදිය", type: "uuid-ref", refResource: "nurses", refLabel: "name", showInTable: true },
+  { key: "attendant_id", en: "Attendant", si: "උපස්ථායක", type: "uuid-ref", refResource: "attendants", refLabel: "name", showInTable: true },
+  { key: "shift_date", en: "Date", si: "දිනය", type: "text", required: true, showInTable: true },
+  { key: "shift", en: "Shift", si: "මුරය", type: "select", required: true, showInTable: true, options: ["MORNING", "AFTERNOON", "EVENING", "NIGHT"].map(value => ({ value, en: value[0] + value.slice(1).toLowerCase(), si: value })) },
+  { key: "starts_at", en: "Starts", si: "ආරම්භය", type: "datetime", required: true, showInTable: true },
+  { key: "ends_at", en: "Ends", si: "අවසානය", type: "datetime", required: true, showInTable: true },
+  { key: "status", en: "Status", si: "තත්ත්වය", type: "select", showInTable: true, options: [{ value: "SCHEDULED", en: "Scheduled", si: "සැලසුම් කළ" }, { value: "CANCELLED", en: "Cancelled", si: "අවලංගු" }, { value: "COMPLETED", en: "Completed", si: "සම්පූර්ණ" }] },
+  { key: "notes", en: "Notes", si: "සටහන්", type: "text", showInTable: false },
+], inputFields: ["doctor_id", "nurse_id", "attendant_id", "shift_date", "shift", "starts_at", "ends_at", "status", "notes"], canCreate: true, canEdit: true, canDelete: true };
+resourceConfigs["staff-attendance"] = { key: "staff-attendance", endpoint: "staff-attendance", en: { singular: "Attendance", plural: "Staff attendance", description: "Record and verify workforce attendance." }, si: { singular: "පැමිණීම", plural: "කාර්ය මණ්ඩල පැමිණීම", description: "පැමිණීම සටහන් කර සත්‍යාපනය කරන්න." }, fields: [
+  { key: "shift_id", en: "Shift", si: "මුරය", type: "uuid-ref", refResource: "staff-shifts", refLabel: "shift_date", required: true, showInTable: true },
+  { key: "attendance_status", en: "Attendance", si: "පැමිණීම", type: "select", showInTable: true, options: ["PRESENT", "ABSENT", "LATE", "LEAVE"].map(value => ({ value, en: value, si: value })) },
+  { key: "check_in_at", en: "Check in", si: "පැමිණීමේ වේලාව", type: "datetime", showInTable: true },
+  { key: "check_out_at", en: "Check out", si: "පිටවීමේ වේලාව", type: "datetime", showInTable: true },
+  { key: "notes", en: "Notes", si: "සටහන්", type: "text", showInTable: false },
+  { key: "verified_by", en: "Verified by", si: "සත්‍යාපනය කළේ", type: "readonly", showInTable: true },
+], inputFields: ["shift_id", "attendance_status", "check_in_at", "check_out_at", "notes"], canCreate: true, canEdit: true, canDelete: true };
+resourceConfigs["ward-tasks"] = { key: "ward-tasks", endpoint: "ward-tasks", en: { singular: "Ward task", plural: "Ward tasks", description: "Assign ward walks, patient checks and cleaning, then verify completion." }, si: { singular: "වාට්ටු කාර්යය", plural: "වාට්ටු කාර්යයන්", description: "වාට්ටු පරීක්ෂා, රෝගී පරීක්ෂා සහ පිරිසිදු කිරීම්." }, fields: [
+  { key: "ward_id", en: "Ward", si: "වාට්ටුව", type: "uuid-ref", refResource: "wards", refLabel: "name", required: true, showInTable: true },
+  { key: "patient_id", en: "Patient", si: "රෝගියා", type: "uuid-ref", refResource: "patients", refLabel: "external_ref", showInTable: true },
+  { key: "doctor_id", en: "Doctor", si: "වෛද්‍යවරයා", type: "uuid-ref", refResource: "doctors", refLabel: "name", showInTable: true },
+  { key: "nurse_id", en: "Nurse", si: "හෙදිය", type: "uuid-ref", refResource: "nurses", refLabel: "name", showInTable: true },
+  { key: "attendant_id", en: "Attendant", si: "උපස්ථායක", type: "uuid-ref", refResource: "attendants", refLabel: "name", showInTable: true },
+  { key: "task_type", en: "Task", si: "කාර්යය", type: "select", required: true, showInTable: true, options: ["WARD_WALK", "PATIENT_CHECK", "CLEANING"].map(value => ({ value, en: value.replace("_", " "), si: value })) },
+  { key: "scheduled_at", en: "Scheduled at", si: "සැලසුම් කළ වේලාව", type: "datetime", required: true, showInTable: true },
+  { key: "status", en: "Status", si: "තත්ත්වය", type: "select", showInTable: true, options: ["ASSIGNED", "IN_PROGRESS", "COMPLETED", "VERIFIED", "CANCELLED"].map(value => ({ value, en: value.replace("_", " "), si: value })) },
+  { key: "notes", en: "Notes", si: "සටහන්", type: "text", showInTable: false },
+  { key: "verified_by", en: "Verified by", si: "සත්‍යාපනය කළේ", type: "readonly", showInTable: true },
+], inputFields: ["ward_id", "patient_id", "doctor_id", "nurse_id", "attendant_id", "task_type", "scheduled_at", "status", "notes"], canCreate: true, canEdit: true, canDelete: true };
+
 for (const config of Object.values(resourceConfigs)) {
   for (const field of config.fields) {
     if (field.key === "capacity") {
