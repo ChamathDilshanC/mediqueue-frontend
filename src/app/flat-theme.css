@@ -403,3 +403,50 @@ body,
 .app-shell .appointment-summary button:hover {
   border-color: var(--flat-accent) !important;
 }
+
+/* Spacious rounded overlays keep editing comfortable on desktop and mobile. */
+.mq-modal {
+  border-radius: 20px !important;
+  overflow: hidden;
+}
+.mq-modal:has(> .resource-edit-dialog) {
+  width: min(960px, calc(100vw - 32px));
+}
+.mq-modal > .resource-edit-dialog {
+  border-radius: 20px !important;
+  max-width: none;
+}
+.mq-modal .resource-edit-form {
+  padding: 24px 28px;
+  gap: 20px 24px;
+}
+.mq-modal
+  .resource-edit-form
+  > :is(.branch-location-picker, .form-error, p, button) {
+  grid-column: 1 / -1;
+}
+.mq-modal .resource-edit-form input,
+.mq-modal .resource-edit-form textarea,
+.mq-modal .resource-edit-form .mq-select-trigger {
+  border-radius: 10px !important;
+  min-height: 44px;
+}
+.mq-modal .resource-edit-form .branch-location-map {
+  height: 260px;
+  border-radius: 12px !important;
+}
+.mq-modal .resource-edit-dialog > div {
+  padding-inline: 28px;
+}
+@media (max-width: 640px) {
+  .mq-modal:has(> .resource-edit-dialog) {
+    width: calc(100vw - 16px);
+  }
+  .mq-modal .resource-edit-form {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 18px;
+  }
+  .mq-modal .resource-edit-dialog > div {
+    padding-inline: 18px;
+  }
+}

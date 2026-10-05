@@ -514,7 +514,7 @@ function FormDialog({
   return (
     <ModalSurface label={title} onClose={onClose} busy={submitting}>
       <div
-        className={`w-full ${modalWidthClass} max-h-[90vh] bg-white dark:bg-[#181818] rounded-3xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border border-gray-200/50 dark:border-gray-800/50 overflow-hidden animate-in fade-in zoom-in-95 duration-300 flex flex-col my-auto`}
+        className={`resource-edit-dialog w-full ${modalWidthClass} max-h-[90vh] bg-white dark:bg-[#181818] rounded-3xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border border-gray-200/50 dark:border-gray-800/50 overflow-hidden animate-in fade-in zoom-in-95 duration-300 flex flex-col my-auto`}
       >
         {/* Multistep Header */}
         <div className="flex flex-col px-6 pt-5 pb-4 border-b border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#181818] shrink-0">
@@ -594,7 +594,7 @@ function FormDialog({
         {/* Step Form Body */}
         <form
           onSubmit={handleSubmit}
-          className={`p-6 gap-4 overflow-y-auto ${config.key === "wards" ? "grid grid-cols-1 md:grid-cols-2" : "flex flex-col"}`}
+          className="resource-edit-form p-6 gap-4 overflow-y-auto grid grid-cols-1 md:grid-cols-2"
         >
           {refsLoading && (
             <p role="status">
@@ -879,7 +879,7 @@ function FormDialog({
           )}
 
           {/* Controls: Prev, Next & Submit */}
-          <div className="flex items-center justify-between gap-3 pt-4 border-t border-gray-100 dark:border-gray-800/50 mt-2">
+          <div className="col-span-full flex items-center justify-between gap-3 pt-4 border-t border-gray-100 dark:border-gray-800/50 mt-2">
             <div>
               {currentStep > 0 ? (
                 <button
