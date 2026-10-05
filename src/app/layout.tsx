@@ -6,7 +6,9 @@ import "@fontsource/poppins/500.css";
 import "@fontsource/poppins/600.css";
 import "@fontsource/poppins/700.css";
 import "goey-toast/styles.css";
+import "leaflet/dist/leaflet.css";
 import "./globals.css";
+import "./patient-discovery.css";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 

@@ -1,5 +1,17 @@
 # MediQueue Frontend
 
+Patient hospital discovery uses Leaflet and OpenStreetMap (no API key required).
+Admins add public address/contact and map coordinates under **Branches** using
+the map picker. Branches without coordinates remain in the patient directory.
+Patients use **Find care → Choose hospital → Create patient profile (first visit)
+→ Book session → Confirm booking**. Location access enables straight-line nearest
+sorting; directions open Google Maps. Queue counts refresh every 15 seconds and
+wait estimates show their source. Configure `NEXT_PUBLIC_MAP_TILE_URL` and
+`NEXT_PUBLIC_MAP_ATTRIBUTION` together to use another tile provider; respect its
+usage/licensing requirements. The default OSM tiles require visible attribution,
+normal browser caching and no bulk downloading. Apply backend migration 0009
+before deploying these screens.
+
 The Sinhala-first public website and authentication experience for MediQueue.
 
 **Owner: ChamathDilshanC**

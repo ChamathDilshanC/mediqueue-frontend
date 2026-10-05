@@ -1,20 +1,32 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarDays, FileText, HeartPulse, RefreshCw } from "lucide-react";
+import {
+  CalendarDays,
+  FileText,
+  HeartPulse,
+  RefreshCw,
+  CheckCircle2,
+  MapPin,
+  X,
+} from "lucide-react";
 import { PatientShell } from "./patient-shell";
 import { PatientQueue } from "./patient-queue";
 import { useLanguage } from "./providers";
 import { StayDetails } from "./ward-stay";
 import { apiJson } from "@/lib/api-json";
+import { HospitalFinder, directionsUrl, type Center } from "./hospital-finder";
+import { Loader } from "./loader";
 
-type Center = { id: string; tenant_id: string; name: string };
 type Slot = {
   id: string;
   doctor: string;
   specialty: string;
   starts_at: string;
   capacity: number;
+  ends_at?: string;
+  remaining?: number;
+  already_booked?: boolean;
 };
 type Overview = {
   ward_stays?: {
@@ -37,6 +49,11 @@ type Overview = {
     status: string;
     doctor: string;
     starts_at: string;
+    center?: string;
+    address?: string;
+    timezone?: string;
+    latitude?: number | null;
+    longitude?: number | null;
   }[];
   records: Record<string, unknown>[];
 };
@@ -52,6 +69,12 @@ export function PatientPortal() {
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
+  const [sessionsLoading, setSessionsLoading] = useState(false);
+  const [sessionsError, setSessionsError] = useState("");
+  const [sessionAttempt, setSessionAttempt] = useState(0);
+  const [doctorSearch, setDoctorSearch] = useState("");
+  const [sessionDate, setSessionDate] = useState("");
+  const [confirmSlot, setConfirmSlot] = useState<Slot | null>(null);
   const request = useCallback(
     async (path: string, init?: RequestInit) => {
       const response = await fetch(`/api/backend/patient/${path}`, {
@@ -94,17 +117,26 @@ export function PatientPortal() {
   }, [load]);
   useEffect(() => {
     setSlots([]);
-    if (!center) return;
+    setSessionsError("");
+    setConfirmSlot(null);
+    if (!center) {
+      setSessionsLoading(false);
+      return;
+    }
+    setSessionsLoading(true);
     const controller = new AbortController();
     void request(`schedules/${center}`)
       .then((data) => {
         if (!controller.signal.aborted) setSlots(data);
       })
       .catch((e) => {
-        if (!controller.signal.aborted) setError(e.message);
+        if (!controller.signal.aborted) setSessionsError(e.message);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setSessionsLoading(false);
       });
     return () => controller.abort();
-  }, [center, request]);
+  }, [center, request, sessionAttempt]);
   async function action(path: string, method: string, body?: unknown) {
     setBusy(true);
     setError("");
@@ -115,7 +147,17 @@ export function PatientPortal() {
         ...(body ? { body: JSON.stringify(body) } : {}),
       });
       await load();
-      setNotice(si ? "සාර්ථකව සුරකින ලදී" : "Saved successfully");
+      setSessionAttempt((v) => v + 1);
+      setNotice(
+        path === "appointments"
+          ? si
+            ? "හමුවීම සාර්ථකව වෙන්කරන ලදී. මගේ හමුවීම් යටතේ විස්තර බලන්න."
+            : "Appointment confirmed. Your booking is listed under My appointments."
+          : si
+            ? "සාර්ථකව සුරකින ලදී"
+            : "Saved successfully",
+      );
+      setConfirmSlot(null);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -126,10 +168,20 @@ export function PatientPortal() {
   const enrolled = overview?.profiles.some(
     (p) => p.tenant_id === selected?.tenant_id,
   );
-  const date = (value: string) =>
+  const date = (value: string, zone = selected?.timezone || "Asia/Colombo") =>
     new Date(value).toLocaleString(si ? "si-LK" : "en-GB", {
-      timeZone: "Asia/Colombo",
+      timeZone: zone,
     });
+  const visibleSlots = slots.filter(
+    (s) =>
+      `${s.doctor} ${s.specialty}`
+        .toLowerCase()
+        .includes(doctorSearch.toLowerCase()) &&
+      (!sessionDate ||
+        new Date(s.starts_at).toLocaleDateString("en-CA", {
+          timeZone: selected?.timezone || "Asia/Colombo",
+        }) === sessionDate),
+  );
   return (
     <PatientShell name={overview?.profiles[0]?.name}>
       <main className="patient-portal care-page" id="care-home">
@@ -147,7 +199,7 @@ export function PatientPortal() {
                 : "A calmer hospital visit starts here. Your appointments, queue and health records, together."}
             </p>
           </div>
-          <a className="button primary" href="#book-care">
+          <a className="button primary" href="#find-care">
             {si ? "හමුවීමක් වෙන්කරන්න" : "Book an appointment"} ↗
           </a>
         </div>
@@ -181,18 +233,32 @@ export function PatientPortal() {
           </div>
         )}
         {notice && (
-          <p role="status" className="availability available">
+          <p role="status" className="care-booking-notice">
+            <CheckCircle2 size={20} />
             {notice}
           </p>
         )}
-        {loading && (
-          <p role="status">{si ? "පූරණය වෙමින්..." : "Loading your care..."}</p>
-        )}
+        {loading && <Loader />}
+        <HospitalFinder
+          centers={centers}
+          selected={center}
+          onSelect={setCenter}
+          loading={loading}
+        />
         <PatientQueue center={center} enrolled={!!enrolled} />
         <div className="patient-grid">
           <section className="account-card" id="book-care">
             <CalendarDays size={24} />
             <h2>{si ? "හමුවීමක් වෙන්කරන්න" : "Book an appointment"}</h2>
+            <ol className="booking-steps">
+              <li className={center ? "done" : ""}>
+                1 · {si ? "රෝහල" : "Choose hospital"}
+              </li>
+              <li className={enrolled ? "done" : ""}>
+                2 · {si ? "පැතිකඩ" : "Your profile"}
+              </li>
+              <li>3 · {si ? "හමුවීම" : "Choose session"}</li>
+            </ol>
             <label htmlFor="center">
               {si ? "රෝහල / වෛද්‍ය මධ්‍යස්ථානය" : "Hospital / medical center"}
             </label>
@@ -238,6 +304,7 @@ export function PatientPortal() {
                   name="full_name"
                   required
                   maxLength={200}
+                  defaultValue={overview?.profiles[0]?.name}
                 />
                 <label htmlFor="mobile">
                   {si ? "දුරකථන අංකය" : "Mobile number"}
@@ -254,31 +321,93 @@ export function PatientPortal() {
                 </button>
               </form>
             )}
+            {selected && enrolled && (
+              <p className="booking-enrolled">
+                <CheckCircle2 size={17} />
+                {si
+                  ? "ඔබගේ පැතිකඩ සූදානම්. පහත හමුවීමක් තෝරන්න."
+                  : "Your profile is ready. Choose a session below."}
+              </p>
+            )}
             {center && (
               <div className="patient-list">
-                {slots.length === 0 ? (
+                <div className="booking-filters">
+                  <input
+                    aria-label={
+                      si
+                        ? "වෛද්‍යවරයා හෝ විශේෂඥතාව සොයන්න"
+                        : "Search doctor or specialty"
+                    }
+                    placeholder={
+                      si ? "වෛද්‍යවරයා හෝ විශේෂඥතාව" : "Doctor or specialty"
+                    }
+                    value={doctorSearch}
+                    onChange={(e) => setDoctorSearch(e.target.value)}
+                  />
+                  <input
+                    type="date"
+                    aria-label={si ? "හමුවීමේ දිනය" : "Session date"}
+                    value={sessionDate}
+                    onChange={(e) => setSessionDate(e.target.value)}
+                  />
+                </div>
+                {sessionsLoading ? (
+                  <Loader />
+                ) : sessionsError ? (
+                  <div role="alert">
+                    <p>{sessionsError}</p>
+                    <button
+                      className="button secondary"
+                      onClick={() => setSessionAttempt((v) => v + 1)}
+                    >
+                      {si ? "නැවත උත්සාහ කරන්න" : "Retry sessions"}
+                    </button>
+                  </div>
+                ) : slots.length === 0 ? (
                   <p>{si ? "ඉදිරි කාලසටහන් නොමැත" : "No upcoming sessions."}</p>
                 ) : (
-                  slots.map((s) => (
-                    <article key={s.id}>
+                  visibleSlots.map((s) => (
+                    <article key={s.id} className="booking-session">
                       <strong>{s.doctor}</strong>
                       <p>
                         {s.specialty} · {date(s.starts_at)}
                       </p>
+                      <span
+                        className={`session-availability ${s.remaining === 0 ? "full" : ""}`}
+                      >
+                        {s.already_booked
+                          ? si
+                            ? "ඔබ වෙන්කර ඇත"
+                            : "Already booked"
+                          : s.remaining !== undefined
+                            ? `${s.remaining} ${si ? "ඉතිරි ස්ථාන" : "places available"}`
+                            : `${si ? "ධාරිතාව" : "Capacity"}: ${s.capacity}`}
+                      </span>
                       <button
                         className="button primary"
-                        disabled={busy || !enrolled}
-                        onClick={() =>
-                          void action("appointments", "POST", {
-                            schedule_id: s.id,
-                          })
+                        disabled={
+                          busy ||
+                          !enrolled ||
+                          s.remaining === 0 ||
+                          s.already_booked
                         }
+                        onClick={() => setConfirmSlot(s)}
                       >
                         {si ? "වෙන්කරන්න" : "Book session"}
                       </button>
                     </article>
                   ))
                 )}
+                {!sessionsLoading &&
+                  !sessionsError &&
+                  slots.length > 0 &&
+                  !visibleSlots.length && (
+                    <p>
+                      {si
+                        ? "ගැළපෙන හමුවීම් නොමැත."
+                        : "No sessions match your filters."}
+                    </p>
+                  )}
               </div>
             )}
           </section>
@@ -294,7 +423,13 @@ export function PatientPortal() {
               {overview?.appointments.map((a) => (
                 <article key={a.id}>
                   <strong>{a.doctor}</strong>
-                  <p>{date(a.starts_at)}</p>
+                  <p>{date(a.starts_at, a.timezone || "Asia/Colombo")}</p>
+                  {a.center && (
+                    <p>
+                      <MapPin size={15} /> {a.center}
+                    </p>
+                  )}
+                  {a.address && <small>{a.address}</small>}
                   <span className="eyebrow-pill">{a.status}</span>
                   {a.status === "BOOKED" && (
                     <button
@@ -390,6 +525,101 @@ export function PatientPortal() {
           </section>
         </div>
       </main>
+      {confirmSlot && (
+        <div className="booking-dialog-backdrop">
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="booking-confirm-title"
+            className="booking-dialog"
+            tabIndex={-1}
+            onKeyDown={(e) => {
+              if (e.key === "Escape" && !busy) setConfirmSlot(null);
+              if (e.key === "Tab") {
+                const controls = Array.from(
+                  e.currentTarget.querySelectorAll<HTMLElement>(
+                    "button:not(:disabled), a[href], input:not(:disabled)",
+                  ),
+                );
+                const first = controls[0],
+                  last = controls[controls.length - 1];
+                if (e.shiftKey && document.activeElement === first) {
+                  e.preventDefault();
+                  last?.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                  e.preventDefault();
+                  first?.focus();
+                }
+              }
+            }}
+          >
+            <button
+              className="care-icon-button booking-dialog-close"
+              aria-label={si ? "වසන්න" : "Close confirmation"}
+              disabled={busy}
+              onClick={() => setConfirmSlot(null)}
+              autoFocus
+            >
+              <X size={18} />
+            </button>
+            <span className="hospital-building">
+              <CalendarDays size={25} />
+            </span>
+            <h2 id="booking-confirm-title">
+              {si ? "හමුවීම තහවුරු කරන්න" : "Confirm your appointment"}
+            </h2>
+            <h3>{confirmSlot.doctor}</h3>
+            <p>{confirmSlot.specialty}</p>
+            <p>{selected?.name}</p>
+            <p>{date(confirmSlot.starts_at)}</p>
+            <p>
+              {si
+                ? "මෙය වෛද්‍ය සැසියේ ආරම්භක වේලාවයි. ඔබේ වාරය සඳහා පෝලිම් තොරතුරු බලන්න."
+                : "This is the session start time. Your consultation order is managed by the care team."}
+            </p>
+            {selected && (
+              <a
+                href={directionsUrl(selected)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {si ? "රෝහලට මාර්ගය බලන්න" : "View hospital directions"} ↗
+              </a>
+            )}
+            {error && (
+              <p role="alert" className="care-inline-error">
+                {error}
+              </p>
+            )}
+            <div className="hospital-result-actions">
+              <button
+                className="button secondary"
+                disabled={busy}
+                onClick={() => setConfirmSlot(null)}
+              >
+                {si ? "ආපසු" : "Go back"}
+              </button>
+              <button
+                className="button primary"
+                disabled={busy}
+                onClick={() =>
+                  void action("appointments", "POST", {
+                    schedule_id: confirmSlot.id,
+                  })
+                }
+              >
+                {busy
+                  ? si
+                    ? "වෙන්කරමින්…"
+                    : "Booking…"
+                  : si
+                    ? "හමුවීම තහවුරු කරන්න"
+                    : "Confirm booking"}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </PatientShell>
   );
 }

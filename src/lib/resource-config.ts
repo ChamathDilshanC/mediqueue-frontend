@@ -1914,8 +1914,8 @@ resourceConfigs.queues.inputFields.push("service_type", "room_id");
 resourceConfigs.wards.fields.push(
   {
     key: "initial_bed_count",
-    en: "Create beds now (0 to skip)",
-    si: "දැන් සාදන ඇඳන් ගණන (අවශ්‍ය නැත්නම් 0)",
+    en: "Create beds (0 uses ward capacity)",
+    si: "සාදන ඇඳන් ගණන (0 නම් වාට්ටුවේ ධාරිතාව)",
     type: "number",
     min: 0,
     defaultValue: "0",
@@ -1955,6 +1955,57 @@ resourceConfigs.wards.inputFields.push(
   "bed_number_prefix",
   "bed_start_number",
 );
+
+resourceConfigs.branches.fields.push(
+  {
+    key: "address",
+    en: "Public address",
+    si: "රෝහලේ ලිපිනය",
+    type: "text",
+    maxLength: 500,
+    showInTable: true,
+  },
+  {
+    key: "phone",
+    en: "Public contact number",
+    si: "දුරකථන අංකය",
+    type: "text",
+    maxLength: 40,
+  },
+  {
+    key: "latitude",
+    en: "Latitude",
+    si: "අක්ෂාංශ",
+    type: "number",
+    min: -90,
+    step: "any",
+  },
+  {
+    key: "longitude",
+    en: "Longitude",
+    si: "දේශාංශ",
+    type: "number",
+    min: -180,
+    step: "any",
+  },
+);
+resourceConfigs.branches.inputFields.push(
+  "address",
+  "phone",
+  "latitude",
+  "longitude",
+);
+resourceConfigs.queues.fields.push({
+  key: "average_service_minutes",
+  en: "Average service time (minutes)",
+  si: "සාමාන්‍ය සේවා කාලය (මිනිත්තු)",
+  type: "number",
+  min: 1,
+  step: 1,
+  defaultValue: "5",
+  required: true,
+});
+resourceConfigs.queues.inputFields.push("average_service_minutes");
 
 resourceConfigs.wards.fields.find((f) => f.key === "department_id")!.required =
   false;

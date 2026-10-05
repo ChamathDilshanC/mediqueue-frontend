@@ -99,7 +99,7 @@ test("visual ward map shows status, dates, filters and completed stays on mobile
   await expect(details.getByText("Nimal Perera")).toBeVisible();
   await expect(details.getByText("4 days", { exact: true })).toBeVisible();
   await expect(details.getByText("3 days", { exact: true })).toBeVisible();
-  await expect(details.getByText("1 Oct 2026", { exact: false })).toBeVisible();
+  await expect(details.getByText("2026-Oct-01", { exact: false })).toBeVisible();
   await expect(details.getByText("Discharge due today")).toBeVisible();
   await expect(
     page.getByRole("progressbar", { name: "Bed occupancy" }),
@@ -119,7 +119,7 @@ test("visual ward map shows status, dates, filters and completed stays on mobile
     .getByRole("button", { name: "Bed A-04, Cleaning", exact: true })
     .click();
   await expect(details.getByText("Last stay", { exact: false })).toBeVisible();
-  await expect(details.getByText("4 Oct 2026", { exact: false })).toHaveCount(
+  await expect(details.getByText("2026-Oct-04", { exact: false })).toHaveCount(
     2,
   );
   await page.setViewportSize({ width: 390, height: 844 });

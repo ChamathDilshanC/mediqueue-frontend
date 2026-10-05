@@ -37,14 +37,14 @@ export function hospitalDate(
   zone = "Asia/Colombo",
 ) {
   if (!value) return "—";
-  return new Intl.DateTimeFormat(language === "si" ? "si-LK" : "en-GB", {
-    day: "numeric",
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
     month: "short",
     year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
     timeZone: zone,
-  }).format(new Date(value));
+  }).formatToParts(new Date(value));
+  const part = (type: string) => parts.find((p) => p.type === type)?.value;
+  return `${part("year")}-${part("month")}-${part("day")}`;
 }
 export function StayDetails({
   stay,

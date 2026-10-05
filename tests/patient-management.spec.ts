@@ -13,7 +13,11 @@ test("patient sign in, enrollment, booking, records and cancellation", async ({
   let cancelled = false;
   await page.route("**/api/backend/patient/**", async (route) => {
     const path = new URL(route.request().url()).pathname;
-    if (path.endsWith("/tickets") || path.includes("/queues/"))
+    if (
+      path.endsWith("/tickets") ||
+      path.includes("/queues/") ||
+      path.includes("/queue-status/")
+    )
       return route.fulfill({ json: [] });
     if (path.endsWith("/centers"))
       return route.fulfill({
@@ -113,6 +117,9 @@ test("patient sign in, enrollment, booking, records and cancellation", async ({
     page.getByRole("button", { name: "Book session" }),
   ).toBeEnabled();
   await page.getByRole("button", { name: "Book session" }).click();
+  await page
+    .getByRole("button", { name: "Confirm booking", exact: true })
+    .click();
   await expect(
     page.getByRole("button", { name: "Cancel appointment" }),
   ).toBeVisible();

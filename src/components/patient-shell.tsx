@@ -12,9 +12,11 @@ import {
   BedDouble,
   LogOut,
   ArrowUpRight,
+  MapPin,
 } from "lucide-react";
 const links = [
   ["care-home", "Overview", "දළ විශ්ලේෂණය", HeartPulse],
+  ["find-care", "Find care", "රෝහලක් සොයන්න", MapPin],
   ["my-queue", "My queue", "මගේ පෝලිම", Ticket],
   ["my-appointments", "Appointments", "හමුවීම්", CalendarDays],
   ["my-stays", "Ward stays", "නේවාසික තොරතුරු", BedDouble],

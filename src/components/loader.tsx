@@ -2,7 +2,7 @@
 import { Loader2 } from "lucide-react";
 import { useLanguage } from "./providers";
 export function Loader({ fullPage = false }: { fullPage?: boolean }) {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   return (
     <div
       className={`loader ${fullPage ? "loader-page" : ""}`}
@@ -10,7 +10,13 @@ export function Loader({ fullPage = false }: { fullPage?: boolean }) {
       aria-live="polite"
     >
       <Loader2 size={40} className="animate-spin" aria-hidden="true" />
-      <span>{language === "si" ? "පූරණය වෙමින්..." : "Loading..."}</span>
+      <span>
+        {fullPage
+          ? language === "si"
+            ? "පූරණය වෙමින්..."
+            : "Loading..."
+          : t.submitting}
+      </span>
     </div>
   );
 }

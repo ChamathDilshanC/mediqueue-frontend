@@ -1,4 +1,6 @@
 "use client";
+import { hospitalDate } from "./ward-stay";
+import { BranchLocationPicker } from "./branch-location-picker";
 
 import {
   type ReactNode,
@@ -179,7 +181,7 @@ function formatRefDisplay(
 ): string {
   const primary = opt[refLabel];
   if (refLabel === "starts_at" && typeof primary === "string") {
-    return new Date(primary).toLocaleString();
+    return hospitalDate(primary, "en");
   }
   const main = String(primary ?? opt.name ?? opt.id);
 
@@ -230,10 +232,13 @@ function cellValue(
     );
   }
 
-  if (field.type === "datetime" && typeof value === "string") {
+  if (
+    (field.type === "datetime" || /(_at|date)$/.test(field.key)) &&
+    typeof value === "string"
+  ) {
     return (
       <span className="text-sm text-[#374151] dark:text-[#d1d5db]">
-        {new Date(value).toLocaleString()}
+        {hospitalDate(value, language === "si" ? "si" : "en")}
       </span>
     );
   }
@@ -284,7 +289,8 @@ function FormDialog({
 
   // Group fields into steps (up to 3 fields per step for multi-step UX)
   const steps = useMemo(() => {
-    if (config.key === "wards") return [editableFields];
+    if (config.key === "wards" || config.key === "branches")
+      return [editableFields];
     const chunks: FieldDef[][] = [];
     for (let i = 0; i < editableFields.length; i += 3) {
       chunks.push(editableFields.slice(i, i + 3));
@@ -299,7 +305,9 @@ function FormDialog({
         initial[f.key] = String(editing[f.key] ?? "");
       } else {
         initial[f.key] =
-          f.defaultValue ??
+          (f.type === "datetime" && !/planned|ends_at/.test(f.key)
+            ? new Date().toISOString()
+            : f.defaultValue) ??
           (f.type === "select"
             ? (f.options?.[0]?.value ?? "")
             : f.type === "number"
@@ -404,6 +412,7 @@ function FormDialog({
         if (
           f.createOnly &&
           config.inputFields.includes(f.key) &&
+          !(config.key === "branches" && f.key === "tenant_id") &&
           editing[f.key] !== undefined
         )
           body[f.key] = editing[f.key];
@@ -481,7 +490,9 @@ function FormDialog({
   const isLastStep = currentStep === steps.length - 1;
   const progressPercent = Math.round(((currentStep + 1) / steps.length) * 100);
   const modalWidthClass =
-    config.key === "wards" || steps.length > 3 ? "max-w-2xl" : "max-w-lg";
+    ["wards", "branches"].includes(config.key) || steps.length > 3
+      ? "max-w-2xl"
+      : "max-w-lg";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md p-4 overflow-y-auto">
@@ -565,6 +576,15 @@ function FormDialog({
           onSubmit={handleSubmit}
           className={`p-6 gap-4 overflow-y-auto ${config.key === "wards" ? "grid grid-cols-1 md:grid-cols-2" : "flex flex-col"}`}
         >
+          {config.key === "branches" && (
+            <BranchLocationPicker
+              latitude={formData.latitude || ""}
+              longitude={formData.longitude || ""}
+              onChange={(latitude, longitude) =>
+                setFormData((prev) => ({ ...prev, latitude, longitude }))
+              }
+            />
+          )}
           {currentStepFields.map((f) => {
             const placeholderText =
               language === "si" && f.placeholderSi
@@ -605,7 +625,14 @@ function FormDialog({
                     id={`${config.key}-${f.key}`}
                     value={formData[f.key] ?? undefined}
                     onValueChange={(val) =>
-                      setFormData((prev) => ({ ...prev, [f.key]: val }))
+                      setFormData((prev) => ({
+                        ...prev,
+                        [f.key]: val,
+                        ...(config.key === "ward-admissions" &&
+                        f.key === "ward_id"
+                          ? { bed_id: "" }
+                          : {}),
+                      }))
                     }
                   >
                     <MorphSelectTrigger className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] w-full flex items-center justify-between focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm">
@@ -619,14 +646,29 @@ function FormDialog({
                         language === "si" ? "සොයන්න..." : "Search..."
                       }
                     >
-                      {(refCache[f.refResource!] ?? []).map((opt) => (
-                        <MorphSelectItem
-                          key={String(opt.id)}
-                          value={String(opt.id)}
-                        >
-                          {formatRefDisplay(f.refResource!, f.refLabel!, opt)}
-                        </MorphSelectItem>
-                      ))}
+                      {(refCache[f.refResource!] ?? [])
+                        .filter((opt) => {
+                          if (
+                            config.key !== "ward-admissions" ||
+                            f.key !== "bed_id"
+                          )
+                            return true;
+                          return (
+                            opt.ward_id === formData.ward_id &&
+                            opt.is_active === true &&
+                            (opt.status === "AVAILABLE" ||
+                              (editing?.admission_status === "ADMITTED" &&
+                                opt.id === editing.bed_id))
+                          );
+                        })
+                        .map((opt) => (
+                          <MorphSelectItem
+                            key={String(opt.id)}
+                            value={String(opt.id)}
+                          >
+                            {formatRefDisplay(f.refResource!, f.refLabel!, opt)}
+                          </MorphSelectItem>
+                        ))}
                     </MorphSelectContent>
                   </MorphSelect>
                 ) : f.type === "select" ? (
@@ -678,30 +720,40 @@ function FormDialog({
                     </MorphSelectContent>
                   </MorphSelect>
                 ) : f.type === "datetime" ? (
-                  <input
-                    id={`${config.key}-${f.key}`}
-                    type="datetime-local"
-                    value={
-                      formData[f.key]
-                        ? new Date(
-                            new Date(formData[f.key]).getTime() -
-                              new Date(formData[f.key]).getTimezoneOffset() *
-                                60000,
-                          )
-                            .toISOString()
-                            .slice(0, 16)
-                        : ""
-                    }
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setFormData((prev) => ({
-                        ...prev,
-                        [f.key]: val ? new Date(val).toISOString() : "",
-                      }));
-                    }}
-                    className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] focus:outline-none focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm"
-                    required={f.required}
-                  />
+                  <>
+                    <input
+                      id={`${config.key}-${f.key}`}
+                      type="datetime-local"
+                      value={
+                        formData[f.key]
+                          ? new Date(
+                              new Date(formData[f.key]).getTime() -
+                                new Date(formData[f.key]).getTimezoneOffset() *
+                                  60000,
+                            )
+                              .toISOString()
+                              .slice(0, 16)
+                          : ""
+                      }
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setFormData((prev) => ({
+                          ...prev,
+                          [f.key]: val ? new Date(val).toISOString() : "",
+                        }));
+                      }}
+                      className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] focus:outline-none focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm"
+                      required={f.required}
+                    />
+                    {formData[f.key] && (
+                      <span className="text-xs text-gray-500">
+                        {hospitalDate(
+                          formData[f.key],
+                          language === "si" ? "si" : "en",
+                        )}
+                      </span>
+                    )}
+                  </>
                 ) : f.type === "number" ? (
                   <input
                     id={`${config.key}-${f.key}`}
@@ -946,6 +998,9 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
   // Dialogs
   const [showCreate, setShowCreate] = useState(false);
   const [editRow, setEditRow] = useState<Row | null>(null);
+  const [dischargeRow, setDischargeRow] = useState<Row | null>(null);
+  const [discharging, setDischarging] = useState(false);
+  const [dischargeError, setDischargeError] = useState("");
   const [deleteRow, setDeleteRow] = useState<Row | null>(null);
 
   const meta = language === "si" ? config.si : config.en;
@@ -962,12 +1017,18 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
     await Promise.all(
       refFields.map(async (f) => {
         try {
-          const resp = await fetch(`/api/backend/${f.refResource}?limit=200`, {
-            cache: "no-store",
-          });
-          if (resp.ok) {
-            cache[f.refResource!] = await resp.json();
+          const records: Row[] = [];
+          for (let offset = 0; ; offset += 200) {
+            const resp = await fetch(
+              `/api/backend/${f.refResource}?limit=200&offset=${offset}`,
+              { cache: "no-store" },
+            );
+            if (!resp.ok) break;
+            const batch: Row[] = await resp.json();
+            records.push(...batch);
+            if (batch.length < 200) break;
           }
+          cache[f.refResource!] = records;
         } catch {
           /* ignore ref load failures */
         }
@@ -1043,6 +1104,73 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
   return (
     <div className="flex-1">
       {/* Dialogs */}
+      {dischargeRow && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Discharge patient"
+            className="bg-white dark:bg-[#18181b] rounded-3xl p-6 max-w-md w-full space-y-4"
+          >
+            <h3>
+              {language === "si" ? "රෝගියා පිටත් කරන්න" : "Discharge patient"}
+            </h3>
+            <p>
+              {language === "si"
+                ? "රෝගියා පිටත් කළ පසු ඇඳ නැවත ලබාගත හැක."
+                : "Discharging this patient makes their bed available immediately."}
+            </p>
+            {dischargeError && <p role="alert">{dischargeError}</p>}
+            <div className="flex gap-3">
+              <button
+                className="button secondary"
+                disabled={discharging}
+                onClick={() => setDischargeRow(null)}
+              >
+                {language === "si" ? "අවලංගු කරන්න" : "Cancel"}
+              </button>
+              <button
+                className="button primary"
+                disabled={discharging}
+                onClick={async () => {
+                  setDischarging(true);
+                  setDischargeError("");
+                  try {
+                    const response = await fetch(
+                      `/api/backend/ward-admissions/${dischargeRow.id}/discharge`,
+                      { method: "POST" },
+                    );
+                    if (!response.ok) {
+                      const data = await response.json();
+                      throw new Error(
+                        typeof data.detail === "string"
+                          ? data.detail
+                          : "Unable to discharge",
+                      );
+                    }
+                    setDischargeRow(null);
+                    onSaved();
+                  } catch (err) {
+                    setDischargeError(
+                      err instanceof Error
+                        ? err.message
+                        : "Unable to discharge",
+                    );
+                  } finally {
+                    setDischarging(false);
+                  }
+                }}
+              >
+                {discharging
+                  ? "…"
+                  : language === "si"
+                    ? "පිටත් කරන්න"
+                    : "Discharge"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {(showCreate || editRow) && (
         <FormDialog
           config={config}
@@ -1080,7 +1208,10 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
             </div>
             {config.canCreate && config.inputFields.length > 0 && (
               <button
-                onClick={() => setShowCreate(true)}
+                onClick={() => {
+                  void loadRefs();
+                  setShowCreate(true);
+                }}
                 className="button primary flex items-center gap-2"
               >
                 <Plus size={16} />
@@ -1196,15 +1327,33 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
                     {(config.canEdit || config.canDelete) && (
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          {config.canEdit && config.inputFields.length > 0 && (
-                            <button
-                              onClick={() => setEditRow(row)}
-                              className="p-2 text-[#9ca3af] hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
-                              title={language === "si" ? "සංස්කරණය" : "Edit"}
-                            >
-                              <Pencil size={15} />
-                            </button>
-                          )}
+                          {config.key === "ward-admissions" &&
+                            config.canEdit &&
+                            row.admission_status === "ADMITTED" && (
+                              <button
+                                className="button secondary"
+                                onClick={() => {
+                                  setDischargeError("");
+                                  setDischargeRow(row);
+                                }}
+                              >
+                                {language === "si"
+                                  ? "පිටත් කරන්න"
+                                  : "Discharge"}
+                              </button>
+                            )}
+                          {config.canEdit &&
+                            config.inputFields.length > 0 &&
+                            (config.key !== "ward-admissions" ||
+                              row.admission_status === "ADMITTED") && (
+                              <button
+                                onClick={() => setEditRow(row)}
+                                className="p-2 text-[#9ca3af] hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+                                title={language === "si" ? "සංස්කරණය" : "Edit"}
+                              >
+                                <Pencil size={15} />
+                              </button>
+                            )}
                           {config.canDelete && (
                             <button
                               onClick={() => setDeleteRow(row)}

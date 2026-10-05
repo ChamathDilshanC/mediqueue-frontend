@@ -78,6 +78,7 @@ test("patient-only space takes a ticket, tracks calls and stays usable on mobile
   );
   await page.route("**/api/backend/patient/**", async (route) => {
     const path = new URL(route.request().url()).pathname;
+    if (path.includes("/queue-status/")) return route.fulfill({ json: [] });
     if (path.endsWith("/centers"))
       return route.fulfill({
         json: [
