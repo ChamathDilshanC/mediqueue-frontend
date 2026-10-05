@@ -11,11 +11,13 @@ import {
   UsersRound,
   ArrowUpRight,
   Building2,
+  UserPlus,
 } from "lucide-react";
 import { z } from "zod";
 import { apiJson } from "@/lib/api-json";
 import { useLanguage } from "./providers";
 import { hospitalDate, StayDetails, wardLabel } from "./ward-stay";
+import { ModalSurface } from "./ui/modal-surface";
 const staySchema = z.object({
   id: z.string(),
   status: z.string(),
@@ -58,6 +60,7 @@ const snapshotSchema = z.object({
   beds: z.array(bedSchema),
 });
 type Snapshot = z.infer<typeof snapshotSchema>;
+type PatientOption = { id: string; external_ref?: string; mobile?: string; nic?: string };
 const statuses = [
   "ALL",
   "OCCUPIED",
@@ -82,6 +85,15 @@ export function WardBedBoard() {
   const [loading, setLoading] = useState(true);
   const [attempt, setAttempt] = useState(0);
   const [wardAttempt, setWardAttempt] = useState(0);
+  const [admissionOpen, setAdmissionOpen] = useState(false);
+  const [patients, setPatients] = useState<PatientOption[]>([]);
+  const [patientMode, setPatientMode] = useState<"existing" | "new">("existing");
+  const [patientId, setPatientId] = useState("");
+  const [patientName, setPatientName] = useState("");
+  const [patientMobile, setPatientMobile] = useState("");
+  const [patientNic, setPatientNic] = useState("");
+  const [admissionBusy, setAdmissionBusy] = useState(false);
+  const [admissionError, setAdmissionError] = useState("");
   const fallback = si
     ? "ඇඳන් තොරතුරු දැනට ලබාගත නොහැක. නැවත උත්සාහ කරන්න."
     : "Bed information is temporarily unavailable. Please try again.";
@@ -177,6 +189,71 @@ export function WardBedBoard() {
   function refresh() {
     if (!wards.length) setWardAttempt((a) => a + 1);
     else setAttempt((a) => a + 1);
+  }
+  async function openAdmission() {
+    setAdmissionError("");
+    setAdmissionOpen(true);
+    if (patients.length) return;
+    try {
+      const response = await fetch("/api/backend/patients?limit=100&offset=0", {
+        cache: "no-store",
+      });
+      const data = await apiJson(response, fallback);
+      setPatients(Array.isArray(data) ? data : []);
+    } catch (error) {
+      setAdmissionError(error instanceof Error ? error.message : fallback);
+    }
+  }
+  async function registerAdmission() {
+    if (!bed || bed.status !== "AVAILABLE") return;
+    setAdmissionBusy(true);
+    setAdmissionError("");
+    try {
+      let selectedPatient = patientId;
+      if (patientMode === "new") {
+        if (!patientName.trim() || !patientMobile.trim()) {
+          throw new Error(
+            si ? "රෝගියාගේ නම සහ ජංගම දුරකථනය ඇතුළත් කරන්න." : "Enter the patient's name and mobile number.",
+          );
+        }
+        const patientResponse = await fetch("/api/backend/patients", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            external_ref: patientName.trim(),
+            mobile: patientMobile.trim(),
+            nic: patientNic.trim(),
+          }),
+        });
+        const created = await apiJson(patientResponse, fallback);
+        selectedPatient = created.id;
+      }
+      if (!selectedPatient) {
+        throw new Error(si ? "රෝගියෙකු තෝරන්න." : "Select a patient.");
+      }
+      const admissionResponse = await fetch("/api/backend/ward-admissions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          patient_id: selectedPatient,
+          ward_id: ward,
+          bed_id: bed.id,
+          admission_status: "ADMITTED",
+          assigned_by: "Ward desk",
+        }),
+      });
+      await apiJson(admissionResponse, fallback);
+      setAdmissionOpen(false);
+      setPatientId("");
+      setPatientName("");
+      setPatientMobile("");
+      setPatientNic("");
+      setAttempt((value) => value + 1);
+    } catch (error) {
+      setAdmissionError(error instanceof Error ? error.message : fallback);
+    } finally {
+      setAdmissionBusy(false);
+    }
   }
   return (
     <section className="ward-board">
@@ -548,6 +625,12 @@ export function WardBedBoard() {
                             ? "මෙම ඇඳ සඳහා ඇතුළත් කිරීමේ වාර්තාවක් නැත."
                             : "No admission has been recorded for this bed."}
                       </p>
+                      {bed.status === "AVAILABLE" && (
+                        <button className="button primary" onClick={() => void openAdmission()}>
+                          <UserPlus size={16} />
+                          {si ? "රෝගියා ඇතුළත් කරන්න" : "Register patient here"}
+                        </button>
+                      )}
                       <Link
                         className="button secondary"
                         href="/dashboard?resource=ward-admissions"
@@ -566,6 +649,45 @@ export function WardBedBoard() {
               )}
             </aside>
           </div>
+          {admissionOpen && bed && (
+            <ModalSurface
+              label={si ? "ඇඳට රෝගියා ඇතුළත් කරන්න" : "Register patient to bed"}
+              onClose={() => !admissionBusy && setAdmissionOpen(false)}
+              busy={admissionBusy}
+            >
+              <div className="ward-admission-dialog">
+                <h3>{si ? `${bed.number} සඳහා රෝගියා` : `Register patient to ${bed.number}`}</h3>
+                <p>{si ? "රෝගියා තෝරන්න හෝ නව රෝගියෙකු ලියාපදිංචි කරන්න." : "Choose an existing patient or create a new patient profile."}</p>
+                {admissionError && <div className="ward-error" role="alert">{admissionError}</div>}
+                <div className="ward-admission-mode">
+                  <button className={`button ${patientMode === "existing" ? "primary" : "secondary"}`} onClick={() => setPatientMode("existing")}>
+                    {si ? "දැනට සිටින රෝගියා" : "Existing patient"}
+                  </button>
+                  <button className={`button ${patientMode === "new" ? "primary" : "secondary"}`} onClick={() => setPatientMode("new")}>
+                    {si ? "නව රෝගියා" : "New patient"}
+                  </button>
+                </div>
+                {patientMode === "existing" ? (
+                  <select value={patientId} onChange={(event) => setPatientId(event.target.value)}>
+                    <option value="">{si ? "රෝගියෙකු තෝරන්න" : "Select a patient"}</option>
+                    {patients.map((patient) => (
+                      <option key={patient.id} value={patient.id}>{patient.external_ref || patient.id} {patient.mobile ? `· ${patient.mobile}` : ""}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="ward-admission-fields">
+                    <input value={patientName} onChange={(event) => setPatientName(event.target.value)} placeholder={si ? "රෝගියාගේ නම" : "Patient name"} />
+                    <input value={patientMobile} onChange={(event) => setPatientMobile(event.target.value)} placeholder={si ? "ජංගම දුරකථනය" : "Mobile number"} />
+                    <input value={patientNic} onChange={(event) => setPatientNic(event.target.value)} placeholder={si ? "ජා.හැ. අංකය (විකල්ප)" : "NIC (optional)"} />
+                  </div>
+                )}
+                <div className="ward-admission-actions">
+                  <button className="button secondary" onClick={() => setAdmissionOpen(false)} disabled={admissionBusy}>{si ? "අවලංගු කරන්න" : "Cancel"}</button>
+                  <button className="button primary" onClick={() => void registerAdmission()} disabled={admissionBusy}>{admissionBusy ? "…" : si ? "ඇතුළත් කරන්න" : "Admit patient"}</button>
+                </div>
+              </div>
+            </ModalSurface>
+          )}
           <footer className="ward-board-footer">
             <span>
               <i className="ward-live-dot" />

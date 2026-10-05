@@ -603,6 +603,46 @@
   box-shadow: 0 18px 50px #00caff0b;
 }
 
+.ward-admission-dialog {
+  width: min(560px, calc(100vw - 32px));
+  display: grid;
+  gap: 16px;
+  padding: 28px;
+  background: var(--ui-surface);
+  color: var(--ui-text);
+  border-radius: 20px;
+}
+.ward-admission-dialog h3 {
+  font-size: 22px;
+}
+.ward-admission-dialog p {
+  color: var(--ui-muted);
+}
+.ward-admission-dialog select,
+.ward-admission-fields input {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 13px;
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  background: var(--ui-surface);
+  color: var(--ui-text);
+}
+.ward-admission-fields {
+  display: grid;
+  gap: 10px;
+}
+.ward-admission-mode,
+.ward-admission-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.ward-admission-actions {
+  justify-content: flex-end;
+  padding-top: 8px;
+}
+
 .patient-portal .patient-grid {
   grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
   gap: 28px;
