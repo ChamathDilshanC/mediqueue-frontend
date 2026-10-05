@@ -572,8 +572,10 @@ function FormDialog({
   const isLastStep = currentStep === steps.length - 1;
   const progressPercent = Math.round(((currentStep + 1) / steps.length) * 100);
   const modalWidthClass =
-    ["wards", "branches"].includes(config.key) || steps.length > 3
-      ? "max-w-2xl"
+    config.key === "doctors"
+      ? "max-w-4xl"
+      : ["wards", "branches"].includes(config.key) || steps.length > 3
+        ? "max-w-2xl"
       : "max-w-lg";
 
   return (

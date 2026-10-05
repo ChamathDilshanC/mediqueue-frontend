@@ -29,6 +29,7 @@ type Slot = {
   ends_at?: string;
   remaining?: number;
   already_booked?: boolean;
+  quotation_template?: { name: string; amount: number }[];
 };
 type Overview = {
   ward_stays?: {
@@ -90,6 +91,7 @@ export function PatientPortal({
   const [doctorSearch, setDoctorSearch] = useState("");
   const [sessionDate, setSessionDate] = useState("");
   const [confirmSlot, setConfirmSlot] = useState<Slot | null>(null);
+  const [selectedQuotationItems, setSelectedQuotationItems] = useState<string[]>([]);
   const [paymentBusy, setPaymentBusy] = useState<string | null>(null);
   const request = useCallback(
     async (path: string, init?: RequestInit) => {
@@ -364,6 +366,7 @@ export function PatientPortal({
                     branch_id: center,
                     full_name: data.get("full_name"),
                     mobile: data.get("mobile"),
+                    nic: data.get("nic"),
                   });
                 }}
               >
@@ -391,6 +394,15 @@ export function PatientPortal({
                   type="tel"
                   required
                   maxLength={30}
+                />
+                <label htmlFor="nic">{si ? "ජාතික හැඳුනුම්පත් අංකය" : "NIC number"}</label>
+                <input
+                  id="nic"
+                  name="nic"
+                  required
+                  maxLength={12}
+                  pattern="(?:\d{9}[VvXx]|\d{12})"
+                  title={si ? "වලංගු NIC අංකයක් ඇතුළත් කරන්න" : "Enter a valid NIC (9 digits with V/X or 12 digits)"}
                 />
                 <button disabled={busy} className="button primary">
                   {si ? "පැතිකඩ සාදන්න" : "Create patient profile"}
@@ -510,7 +522,12 @@ export function PatientPortal({
                           s.remaining === 0 ||
                           s.already_booked
                         }
-                        onClick={() => setConfirmSlot(s)}
+                        onClick={() => {
+                          setConfirmSlot(s);
+                          setSelectedQuotationItems(
+                            (s.quotation_template ?? []).map((item) => item.name),
+                          );
+                        }}
                       >
                         {si ? "වෙන්කරන්න" : "Book session"}
                       </button>
@@ -706,6 +723,30 @@ export function PatientPortal({
             <p>{confirmSlot.specialty}</p>
             <p>{selected?.name}</p>
             <p>{date(confirmSlot.starts_at)}</p>
+            {!!confirmSlot.quotation_template?.length && (
+              <div className="booking-quotation-options">
+                <strong>
+                  {si ? "අවශ්‍ය සේවා තෝරන්න" : "Choose services for this doctor"}
+                </strong>
+                {confirmSlot.quotation_template.map((item) => (
+                  <label key={item.name}>
+                    <input
+                      type="checkbox"
+                      checked={selectedQuotationItems.includes(item.name)}
+                      onChange={(event) =>
+                        setSelectedQuotationItems((current) =>
+                          event.target.checked
+                            ? [...current, item.name]
+                            : current.filter((name) => name !== item.name),
+                        )
+                      }
+                    />
+                    <span>{item.name}</span>
+                    <b>LKR {Number(item.amount).toLocaleString()}</b>
+                  </label>
+                ))}
+              </div>
+            )}
             <p>
               {si
                 ? "මෙය වෛද්‍ය සැසියේ ආරම්භක වේලාවයි. ඔබේ වාරය සඳහා පෝලිම් තොරතුරු බලන්න."
@@ -739,6 +780,7 @@ export function PatientPortal({
                 onClick={() =>
                   void action("appointments", "POST", {
                     schedule_id: confirmSlot.id,
+                    quotation_items: selectedQuotationItems,
                   })
                 }
               >

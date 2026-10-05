@@ -272,6 +272,28 @@
 .booking-session {
   position: relative;
 }
+
+.booking-quotation-options {
+  width: 100%;
+  display: grid;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  text-align: left;
+}
+
+.booking-quotation-options label {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--flat-line);
+  border-radius: 0.75rem;
+}
+
+.booking-quotation-options label span {
+  flex: 1;
+}
 .session-availability {
   display: inline-flex;
   font-size: 11px;
