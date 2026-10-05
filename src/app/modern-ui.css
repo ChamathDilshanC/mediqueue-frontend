@@ -377,13 +377,25 @@ html[data-theme="dark"] .auth-layout .auth-visual-side p {
   color: var(--ui-muted);
 }
 .mq-modal:has(.booking-dialog) {
-  width: min(480px, calc(100vw - 32px));
+  width: min(66.666vw, 980px);
+  max-width: calc(100vw - 48px);
 }
 .mq-modal .booking-dialog {
   width: 100%;
   margin: 0;
-  max-height: calc(100dvh - 40px);
+  max-height: calc(100dvh - 32px);
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.mq-modal .booking-dialog::-webkit-scrollbar {
+  display: none;
+}
+.mq-modal .booking-dialog .booking-quotation-options {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.mq-modal .booking-dialog .booking-quotation-options > strong {
+  grid-column: 1 / -1;
 }
 .care-shell .care-card {
   border-radius: 18px;
@@ -446,6 +458,17 @@ html[lang="si"] .appointment-summary span {
   .mq-modal {
     width: calc(100vw - 20px);
     max-height: calc(100dvh - 24px);
+  }
+  .mq-modal:has(.booking-dialog) {
+    width: calc(100vw - 20px);
+    max-width: calc(100vw - 20px);
+  }
+  .mq-modal .booking-dialog {
+    max-height: calc(100dvh - 24px);
+    padding: 24px 18px;
+  }
+  .mq-modal .booking-dialog .booking-quotation-options {
+    grid-template-columns: 1fr;
   }
   .mq-modal > div {
     max-height: calc(100dvh - 24px);
