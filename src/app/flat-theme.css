@@ -582,3 +582,29 @@ body,
 .app-shell .auth-form-wrap .auth-privacy p {
   line-height: 1.5;
 }
+/* Cyan action buttons with readable dark labels across both themes. */
+.app-shell .button.primary,
+.mq-modal .button.primary,
+.app-shell .auth-audience .auth-audience-option[aria-current="page"],
+.app-shell .ward-filters button[aria-pressed="true"],
+.app-shell .appointment-summary button[aria-pressed="true"] {
+  background: #00caff !important;
+  border-color: #00caff !important;
+  color: #000000 !important;
+}
+.app-shell .button.primary:hover,
+.mq-modal .button.primary:hover {
+  background: #00caff !important;
+  border-color: #00caff !important;
+  filter: brightness(0.94);
+}
+.app-shell .button.primary :is(span, strong, svg),
+.mq-modal .button.primary :is(span, strong, svg),
+.app-shell .appointment-summary button[aria-pressed="true"] :is(span, strong) {
+  color: #000000 !important;
+}
+.app-shell .button.secondary,
+.mq-modal .button.secondary {
+  border-color: #00caff !important;
+  color: var(--flat-text) !important;
+}
