@@ -5,6 +5,7 @@ import { BranchLocationPicker } from "./branch-location-picker";
 import { messageForStatus } from "@/lib/error-messages";
 
 import {
+  Fragment,
   type ReactNode,
   useCallback,
   useEffect,
@@ -22,6 +23,7 @@ import {
   CalendarClock,
   CheckCircle2,
   ChevronLeft,
+  ChevronDown,
   ChevronRight,
   Clock,
   CreditCard,
@@ -1217,11 +1219,15 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
   const [discharging, setDischarging] = useState(false);
   const [dischargeError, setDischargeError] = useState("");
   const [deleteRow, setDeleteRow] = useState<Row | null>(null);
+  const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
 
   const meta = language === "si" ? config.si : config.en;
   const tableFields = config.fields.filter(
     (f) =>
       f.showInTable && (f.type === "uuid-ref" || !/(^id$|_id$)/.test(f.key)),
+  );
+  const detailFields = config.fields.filter(
+    (field) => field.type !== "readonly" && field.key !== "id",
   );
 
   // Fetch ref data for uuid-ref fields
@@ -1531,7 +1537,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
               </p>
             </div>
           ) : (
-            <table className="w-full text-sm text-left whitespace-nowrap">
+            <table className="resource-data-table w-full text-sm text-left">
               <thead className="text-xs text-[#727272] dark:text-[#a2a2a2] uppercase bg-[#ffffff]/50 dark:bg-gray-800/50 border-b border-[#f4f4f4] dark:border-gray-800">
                 <tr>
                   {tableFields.map((f) => (
@@ -1542,7 +1548,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
                       {language === "si" ? f.si : f.en}
                     </th>
                   ))}
-                  {(config.canEdit || config.canDelete) && (
+                  {(config.canEdit || config.canDelete || detailFields.length > 0) && (
                     <th className="px-6 py-4 font-semibold text-right">
                       {language === "si" ? "ක්‍රියා" : "Actions"}
                     </th>
@@ -1551,21 +1557,45 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filteredRows.map((row, index) => (
-                  <tr
-                    key={String(row.id ?? index)}
-                    className="hover:bg-[#ffffff] dark:bg-[#222222] transition-colors group"
-                  >
+                  <Fragment key={String(row.id ?? index)}>
+                    <tr className="hover:bg-[#ffffff] dark:bg-[#222222] transition-colors group">
                     {tableFields.map((f, colIdx) => (
                       <td
                         key={f.key}
-                        className={`px-6 py-4 ${colIdx === 0 ? "font-medium text-[#000000] dark:text-gray-100" : "text-[#727272] dark:text-[#a2a2a2]"}`}
+                        className={`px-6 py-4 align-top ${colIdx === 0 ? "font-medium text-[#000000] dark:text-gray-100" : "text-[#727272] dark:text-[#a2a2a2]"}`}
                       >
                         {cellValue(f, row[f.key], refCache, language)}
                       </td>
                     ))}
-                    {(config.canEdit || config.canDelete) && (
+                    {(config.canEdit || config.canDelete || detailFields.length > 0) && (
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-1 resource-row-actions transition-opacity">
+                          {detailFields.length > 0 && (
+                            <button
+                              className="button secondary resource-details-toggle"
+                              onClick={() => {
+                                const rowKey = String(row.id ?? index);
+                                setExpandedRows((current) => ({
+                                  ...current,
+                                  [rowKey]: !current[rowKey],
+                                }));
+                              }}
+                              aria-expanded={Boolean(
+                                expandedRows[String(row.id ?? index)],
+                              )}
+                            >
+                              <ChevronDown
+                                size={15}
+                                aria-hidden="true"
+                                className={
+                                  expandedRows[String(row.id ?? index)]
+                                    ? "rotate-180"
+                                    : ""
+                                }
+                              />
+                              {language === "si" ? "විස්තර" : "Details"}
+                            </button>
+                          )}
                           {config.key === "ward-admissions" &&
                             config.canEdit &&
                             row.admission_status === "ADMITTED" && (
@@ -1608,7 +1638,38 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
                         </div>
                       </td>
                     )}
-                  </tr>
+                    </tr>
+                    {expandedRows[String(row.id ?? index)] && (
+                      <tr className="resource-details-row">
+                      <td
+                        colSpan={
+                          tableFields.length +
+                          (config.canEdit || config.canDelete || detailFields.length > 0
+                            ? 1
+                            : 0)
+                        }
+                      >
+                        <div className="resource-details-grid">
+                          {detailFields.map((field) => (
+                            <div key={field.key} className="resource-detail-item">
+                              <span>
+                                {language === "si" ? field.si : field.en}
+                              </span>
+                              <strong>
+                                {cellValue(
+                                  field,
+                                  row[field.key],
+                                  refCache,
+                                  language,
+                                ) || "—"}
+                              </strong>
+                            </div>
+                          ))}
+                        </div>
+                      </td>
+                      </tr>
+                    )}
+                  </Fragment>
                 ))}
               </tbody>
             </table>
