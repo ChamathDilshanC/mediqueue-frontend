@@ -24,6 +24,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
 import { SharedLayoutBg } from "@/components/motion/shared-layout-bg";
 import { EASE_DRAWER, EASE_OUT, SPRING_LAYOUT, SPRING_PRESS } from "@/lib/ease";
 import { cn } from "@/lib/utils";
@@ -1012,6 +1013,7 @@ export function AnimatedSidebarMenuButton({
 }: AnimatedSidebarMenuButtonProps) {
   const context = useAnimatedSidebar();
   const panel = useAnimatedSidebarPanel();
+  const router = useRouter();
   const textLabel = typeof children === "string" ? children : undefined;
 
   const select = (
@@ -1020,6 +1022,10 @@ export function AnimatedSidebarMenuButton({
     if (disabled) {
       event.preventDefault();
       return;
+    }
+    if (href?.startsWith("/") && target !== "_blank") {
+      event.preventDefault();
+      router.push(href);
     }
     onSelect?.();
     const shouldCloseOnSelect = closeOnSelect ?? ariaExpanded === undefined;
