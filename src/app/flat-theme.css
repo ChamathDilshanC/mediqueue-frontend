@@ -469,3 +469,116 @@ body,
     transition: none;
   }
 }
+
+/* Compact authentication screens without hiding fields or clipping content. */
+.app-shell .auth-layout.container {
+  min-height: 0;
+  padding-block: 18px;
+  align-items: start;
+  gap: 48px;
+}
+.app-shell .auth-form-side {
+  margin-block: 0;
+}
+.app-shell .auth-form-wrap {
+  margin-top: 0;
+  padding: 12px 20px;
+}
+.app-shell .auth-form-wrap .auth-mark {
+  display: inline-flex;
+  margin: 0 8px 12px 0;
+  vertical-align: middle;
+}
+.app-shell .auth-form-wrap > .eyebrow {
+  display: inline-block;
+  margin: 0 0 12px;
+  vertical-align: middle;
+}
+.app-shell .auth-form-wrap .auth-audience {
+  margin-bottom: 16px;
+}
+.app-shell .auth-form-wrap h1 {
+  margin-bottom: 6px;
+}
+.app-shell .auth-form-wrap .auth-subtitle {
+  margin-bottom: 14px;
+}
+.app-shell .auth-form-wrap .auth-divider {
+  margin-block: 12px;
+}
+.app-shell .auth-form-wrap .form-field {
+  margin-bottom: 12px;
+}
+.app-shell .auth-form-wrap .input-wrap {
+  min-height: 44px;
+}
+.app-shell .auth-form-wrap .submit-button {
+  min-height: 44px;
+  margin-top: 4px;
+}
+.app-shell .auth-form-wrap .auth-switch {
+  margin-top: 14px;
+}
+.app-shell .auth-form-wrap .auth-privacy {
+  margin-top: 16px;
+  padding-top: 12px;
+}
+.app-shell .auth-layout .auth-visual-side {
+  min-height: 0;
+  padding: 36px 24px 20px;
+}
+.app-shell .auth-layout .auth-care-preview {
+  margin-top: 24px;
+  gap: 12px;
+}
+.app-shell .auth-layout .auth-feature {
+  padding: 12px 0;
+}
+.app-shell .auth-layout .auth-visual-caption {
+  margin-top: 20px;
+}
+.app-shell .auth-visual-side .back-link {
+  margin-top: 14px;
+  justify-content: center;
+}
+@media (max-width: 760px) {
+  .app-shell .auth-layout.container {
+    gap: 12px;
+    padding-block: 12px;
+  }
+  .app-shell .auth-form-wrap {
+    padding: 8px 0;
+  }
+  .app-shell .auth-layout .auth-visual-side {
+    display: flex;
+    min-height: 0;
+    padding: 0;
+    flex-direction: column;
+    align-items: center;
+  }
+  .app-shell .auth-visual-side > :not(.back-link) {
+    display: none;
+  }
+}
+.app-shell .auth-form-wrap .form-field {
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+.app-shell .auth-form-wrap .field-title {
+  line-height: 1.5;
+}
+.app-shell .auth-form-wrap .input-wrap {
+  height: 44px;
+  min-height: 44px;
+  margin-top: 6px;
+}
+.app-shell .auth-form-wrap .auth-subtitle {
+  line-height: 1.5;
+}
+.app-shell .auth-form-wrap h1 {
+  font-size: 26px;
+  line-height: 1.4;
+}
+.app-shell .auth-form-wrap .auth-privacy p {
+  line-height: 1.5;
+}

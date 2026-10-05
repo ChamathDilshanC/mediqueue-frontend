@@ -154,3 +154,25 @@ test("authentication layouts fit mobile in both languages and themes", async ({
     fullPage: true,
   });
 });
+
+test("login and registration fit a desktop viewport with the home link below the caption", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  for (const path of [
+    "/login",
+    "/register",
+    "/patient/login",
+    "/patient/register",
+  ]) {
+    await page.goto(path);
+    const home = page.locator(".auth-visual-side .back-link");
+    await expect(home).toBeVisible();
+    const caption = await page.locator(".auth-visual-caption").boundingBox();
+    const link = await home.boundingBox();
+    expect(link!.y).toBeGreaterThan(caption!.y + caption!.height);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollHeight),
+    ).toBeLessThanOrEqual(900);
+  }
+});

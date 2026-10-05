@@ -137,10 +137,6 @@ export function AuthForm({
       <SiteHeader simple />
       <main className="auth-layout container">
         <section className="auth-form-side">
-          <Link href="/" className="back-link">
-            <ArrowLeft size={15} />
-            {t.back}
-          </Link>
           {sent ? (
             <div className="auth-success" role="status">
               <span className="success-icon">
@@ -421,6 +417,10 @@ export function AuthForm({
             ))}
           </div>
           <p className="auth-visual-caption">{t.built}</p>
+          <Link href="/" className="back-link">
+            <ArrowLeft size={15} />
+            {t.back}
+          </Link>
         </aside>
       </main>
     </>
