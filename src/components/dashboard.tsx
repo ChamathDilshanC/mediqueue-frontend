@@ -18,6 +18,7 @@ import { useLanguage } from "./providers";
 import { SiteHeader } from "./site-header";
 import { ResourcePanel } from "./resource-panel";
 import { WorkflowPanel } from "./workflow-panel";
+import { Loader } from "./loader";
 import { WardBedBoard } from "./ward-bed-board";
 import Link from "next/link";
 import { OperationsReport, reportSchema } from "./operations-report";
@@ -457,8 +458,8 @@ export function Dashboard() {
     );
   if (!role)
     return (
-      <main className="container account-page" role="status">
-        {si ? "පූරණය වෙමින්..." : "Loading workspace..."}
+      <main className="workspace-loading">
+        <Loader fullPage />
       </main>
     );
   if (resource !== "overview" && !canRead(resource, role))
@@ -526,8 +527,27 @@ export function Dashboard() {
           {(resource === "queues" || resource === "appointments") && (
             <WorkflowPanel kind={resource} role={role} />
           )}
-          {resource === "bed-board" ? (
-            <WardBedBoard />
+          {resource === "bed-board" || resource === "beds" ? (
+            <>
+              <WardBedBoard />
+              {resource === "beds" && (
+                <details className="mt-8">
+                  <summary className="button secondary">
+                    {si ? "ඇඳන් කළමනාකරණය" : "Manage bed records"}
+                  </summary>
+                  <div className="mt-4">
+                    <ResourcePanel
+                      config={{
+                        ...resourceConfigs.beds,
+                        canCreate: canWrite("beds", role),
+                        canEdit: canWrite("beds", role),
+                        canDelete: role === "admin",
+                      }}
+                    />
+                  </div>
+                </details>
+              )}
+            </>
           ) : resource === "reports" ? (
             <OperationsReport />
           ) : resource === "overview" ? (

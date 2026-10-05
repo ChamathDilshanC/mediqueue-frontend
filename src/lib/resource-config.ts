@@ -1910,3 +1910,73 @@ resourceConfigs.queues.fields.push(
   },
 );
 resourceConfigs.queues.inputFields.push("service_type", "room_id");
+
+resourceConfigs.wards.fields.push(
+  {
+    key: "initial_bed_count",
+    en: "Create beds now (0 to skip)",
+    si: "දැන් සාදන ඇඳන් ගණන (අවශ්‍ය නැත්නම් 0)",
+    type: "number",
+    min: 0,
+    defaultValue: "0",
+    createOnly: true,
+  },
+  {
+    key: "initial_bed_type",
+    en: "Bed type",
+    si: "ඇඳ වර්ගය",
+    type: "select",
+    createOnly: true,
+    options: resourceConfigs.beds.fields.find((f) => f.key === "bed_type")
+      ?.options,
+  },
+  {
+    key: "bed_number_prefix",
+    en: "Bed number prefix",
+    si: "ඇඳ අංකයට මුලින් යෙදෙන අකුරු",
+    type: "text",
+    maxLength: 30,
+    defaultValue: "BED-",
+    createOnly: true,
+  },
+  {
+    key: "bed_start_number",
+    en: "First bed number",
+    si: "පළමු ඇඳ අංකය",
+    type: "number",
+    min: 1,
+    defaultValue: "1",
+    createOnly: true,
+  },
+);
+resourceConfigs.wards.inputFields.push(
+  "initial_bed_count",
+  "initial_bed_type",
+  "bed_number_prefix",
+  "bed_start_number",
+);
+
+resourceConfigs.wards.fields.find((f) => f.key === "department_id")!.required =
+  false;
+resourceConfigs.wards.fields.push(
+  ...resourceConfigs.departments.fields
+    .filter(
+      (f) =>
+        resourceConfigs.departments.inputFields.includes(f.key) &&
+        f.type !== "readonly",
+    )
+    .map((f) => ({
+      ...f,
+      key: `new_department_${f.key}`,
+      en: `New department: ${f.en}`,
+      si: `නව අංශය: ${f.si}`,
+      required: false,
+      showInTable: false,
+      createOnly: true,
+    })),
+);
+resourceConfigs.wards.inputFields.push(
+  ...resourceConfigs.wards.fields
+    .filter((f) => f.key.startsWith("new_department_"))
+    .map((f) => f.key),
+);

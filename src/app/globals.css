@@ -4678,3 +4678,140 @@ html[data-theme="dark"] .queue-card p {
 @media(min-width:1600px){.care-page { padding-top: 50px; }.care-hero { padding: 45px; }}
 @media(max-width:1150px){.care-sidebar { width: 215px; padding-left: 15px; padding-right: 15px; }.care-workspace { margin-left: 215px; }.care-page { padding: 28px; }.care-overview-stats article { grid-template-columns: 25px 1fr; padding: 17px; }.care-overview-stats strong { grid-column: 2; }.care-hero { padding: 28px; flex-direction: column; align-items: flex-start; }}
 @media(max-width:800px){.care-sidebar { display: none; }.care-workspace { margin-left: 0; }.care-topbar { padding: 0 20px; height: 72px; }.care-topbar-title,.care-avatar { display: none; }.care-mobile-brand,.care-mobile-logout { display: block; }.care-mobile-brand .brand { font-size: 20px; gap: 6px; }.care-mobile-brand .brand img { width: 27px; height: 27px; }.care-topbar-tools { gap: 9px; }.care-mobile-nav { display: flex; gap: 6px; overflow-x: auto; background: var(--care-panel); border-bottom: 1px solid var(--care-line); padding: 10px 18px; }.care-mobile-nav a { flex-shrink: 0; display: flex; align-items: center; gap: 7px; padding: 9px 11px; border-radius: 9px; color: var(--care-muted); font-size: 11px; }.care-mobile-nav a[aria-current] { color: var(--care-accent); background: var(--care-bg); }.care-page { padding: 22px 18px 40px; }.care-page section { scroll-margin-top: 15px; }.care-overview-stats { gap: 8px; }.care-overview-stats article { padding: 12px; gap: 7px; grid-template-columns: 1fr; }.care-overview-stats strong { grid-column: 1; font-size: 24px; }.care-overview-stats span { font-size: 10px; }.care-shell .account-card,.care-queue { padding: 21px; }.care-steps li { font-size: 10px; gap: 6px; }.care-steps li:not(:last-child)::after { display: none; }.care-ticket { grid-template-columns: 110px 1fr; }.care-ticket-number { padding: 20px 10px; }.care-ticket-number strong { font-size: 44px; }.care-ticket-info { padding: 19px 15px; }.care-ticket-info h3 { font-size: 16px; }.care-ticket-info p { font-size: 11px; }.care-now-serving { gap: 8px; }.care-ticket-actions { align-items: stretch; flex-direction: column; }.care-ticket-actions select { width: 100%; }.care-queue-empty { padding: 19px; gap: 15px; }.care-ticket-history > div { flex-direction: column; gap: 5px; }}
+
+.workspace-loading {
+  flex: 1;
+  width: 100%;
+}
+.loader-page {
+  min-height: 100dvh;
+  width: 100%;
+}
+.ward-plan-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 4px;
+}
+.ward-plan-heading span {
+  margin-left: auto;
+  font-size: 12px;
+}
+.ward-floor-plan {
+  position: relative;
+  padding: 24px;
+  border: 6px solid var(--wb-border);
+  border-radius: 22px;
+  background: repeating-linear-gradient(
+    0deg,
+    var(--wb-soft),
+    var(--wb-soft) 39px,
+    #92a69b18 40px
+  );
+}
+.ward-floor-plan .ward-bed-grid {
+  position: relative;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px 90px;
+}
+.ward-corridor {
+  position: absolute;
+  inset: 0 auto 0 calc(50% - 32px);
+  width: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  writing-mode: vertical-rl;
+  font-size: 10px;
+  letter-spacing: 3px;
+  background: var(--wb-bg);
+  border-inline: 1px dashed var(--wb-border);
+}
+.ward-floor-plan .ward-bed-tile {
+  box-shadow:
+    0 5px 0 var(--wb-border),
+    0 10px 20px #23382b0b;
+  border-radius: 12px;
+}
+.ward-bed-sketch {
+  width: 76px;
+  height: 112px;
+  margin: 4px auto 18px;
+  border: 4px solid #8ba099;
+  border-radius: 12px 12px 6px 6px;
+  position: relative;
+  background: #edf3f0;
+  box-shadow: 7px 8px 0 #23382b12;
+}
+.sketch-pillow {
+  position: absolute;
+  inset: 6px 8px auto;
+  height: 23px;
+  background: white;
+  border: 1px solid #ccd9d2;
+  border-radius: 6px;
+}
+.sketch-blanket {
+  position: absolute;
+  inset: 37px 3px 5px;
+  background: #b9dcca;
+  border-radius: 4px;
+  border-top: 8px solid #d6eee0;
+}
+.occupied .sketch-blanket {
+  background: #e7c78f;
+  border-color: #f4dfb6;
+}
+.reserved .sketch-blanket {
+  background: #bfc2e8;
+  border-color: #dddff5;
+}
+.cleaning .sketch-blanket {
+  background: #96d2ce;
+}
+.maintenance .sketch-blanket {
+  background: #deb0b0;
+}
+.inactive .sketch-blanket {
+  background: #bec6c2;
+}
+.sketch-number {
+  position: absolute;
+  inset: 55px 0 auto;
+  text-align: center;
+  font-weight: 700;
+  font-size: 11px;
+  color: #243e32;
+  overflow-wrap: anywhere;
+}
+.ward-plan-entry {
+  text-align: center;
+  margin: 14px auto;
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+@media (max-width: 600px) {
+  .ward-floor-plan {
+    padding: 12px;
+    border-width: 4px;
+  }
+  .ward-floor-plan .ward-bed-grid {
+    gap: 16px 38px;
+  }
+  .ward-corridor {
+    width: 28px;
+    left: calc(50% - 14px);
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+  .ward-floor-plan .ward-bed-tile {
+    padding: 10px;
+  }
+  .ward-plan-heading {
+    flex-wrap: wrap;
+  }
+  .ward-plan-heading span {
+    margin-left: 0;
+    width: 100%;
+  }
+}

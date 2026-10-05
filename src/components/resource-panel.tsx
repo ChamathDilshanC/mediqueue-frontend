@@ -284,6 +284,7 @@ function FormDialog({
 
   // Group fields into steps (up to 3 fields per step for multi-step UX)
   const steps = useMemo(() => {
+    if (config.key === "wards") return [editableFields];
     const chunks: FieldDef[][] = [];
     for (let i = 0; i < editableFields.length; i += 3) {
       chunks.push(editableFields.slice(i, i + 3));
@@ -376,11 +377,35 @@ function FormDialog({
       else body[f.key] = val;
     }
 
+    if (config.key === "wards") {
+      const department: Record<string, unknown> = {};
+      for (const key of Object.keys(body))
+        if (key.startsWith("new_department_")) {
+          department[key.replace("new_department_", "")] = body[key];
+          delete body[key];
+        }
+      if (!editing && !body.department_id && department.name)
+        body.new_department = department;
+      if (!body.department_id && !body.new_department) {
+        setError(
+          language === "si"
+            ? "අංශයක් තෝරන්න හෝ නව අංශයක නම ඇතුළත් කරන්න"
+            : "Select a department or enter a new department name",
+        );
+        setSubmitting(false);
+        return;
+      }
+    }
+
     if (editing?.version !== undefined) body.version = editing.version;
     // References marked create-only remain part of complete replacement bodies.
     if (editing)
       for (const f of config.fields) {
-        if (f.createOnly && config.inputFields.includes(f.key))
+        if (
+          f.createOnly &&
+          config.inputFields.includes(f.key) &&
+          editing[f.key] !== undefined
+        )
           body[f.key] = editing[f.key];
       }
     try {
@@ -455,7 +480,8 @@ function FormDialog({
   const currentStepFields = steps[currentStep] ?? [];
   const isLastStep = currentStep === steps.length - 1;
   const progressPercent = Math.round(((currentStep + 1) / steps.length) * 100);
-  const modalWidthClass = steps.length > 3 ? "max-w-2xl" : "max-w-lg";
+  const modalWidthClass =
+    config.key === "wards" || steps.length > 3 ? "max-w-2xl" : "max-w-lg";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md p-4 overflow-y-auto">
@@ -535,7 +561,10 @@ function FormDialog({
         </div>
 
         {/* Step Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-4">
+        <form
+          onSubmit={handleSubmit}
+          className={`p-6 gap-4 overflow-y-auto ${config.key === "wards" ? "grid grid-cols-1 md:grid-cols-2" : "flex flex-col"}`}
+        >
           {currentStepFields.map((f) => {
             const placeholderText =
               language === "si" && f.placeholderSi
@@ -579,9 +608,7 @@ function FormDialog({
                       setFormData((prev) => ({ ...prev, [f.key]: val }))
                     }
                   >
-                    <MorphSelectTrigger
-                      className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] w-full flex items-center justify-between focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm"
-                    >
+                    <MorphSelectTrigger className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] w-full flex items-center justify-between focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm">
                       <MorphSelectValue
                         placeholder={`— ${language === "si" ? "තෝරන්න" : "Select"} —`}
                       />
@@ -610,9 +637,7 @@ function FormDialog({
                       setFormData((prev) => ({ ...prev, [f.key]: val }))
                     }
                   >
-                    <MorphSelectTrigger
-                      className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] w-full flex items-center justify-between focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm"
-                    >
+                    <MorphSelectTrigger className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] w-full flex items-center justify-between focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm">
                       <MorphSelectValue
                         placeholder={`— ${language === "si" ? "තෝරන්න" : "Select"} —`}
                       />
@@ -638,9 +663,7 @@ function FormDialog({
                       setFormData((prev) => ({ ...prev, [f.key]: val }))
                     }
                   >
-                    <MorphSelectTrigger
-                      className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] w-full flex items-center justify-between focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm"
-                    >
+                    <MorphSelectTrigger className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] w-full flex items-center justify-between focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm">
                       <MorphSelectValue
                         placeholder={`— ${language === "si" ? "තෝරන්න" : "Select"} —`}
                       />

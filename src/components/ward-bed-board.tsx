@@ -373,67 +373,87 @@ export function WardBedBoard() {
                   </button>
                 ))}
               </div>
-              <div className="ward-bed-grid">
-                {beds.map((b) => {
-                  const current =
-                    b.admission?.status === "ADMITTED" ? b.admission : null;
-                  return (
-                    <button
-                      key={b.id}
-                      className={`ward-bed-tile ${b.status.toLowerCase()} ${selected === b.id ? "chosen" : ""}`}
-                      aria-label={`${si ? "ඇඳ" : "Bed"} ${b.number}, ${wardLabel(b.status, language)}`}
-                      aria-pressed={selected === b.id}
-                      onClick={() => setSelected(b.id)}
-                    >
-                      <div className="ward-tile-top">
-                        <span className="ward-bed-icon">
-                          <BedDouble size={26} />
+              <div className="ward-plan-heading">
+                <Building2 size={18} />
+                <strong>{si ? "වෝඩ් සැලැස්ම" : "Ward floor plan"}</strong>
+                <span>
+                  {si ? "ඇඳක් තෝරා විස්තර බලන්න" : "Select a numbered bed"}
+                </span>
+              </div>
+              <div className="ward-floor-plan">
+                <div className="ward-corridor" aria-hidden="true">
+                  {si ? "මැද කොරිඩෝව" : "CENTRAL AISLE"}
+                </div>
+                <div className="ward-bed-grid">
+                  {beds.map((b) => {
+                    const current =
+                      b.admission?.status === "ADMITTED" ? b.admission : null;
+                    return (
+                      <button
+                        key={b.id}
+                        className={`ward-bed-tile ${b.status.toLowerCase()} ${selected === b.id ? "chosen" : ""}`}
+                        aria-label={`${si ? "ඇඳ" : "Bed"} ${b.number}, ${wardLabel(b.status, language)}`}
+                        aria-pressed={selected === b.id}
+                        onClick={() => setSelected(b.id)}
+                      >
+                        <div className="ward-bed-sketch" aria-hidden="true">
+                          <span className="sketch-pillow" />
+                          <span className="sketch-blanket" />
+                          <span className="sketch-number">{b.number}</span>
+                        </div>
+                        <div className="ward-tile-top">
+                          <span className="ward-bed-icon">
+                            <BedDouble size={26} />
+                          </span>
+                          <span
+                            className={`ward-status ${b.status.toLowerCase()}`}
+                          >
+                            {wardLabel(b.status, language)}
+                          </span>
+                        </div>
+                        <strong>{b.number}</strong>
+                        <span className="ward-bed-type">
+                          {b.type.replaceAll("_", " ")}
                         </span>
-                        <span
-                          className={`ward-status ${b.status.toLowerCase()}`}
-                        >
-                          {wardLabel(b.status, language)}
-                        </span>
-                      </div>
-                      <strong>{b.number}</strong>
-                      <span className="ward-bed-type">
-                        {b.type.replaceAll("_", " ")}
-                      </span>
-                      <div className="ward-tile-patient">
-                        {current ? (
-                          <>
-                            <span>{current.patient_name}</span>
-                            <small>
-                              {si ? "රෝහල්ගත දින" : "Stay day"}{" "}
-                              {current.stay_days} · {si ? "ඇඳේ දින" : "Bed day"}{" "}
-                              {current.bed_days}
-                            </small>
-                          </>
-                        ) : (
-                          <span>
-                            {b.status === "AVAILABLE"
-                              ? si
-                                ? "නව රෝගියෙකු සඳහා සූදානම්"
-                                : "Ready for a new patient"
-                              : b.status === "OCCUPIED"
+                        <div className="ward-tile-patient">
+                          {current ? (
+                            <>
+                              <span>{current.patient_name}</span>
+                              <small>
+                                {si ? "රෝහල්ගත දින" : "Stay day"}{" "}
+                                {current.stay_days} ·{" "}
+                                {si ? "ඇඳේ දින" : "Bed day"} {current.bed_days}
+                              </small>
+                            </>
+                          ) : (
+                            <span>
+                              {b.status === "AVAILABLE"
                                 ? si
-                                  ? "ඇතුළත් කිරීමේ වාර්තාවක් නොමැත"
-                                  : "Admission details unavailable"
-                                : wardLabel(b.status, language)}
+                                  ? "නව රෝගියෙකු සඳහා සූදානම්"
+                                  : "Ready for a new patient"
+                                : b.status === "OCCUPIED"
+                                  ? si
+                                    ? "ඇතුළත් කිරීමේ වාර්තාවක් නොමැත"
+                                    : "Admission details unavailable"
+                                  : wardLabel(b.status, language)}
+                            </span>
+                          )}
+                        </div>
+                        {current && (
+                          <span
+                            className={`ward-discharge-line ${current.discharge_state.toLowerCase()}`}
+                          >
+                            <CalendarClock size={13} />
+                            {wardLabel(current.discharge_state, language)}
                           </span>
                         )}
-                      </div>
-                      {current && (
-                        <span
-                          className={`ward-discharge-line ${current.discharge_state.toLowerCase()}`}
-                        >
-                          <CalendarClock size={13} />
-                          {wardLabel(current.discharge_state, language)}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="ward-plan-entry">
+                {si ? "වෝඩ් පිවිසුම" : "WARD ENTRANCE"} ↑
               </div>
               {!beds.length && (
                 <div className="ward-empty">
