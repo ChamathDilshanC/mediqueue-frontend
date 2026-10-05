@@ -2032,6 +2032,14 @@ resourceConfigs.wards.fields.push(
       key: `new_department_${f.key}`,
       en: `New department: ${f.en}`,
       si: `නව අංශය: ${f.si}`,
+      placeholder:
+        f.key === "name"
+          ? "e.g. Cardiology (new department)"
+          : f.placeholder,
+      placeholderSi:
+        f.key === "name"
+          ? "උදා. හෘද රෝග අංශය (නව අංශයක්)"
+          : f.placeholderSi,
       required: false,
       showInTable: false,
       createOnly: true,

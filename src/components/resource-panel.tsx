@@ -2,6 +2,7 @@
 import { ModalSurface } from "./ui/modal-surface";
 import { hospitalDate } from "./ward-stay";
 import { BranchLocationPicker } from "./branch-location-picker";
+import { messageForStatus } from "@/lib/error-messages";
 
 import {
   type ReactNode,
@@ -521,20 +522,34 @@ function FormDialog({
               ? data.detail
                   .map((item: { msg?: string }) => item.msg || "Invalid field")
                   .join("; ")
-              : `Error ${resp.status}`,
+              : messageForStatus(
+                  resp.status,
+                  language === "si"
+                    ? "දත්ත සුරැකීමට නොහැකි විය. නැවත උත්සාහ කරන්න."
+                    : "The record could not be saved. Please try again.",
+                ),
         );
         setSubmitting(false);
         return;
       }
       onSaved();
     } catch {
-      setError("Unable to connect");
+      setError(
+        language === "si"
+          ? "සේවාව සමඟ සම්බන්ධ විය නොහැක. ඔබගේ සම්බන්ධතාවය පරීක්ෂා කර නැවත උත්සාහ කරන්න."
+          : "Unable to connect to the service. Check your connection and try again.",
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
-  const label = (f: FieldDef) => (language === "si" ? f.si : f.en);
+  const label = (f: FieldDef) => {
+    const value = language === "si" ? f.si : f.en;
+    return f.key.startsWith("new_department_")
+      ? value.replace(/^(නව අංශය:\s*|New department:\s*)/, "")
+      : value;
+  };
   const title = editing
     ? language === "si"
       ? `${config.si.singular} සංස්කරණය`
@@ -1110,14 +1125,23 @@ function DeleteConfirm({
         setError(
           typeof data?.detail === "string"
             ? data.detail
-            : `Error ${resp.status}`,
+            : messageForStatus(
+                resp.status,
+                language === "si"
+                  ? "මකා දැමීමට නොහැකි විය. නැවත උත්සාහ කරන්න."
+                  : "The record could not be deleted. Please try again.",
+              ),
         );
         setDeleting(false);
         return;
       }
       onDeleted();
     } catch {
-      setError("Unable to connect");
+      setError(
+        language === "si"
+          ? "සේවාව සමඟ සම්බන්ධ විය නොහැක. නැවත උත්සාහ කරන්න."
+          : "Unable to connect to the service. Please try again.",
+      );
       setDeleting(false);
     }
   };
