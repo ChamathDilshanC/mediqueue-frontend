@@ -104,7 +104,7 @@ export function AppointmentInbox({ role }: { role: string }) {
         );
       return value;
     },
-    { refreshInterval: 15000 },
+    { revalidateOnFocus: false },
   );
   async function update() {
     if (!selection || busy) return;

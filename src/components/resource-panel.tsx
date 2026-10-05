@@ -124,6 +124,40 @@ type Row = Record<string, unknown>;
 type RefCache = Record<string, Row[]>;
 
 const PAGE_SIZE = 20;
+const commonQuotationItems = [
+  { en: "Consultation fee", si: "වෛද්‍ය උපදේශන ගාස්තුව" },
+  { en: "Follow-up consultation", si: "නැවත පරීක්ෂා කිරීමේ ගාස්තුව" },
+  { en: "Specialist consultation", si: "විශේෂඥ උපදේශන ගාස්තුව" },
+  { en: "ECG test", si: "ECG පරීක්ෂණය" },
+  { en: "Blood test", si: "රුධිර පරීක්ෂණය" },
+  { en: "Urine test", si: "මුත්‍රා පරීක්ෂණය" },
+  { en: "X-ray", si: "X-ray පරීක්ෂණය" },
+  { en: "Ultrasound scan", si: "Ultrasound ස්කෑන් පරීක්ෂණය" },
+  { en: "Dressing fee", si: "තුවාල බැඳීමේ ගාස්තුව" },
+  { en: "Injection fee", si: "එන්නත් කිරීමේ ගාස්තුව" },
+];
+
+function updateQuotationItem(
+  value: string,
+  names: string[],
+  displayName: string,
+  amount: string,
+) {
+  const lines = value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line && !names.includes(line.split("|")[0].trim()));
+  if (amount.trim()) lines.unshift(`${displayName} | ${amount.trim()}`);
+  return lines.join("\n");
+}
+
+function quotationAmount(value: string, names: string[]) {
+  const line = value
+    .split("\n")
+    .map((item) => item.trim())
+    .find((item) => names.includes(item.split("|")[0].trim()));
+  return line?.slice(line.lastIndexOf("|") + 1).trim() ?? "";
+}
 
 /* ─────────────────── Helpers ─────────────────── */
 
@@ -833,19 +867,67 @@ function FormDialog({
                     )}
                   </>
                 ) : f.type === "quotation" ? (
-                  <textarea
-                    id={`${config.key}-${f.key}`}
-                    value={formData[f.key] ?? ""}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        [f.key]: e.target.value,
-                      }))
-                    }
-                    placeholder={placeholderText ?? ""}
-                    rows={4}
-                    className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] focus:outline-none focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm md:col-span-2"
-                  />
+                  <div className="md:col-span-2 space-y-3">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {language === "si"
+                        ? "අවශ්‍ය සේවාව තෝරා එක් එක් සේවාවට මිල ඇතුළත් කරන්න. හිස්ව තැබූ ඒවා quotation එකට එකතු නොවේ."
+                        : "Enter a price for each service you want to include. Empty options are not added to the quotation."}
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      {commonQuotationItems.map((item) => {
+                        const itemName =
+                          language === "si" ? item.si : item.en;
+                        return (
+                          <label
+                            key={item.en}
+                            className="flex items-center gap-2 rounded-xl border border-gray-200 dark:border-gray-800 px-3 py-2"
+                          >
+                            <span className="text-sm flex-1">{itemName}</span>
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              value={quotationAmount(
+                                formData[f.key] ?? "",
+                                [item.en, item.si],
+                              )}
+                              onChange={(e) =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  [f.key]: updateQuotationItem(
+                                    prev[f.key] ?? "",
+                                    [item.en, item.si],
+                                    itemName,
+                                    e.target.value,
+                                  ),
+                                }))
+                              }
+                              placeholder="LKR"
+                              aria-label={`${itemName} price`}
+                              className="w-28 px-3 py-2 bg-gray-50/50 dark:bg-[#121212] border border-gray-200 dark:border-gray-800 rounded-xl text-sm"
+                            />
+                          </label>
+                        );
+                      })}
+                    </div>
+                    <textarea
+                      id={`${config.key}-${f.key}`}
+                      value={formData[f.key] ?? ""}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          [f.key]: e.target.value,
+                        }))
+                      }
+                      placeholder={
+                        language === "si"
+                          ? "අමතර item එකක්: නම | මිල"
+                          : "Additional item: name | amount"
+                      }
+                      rows={3}
+                      className="w-full px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] focus:outline-none focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm"
+                    />
+                  </div>
                 ) : f.type === "number" ? (
                   <input
                     id={`${config.key}-${f.key}`}

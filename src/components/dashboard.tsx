@@ -27,6 +27,7 @@ import { resources, type ResourceKey } from "@/lib/dashboard-resources";
 import { resourceConfigs } from "@/lib/resource-config";
 import { profileSchema } from "@/lib/auth-contract";
 import { activeMembership, canRead, canWrite } from "@/lib/permissions";
+import { DATA_UPDATED_EVENT } from "@/lib/data-sync";
 
 type Row = Record<string, unknown>;
 
@@ -37,6 +38,7 @@ function OverviewDashboard() {
   const router = useRouter();
 
   const [loadError, setLoadError] = useState(false);
+  const [dataVersion, setDataVersion] = useState(0);
 
   // Live stats from backend
   const [stats, setStats] = useState({
@@ -50,6 +52,12 @@ function OverviewDashboard() {
   const [recentAppointments, setRecentAppointments] = useState<Row[]>([]);
   const [recentDoctors, setRecentDoctors] = useState<Row[]>([]);
   const [recentDepartments, setRecentDepartments] = useState<Row[]>([]);
+
+  useEffect(() => {
+    const onDataUpdated = () => setDataVersion((version) => version + 1);
+    window.addEventListener(DATA_UPDATED_EVENT, onDataUpdated);
+    return () => window.removeEventListener(DATA_UPDATED_EVENT, onDataUpdated);
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -97,7 +105,7 @@ function OverviewDashboard() {
 
     void load();
     return () => controller.abort();
-  }, []);
+  }, [dataVersion]);
 
   const si = language === "si";
 
