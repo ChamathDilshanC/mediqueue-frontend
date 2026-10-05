@@ -92,6 +92,9 @@ export function PatientPortal({
   const [sessionDate, setSessionDate] = useState("");
   const [confirmSlot, setConfirmSlot] = useState<Slot | null>(null);
   const [selectedQuotationItems, setSelectedQuotationItems] = useState<string[]>([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
+    "ONLINE" | "PAY_AT_HOSPITAL"
+  >("PAY_AT_HOSPITAL");
   const [paymentBusy, setPaymentBusy] = useState<string | null>(null);
   const request = useCallback(
     async (path: string, init?: RequestInit) => {
@@ -217,6 +220,52 @@ export function PatientPortal({
       setError((e as Error).message);
     } finally {
       setPaymentBusy(null);
+    }
+  }
+  async function bookAppointment() {
+    if (!confirmSlot) return;
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      const booking = await request("appointments", {
+        method: "POST",
+        body: JSON.stringify({
+          schedule_id: confirmSlot.id,
+          quotation_items: selectedQuotationItems,
+        }),
+      });
+      if (selectedPaymentMethod === "ONLINE") {
+        const payment = await request(`appointments/${booking.id}/payment`, {
+          method: "POST",
+          body: JSON.stringify({ method: "ONLINE" }),
+        });
+        if (payment.checkout_url) {
+          window.location.href = payment.checkout_url;
+          return;
+        }
+      } else {
+        await request(`appointments/${booking.id}/payment`, {
+          method: "POST",
+          body: JSON.stringify({ method: "PAY_AT_HOSPITAL" }),
+        });
+      }
+      await load();
+      setSessionAttempt((value) => value + 1);
+      setConfirmSlot(null);
+      setNotice(
+        selectedPaymentMethod === "ONLINE"
+          ? si
+            ? "Online ගෙවීම ආරම්භ කළ හැකිය."
+            : "Your online payment preference was saved."
+          : si
+            ? "හමුවීම ඉල්ලා ඇති අතර රෝහලට පැමිණ ගෙවීමට තෝරාගෙන ඇත."
+            : "Appointment requested. You can pay at the hospital.",
+      );
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
     }
   }
   const selected = centers.find((c) => c.id === center);
@@ -581,7 +630,7 @@ export function PatientPortal({
                         </div>
                       ))}
                       <b>{si ? "මුළු එකතුව" : "Total"}: LKR {Number(a.quotation_total || 0).toLocaleString()}</b>
-                      {["BOOKED", "CHECKED_IN"].includes(a.status) && a.payment_status !== "PAID" && (
+                      {["PENDING", "BOOKED", "CHECKED_IN"].includes(a.status) && a.payment_status !== "PAID" && (
                         <div className="appointment-payment-actions">
                           <button
                             className="button primary"
@@ -747,6 +796,27 @@ export function PatientPortal({
                 ))}
               </div>
             )}
+            <div className="booking-payment-options">
+              <strong>{si ? "ගෙවීමේ ක්‍රමය" : "Payment method"}</strong>
+              <label>
+                <input
+                  type="radio"
+                  name="appointment-payment-method"
+                  checked={selectedPaymentMethod === "ONLINE"}
+                  onChange={() => setSelectedPaymentMethod("ONLINE")}
+                />
+                <span>{si ? "Stripe හරහා online ගෙවන්න" : "Pay online with Stripe"}</span>
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="appointment-payment-method"
+                  checked={selectedPaymentMethod === "PAY_AT_HOSPITAL"}
+                  onChange={() => setSelectedPaymentMethod("PAY_AT_HOSPITAL")}
+                />
+                <span>{si ? "රෝහලට පැමිණ ගෙවන්න" : "Pay at the hospital"}</span>
+              </label>
+            </div>
             <p>
               {si
                 ? "මෙය වෛද්‍ය සැසියේ ආරම්භක වේලාවයි. ඔබේ වාරය සඳහා පෝලිම් තොරතුරු බලන්න."
@@ -777,12 +847,7 @@ export function PatientPortal({
               <button
                 className="button primary"
                 disabled={busy}
-                onClick={() =>
-                  void action("appointments", "POST", {
-                    schedule_id: confirmSlot.id,
-                    quotation_items: selectedQuotationItems,
-                  })
-                }
+                onClick={() => void bookAppointment()}
               >
                 {busy
                   ? si
