@@ -19,6 +19,20 @@ html[data-theme="dark"] {
 }
 body {
   font-size: 14px;
+  overflow-x: hidden;
+}
+
+html,
+body,
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  display: none;
 }
 :where(button, a, input, textarea, select, summary):focus-visible {
   outline: 3px solid var(--ui-accent);
@@ -150,7 +164,8 @@ body {
   inset: 0;
   margin: auto;
   padding: 0;
-  width: min(680px, calc(100vw - 32px));
+  width: min(66.666vw, 1100px);
+  max-width: calc(100vw - 32px);
   max-height: calc(100dvh - 40px);
   overflow: visible;
   border: 0;
@@ -199,6 +214,7 @@ body {
 }
 .staff-workspace {
   background: var(--ui-canvas);
+  overflow-x: hidden;
 }
 .staff-workspace > div {
   max-width: 1600px;
