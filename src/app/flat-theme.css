@@ -358,3 +358,48 @@ body,
 .app-shell :is(h1, h2, h3, h4, label, th, td) {
   color: var(--flat-text) !important;
 }
+/* Selection controls retain a visible box and selected fill in the flat layout. */
+.app-shell .auth-audience {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--flat-line) !important;
+  border-radius: 8px !important;
+  margin-bottom: 24px;
+}
+.app-shell .auth-audience .auth-audience-option,
+.app-shell .ward-filters button,
+.app-shell .appointment-summary button {
+  min-height: 44px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  color: var(--flat-text) !important;
+  border: 1px solid var(--flat-line) !important;
+  border-radius: 6px !important;
+  background: var(--flat-bg) !important;
+  text-decoration: none;
+}
+.app-shell .auth-audience .auth-audience-option {
+  border-color: transparent !important;
+}
+.app-shell .auth-audience .auth-audience-option[aria-current="page"],
+.app-shell .ward-filters button[aria-pressed="true"],
+.app-shell .appointment-summary button[aria-pressed="true"] {
+  background: var(--palette-violet) !important;
+  color: #ffffff !important;
+  border-color: var(--palette-violet) !important;
+  text-decoration: none;
+}
+.app-shell .appointment-summary button[aria-pressed="true"] :is(span, strong) {
+  color: #ffffff !important;
+}
+.app-shell .auth-audience .auth-audience-option:hover,
+.app-shell .ward-filters button:hover,
+.app-shell .appointment-summary button:hover {
+  border-color: var(--flat-accent) !important;
+}
