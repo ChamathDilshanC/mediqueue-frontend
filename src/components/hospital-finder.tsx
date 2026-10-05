@@ -213,6 +213,8 @@ export function HospitalFinder({
   const si = language === "si";
   const [search, setSearch] = useState("");
   const [position, setPosition] = useState<Position | null>(null);
+  const [page, setPage] = useState(0);
+  const pageSize = 6;
   const [locating, setLocating] = useState(false);
   const [locationError, setLocationError] = useState("");
   const [nearby, setNearby] = useState(false);
@@ -269,6 +271,8 @@ export function HospitalFinder({
         ),
     [centers, search, position, nearby],
   );
+  const visibleMatches = matches.slice(page * pageSize, (page + 1) * pageSize);
+  const pageCount = Math.ceil(matches.length / pageSize);
   const mapped = useMemo(() => matches.filter(hasCoordinates), [matches]);
   return (
     <section className="hospital-finder" id="find-care">
@@ -306,7 +310,10 @@ export function HospitalFinder({
               si ? "රෝහල හෝ ලිපිනය සොයන්න" : "Search hospitals or address"
             }
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(0);
+            }}
           />
         </label>
         <button
@@ -314,6 +321,7 @@ export function HospitalFinder({
           onClick={() => {
             setNearby(false);
             setSearch("");
+            setPage(0);
             setAllVersion((v) => v + 1);
           }}
         >
@@ -371,7 +379,7 @@ export function HospitalFinder({
         <p>{si ? "ගැළපෙන රෝහල් නොමැත." : "No hospitals match your search."}</p>
       )}
       <div className="hospital-results">
-        {matches.map((c, i) => (
+        {visibleMatches.map((c, i) => (
           <article
             key={c.id}
             className={`hospital-result ${selected === c.id ? "chosen" : ""}`}
@@ -438,6 +446,25 @@ export function HospitalFinder({
           </article>
         ))}
       </div>
+      {pageCount > 1 && (
+        <div className="finder-pagination">
+          <button
+            className="button secondary"
+            disabled={page === 0}
+            onClick={() => setPage((value) => value - 1)}
+          >
+            {si ? "පෙර" : "Previous"}
+          </button>
+          <span>{page + 1} / {pageCount}</span>
+          <button
+            className="button secondary"
+            disabled={page >= pageCount - 1}
+            onClick={() => setPage((value) => value + 1)}
+          >
+            {si ? "ඊළඟ" : "Next"}
+          </button>
+        </div>
+      )}
     </section>
   );
 }

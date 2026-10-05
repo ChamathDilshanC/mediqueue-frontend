@@ -514,6 +514,30 @@ html[lang="si"] .appointment-summary span {
   gap: 16px;
   margin-bottom: 24px;
 }
+.appointment-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.appointment-tabs button {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 18px;
+  border: 1px solid var(--ui-border);
+  border-radius: 14px;
+  background: var(--ui-canvas);
+  color: var(--ui-text);
+}
+.appointment-tabs button[aria-selected="true"] {
+  border-color: var(--ui-accent);
+  background: var(--ui-tint);
+}
+.appointment-tabs strong {
+  font-size: 20px;
+}
 .appointment-summary button {
   padding: 18px;
   text-align: left;
@@ -664,6 +688,23 @@ html[lang="si"] .appointment-summary span {
   display: flex;
   gap: 8px;
 }
+.finder-pagination,
+.patient-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+.finder-pagination .button,
+.patient-pagination .button {
+  margin: 0;
+}
+.patient-portal .patient-pagination {
+  justify-content: space-between;
+  padding-top: 16px;
+  border-top: 1px solid var(--care-line);
+}
 .appointment-empty {
   text-align: center;
   padding: 50px 20px;
@@ -696,6 +737,9 @@ html[lang="si"] .appointment-summary span {
   .appointment-summary {
     grid-template-columns: 1fr 1fr;
     gap: 10px;
+  }
+  .appointment-tabs {
+    grid-template-columns: 1fr;
   }
   .appointment-row {
     grid-template-columns: 1fr;

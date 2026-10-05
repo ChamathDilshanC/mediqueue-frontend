@@ -97,6 +97,10 @@ export function PatientPortal({
   >("PAY_AT_HOSPITAL");
   const [paymentBusy, setPaymentBusy] = useState<string | null>(null);
   const [paymentStage, setPaymentStage] = useState<"connecting" | "redirecting" | null>(null);
+  const [appointmentPage, setAppointmentPage] = useState(0);
+  const [sessionPage, setSessionPage] = useState(0);
+  const appointmentPageSize = 6;
+  const sessionPageSize = 6;
   const request = useCallback(
     async (path: string, init?: RequestInit) => {
       const response = await fetch(`/api/backend/patient/${path}`, {
@@ -151,6 +155,7 @@ export function PatientPortal({
     setDoctorsError(false);
     setSessionsError("");
     setConfirmSlot(null);
+    setSessionPage(0);
     if (!center) {
       setSessionsLoading(false);
       return;
@@ -292,6 +297,18 @@ export function PatientPortal({
         new Date(s.starts_at).toLocaleDateString("en-CA", {
           timeZone: selected?.timezone || "Asia/Colombo",
         }) === sessionDate),
+  );
+  const visibleSessionSlots = visibleSlots.slice(
+    sessionPage * sessionPageSize,
+    (sessionPage + 1) * sessionPageSize,
+  );
+  const sessionPages = Math.ceil(visibleSlots.length / sessionPageSize);
+  const visibleAppointments = (overview?.appointments ?? []).slice(
+    appointmentPage * appointmentPageSize,
+    (appointmentPage + 1) * appointmentPageSize,
+  );
+  const appointmentPages = Math.ceil(
+    (overview?.appointments.length ?? 0) / appointmentPageSize,
   );
   return (
     <PatientShell name={overview?.profiles[0]?.name}>
@@ -553,7 +570,7 @@ export function PatientPortal({
                       : "No upcoming sessions. The hospital must publish a doctor’s schedule before appointments can be booked."}
                   </p>
                 ) : (
-                  visibleSlots.map((s) => (
+                  visibleSessionSlots.map((s) => (
                     <article key={s.id} className="booking-session">
                       <strong>{s.doctor}</strong>
                       <p>
@@ -590,6 +607,25 @@ export function PatientPortal({
                     </article>
                   ))
                 )}
+                {sessionPages > 1 && (
+                  <div className="patient-pagination">
+                    <button
+                      className="button secondary"
+                      disabled={sessionPage === 0}
+                      onClick={() => setSessionPage((page) => page - 1)}
+                    >
+                      {si ? "පෙර" : "Previous"}
+                    </button>
+                    <span>{sessionPage + 1} / {sessionPages}</span>
+                    <button
+                      className="button secondary"
+                      disabled={sessionPage >= sessionPages - 1}
+                      onClick={() => setSessionPage((page) => page + 1)}
+                    >
+                      {si ? "ඊළඟ" : "Next"}
+                    </button>
+                  </div>
+                )}
                 {!sessionsLoading &&
                   !sessionsError &&
                   slots.length > 0 &&
@@ -612,7 +648,7 @@ export function PatientPortal({
                   {si ? "තවම හමුවීම් නොමැත" : "You have no appointments yet."}
                 </p>
               )}
-              {overview?.appointments.map((a) => (
+              {visibleAppointments.map((a) => (
                 <article key={a.id}>
                   <strong>{a.doctor}</strong>
                   <p>{date(a.starts_at, a.timezone || "Asia/Colombo")}</p>
@@ -636,6 +672,25 @@ export function PatientPortal({
                           <span>{item.name}</span><span>LKR {Number(item.amount).toLocaleString()}</span>
                         </div>
                       ))}
+                      {appointmentPages > 1 && (
+                        <div className="patient-pagination">
+                          <button
+                            className="button secondary"
+                            disabled={appointmentPage === 0}
+                            onClick={() => setAppointmentPage((page) => page - 1)}
+                          >
+                            {si ? "පෙර" : "Previous"}
+                          </button>
+                          <span>{appointmentPage + 1} / {appointmentPages}</span>
+                          <button
+                            className="button secondary"
+                            disabled={appointmentPage >= appointmentPages - 1}
+                            onClick={() => setAppointmentPage((page) => page + 1)}
+                          >
+                            {si ? "ඊළඟ" : "Next"}
+                          </button>
+                        </div>
+                      )}
                       <b>{si ? "මුළු එකතුව" : "Total"}: LKR {Number(a.quotation_total || 0).toLocaleString()}</b>
                       {["PENDING", "BOOKED", "CHECKED_IN"].includes(a.status) && a.payment_status !== "PAID" && (
                         <div className="appointment-payment-actions">

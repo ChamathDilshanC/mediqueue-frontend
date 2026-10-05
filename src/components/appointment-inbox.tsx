@@ -62,7 +62,7 @@ export function AppointmentInbox({ role }: { role: string }) {
     appointmentLabels[state]?.[si ? 1 : 0] || state;
   const actionLabel = (state: string) =>
     actionLabels[state]?.[si ? 1 : 0] || state;
-  const [filter, setFilter] = useState("");
+  const [filter, setFilter] = useState("ACTIVE");
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(0);
@@ -83,7 +83,8 @@ export function AppointmentInbox({ role }: { role: string }) {
     }, 300);
     return () => window.clearTimeout(timer);
   }, [search]);
-  const key = `/api/backend/appointment-inbox?limit=20&offset=${page * 20}&status=${filter}&q=${encodeURIComponent(query)}`;
+  const pageSize = 6;
+  const key = `/api/backend/appointment-inbox?limit=${pageSize}&offset=${page * pageSize}&status=${filter}&q=${encodeURIComponent(query)}`;
   const {
     data,
     error: loadError,
@@ -174,18 +175,25 @@ export function AppointmentInbox({ role }: { role: string }) {
       className="appointment-inbox"
       aria-label={si ? "හමුවීම් කළමනාකරණය" : "Appointment management"}
     >
-      <div className="appointment-summary">
-        {["PENDING", "BOOKED", "CHECKED_IN", "NO_SHOW"].map((status) => (
+      <div className="appointment-tabs" role="tablist" aria-label={si ? "හමුවීම් වර්ගය" : "Appointment type"}>
+        {(["ACTIVE", "INVALID"] as const).map((status) => (
           <button
             key={status}
-            aria-pressed={filter === status}
+            role="tab"
+            aria-selected={filter === status}
             onClick={() => {
-              setFilter(filter === status ? "" : status);
+              setFilter(status);
               setPage(0);
             }}
           >
-            <span>{label(status)}</span>
-            <strong>{data ? (data.counts[status] ?? 0) : "—"}</strong>
+            <span>{status === "ACTIVE" ? (si ? "සක්‍රීය හමුවීම්" : "Active appointments") : (si ? "අවලංගු හමුවීම්" : "Invalid appointments")}</span>
+            <strong>
+              {data
+                ? status === "ACTIVE"
+                  ? ["PENDING", "BOOKED", "CHECKED_IN"].reduce((total, item) => total + (data.counts[item] ?? 0), 0)
+                  : ["REJECTED", "CANCELLED", "NO_SHOW"].reduce((total, item) => total + (data.counts[item] ?? 0), 0)
+                : "—"}
+            </strong>
           </button>
         ))}
       </div>
@@ -209,7 +217,8 @@ export function AppointmentInbox({ role }: { role: string }) {
             setPage(0);
           }}
         >
-          <option value="">{si ? "සියලු හමුවීම්" : "All appointments"}</option>
+          <option value="ACTIVE">{si ? "සක්‍රීය හමුවීම්" : "Active appointments"}</option>
+          <option value="INVALID">{si ? "අවලංගු හමුවීම්" : "Invalid appointments"}</option>
           {Object.keys(appointmentLabels).map((status) => (
             <option key={status} value={status}>
               {label(status)}
