@@ -10,9 +10,23 @@ import {
 
 type Context = { params: Promise<{ path: string[] }> };
 
-function forwardResponse(upstream: Response) {
+function forwardResponse(upstream: Response, exposePaymentError = false) {
   if (
-    upstream.status >= 500 ||
+    exposePaymentError &&
+    upstream.status >= 500 &&
+    upstream.headers.get("content-type")?.includes("application/json")
+  ) {
+    return new NextResponse(upstream.body, {
+      status: upstream.status,
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store",
+        "X-Expose-Backend-Error": "true",
+      },
+    });
+  }
+  if (
+    (upstream.status >= 500 && !exposePaymentError) ||
     (upstream.status !== 204 &&
       !upstream.headers.get("content-type")?.includes("application/json"))
   ) {
@@ -130,12 +144,12 @@ async function proxy(request: NextRequest, context: Context) {
         },
       );
 
-      const response = forwardResponse(upstream);
+      const response = forwardResponse(upstream, isPaymentRequest);
       setSession(response, session);
       return response;
     }
 
-    return forwardResponse(upstream);
+    return forwardResponse(upstream, isPaymentRequest);
   } catch {
     return NextResponse.json(
       { error: "backendUnavailable" },

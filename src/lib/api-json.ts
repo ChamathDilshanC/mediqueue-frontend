@@ -6,7 +6,9 @@ export async function apiJson(
   const data = await response.json().catch(() => null);
   if (!response.ok || data === null) {
     throw new Error(
-      response.status < 500 && typeof data?.detail === "string"
+      (response.status < 500 ||
+        response.headers.get("x-expose-backend-error") === "true") &&
+      typeof data?.detail === "string"
         ? data.detail
         : fallback,
     );

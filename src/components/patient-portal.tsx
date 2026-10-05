@@ -226,7 +226,12 @@ export function PatientPortal({
       await load();
       setNotice(si ? "ගෙවීමේ ක්‍රමය සුරකින ලදී." : "Payment preference saved.");
     } catch (e) {
-      setError((e as Error).message);
+      setError(
+        (e as Error).message ||
+          (si
+            ? "ගෙවීම ආරම්භ කළ නොහැක. නැවත උත්සාහ කරන්න."
+            : "Payment could not be started. Please try again."),
+      );
     } finally {
       setPaymentBusy(null);
       setPaymentStage(null);
