@@ -1236,13 +1236,21 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
     [config.fields],
   );
 
-  const loadRefs = useCallback(async () => {
+  const loadRefs = useCallback(async (force = false) => {
     const request = ++refRequest.current;
     setRefsLoading(true);
     setRefsError("");
     const resources = [
       ...new Set(refFields.map((field) => field.refResource!)),
     ];
+    if (
+      !force &&
+      resources.length > 0 &&
+      resources.every((resource) => refCache[resource] !== undefined)
+    ) {
+      setRefsLoading(false);
+      return;
+    }
     const results = await Promise.allSettled(
       resources.map(async (resource) => {
         const records: Row[] = [];
@@ -1278,7 +1286,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
           : "Some options could not be loaded. Please retry.",
       );
     setRefsLoading(false);
-  }, [refFields, language]);
+  }, [refCache, refFields, language]);
 
   const fetcher = useCallback(
     async (url: string) => {
@@ -1304,6 +1312,10 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
   } = useSWR(
     `/api/backend/${config.endpoint}?limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}`,
     fetcher,
+    {
+      revalidateIfStale: false,
+      keepPreviousData: true,
+    },
   );
 
   const rows: Row[] = rowsData ?? [];
@@ -1336,7 +1348,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
     setShowCreate(false);
     setEditRow(null);
     void mutateRows();
-    void loadRefs();
+    void loadRefs(true);
   };
 
   const onDeleted = () => {
@@ -1454,7 +1466,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
             {config.canCreate && config.inputFields.length > 0 && (
               <button
                 onClick={() => {
-                  void loadRefs();
+                  void loadRefs(true);
                   setShowCreate(true);
                 }}
                 className="button primary flex items-center gap-2"
@@ -1617,7 +1629,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
                               row.admission_status === "ADMITTED") && (
                               <button
                                 onClick={() => {
-                                  void loadRefs();
+                                  void loadRefs(true);
                                   setEditRow(row);
                                 }}
                                 className="p-2 text-[#a2a2a2] hover:text-[var(--flat-accent)] rounded-lg hover:bg-transparent transition-colors"
