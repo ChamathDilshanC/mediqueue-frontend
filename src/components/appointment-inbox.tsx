@@ -396,37 +396,6 @@ export function AppointmentInbox({ role }: { role: string }) {
                 />
               </label>
             )}
-            {quotationSelection && (
-              <ModalSurface
-                label={si ? "Quotation සකසන්න" : "Create appointment quotation"}
-                busy={busy}
-                onClose={() => setQuotationSelection(null)}
-              >
-                <form className="appointment-confirm" onSubmit={(event) => { event.preventDefault(); void saveQuotation(); }}>
-                  <h2>{si ? "වෛද්‍ය ගාස්තු සහ medical items" : "Appointment quotation"}</h2>
-                  <p>{quotationSelection.patient_name} · {quotationSelection.doctor}</p>
-                  <label>
-                    {si ? "එක් පේළියකට: නම | මුදල (LKR)" : "One item per line: name | amount (LKR)"}
-                    <textarea
-                      rows={6}
-                      value={quotationText}
-                      onChange={(event) => setQuotationText(event.target.value)}
-                      placeholder={"Consultation fee | 2500\nBlood test | 1500"}
-                      disabled={busy}
-                    />
-                  </label>
-                  {error && <p role="alert" className="form-error">{error}</p>}
-                  <div className="appointment-actions">
-                    <button type="button" className="button secondary" disabled={busy} onClick={() => setQuotationSelection(null)}>
-                      {si ? "ආපසු" : "Go back"}
-                    </button>
-                    <button type="submit" className="button primary" disabled={busy}>
-                      {busy ? (si ? "සුරකිමින්..." : "Saving...") : si ? "සුරකින්න" : "Save quotation"}
-                    </button>
-                  </div>
-                </form>
-              </ModalSurface>
-            )}
             {error && (
               <p role="alert" className="form-error">
                 {error}
@@ -453,6 +422,62 @@ export function AppointmentInbox({ role }: { role: string }) {
                     ? "යාවත්කාලීන වෙමින්..."
                     : "Updating..."
                   : actionLabel(selection.status)}
+              </button>
+            </div>
+          </form>
+        </ModalSurface>
+      )}
+      {quotationSelection && (
+        <ModalSurface
+          label={si ? "Quotation සකසන්න" : "Create appointment quotation"}
+          busy={busy}
+          onClose={() => setQuotationSelection(null)}
+        >
+          <form
+            className="appointment-confirm"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void saveQuotation();
+            }}
+          >
+            <h2>{si ? "වෛද්‍ය ගාස්තු සහ medical items" : "Appointment quotation"}</h2>
+            <p>
+              {quotationSelection.patient_name} · {quotationSelection.doctor}
+            </p>
+            <label>
+              {si
+                ? "එක් පේළියකට: නම | මුදල (LKR)"
+                : "One item per line: name | amount (LKR)"}
+              <textarea
+                rows={6}
+                value={quotationText}
+                onChange={(event) => setQuotationText(event.target.value)}
+                placeholder={"Consultation fee | 2500\nBlood test | 1500"}
+                disabled={busy}
+              />
+            </label>
+            {error && (
+              <p role="alert" className="form-error">
+                {error}
+              </p>
+            )}
+            <div className="appointment-actions">
+              <button
+                type="button"
+                className="button secondary"
+                disabled={busy}
+                onClick={() => setQuotationSelection(null)}
+              >
+                {si ? "ආපසු" : "Go back"}
+              </button>
+              <button type="submit" className="button primary" disabled={busy}>
+                {busy
+                  ? si
+                    ? "සුරකිමින්..."
+                    : "Saving..."
+                  : si
+                    ? "සුරකින්න"
+                    : "Save quotation"}
               </button>
             </div>
           </form>
