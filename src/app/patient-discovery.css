@@ -692,6 +692,36 @@
   margin: 0;
 }
 
+.patient-appointment-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 16px;
+}
+
+.patient-appointment-tabs button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--patient-border);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--care-muted);
+}
+
+.patient-appointment-tabs button[aria-selected="true"] {
+  border-color: var(--care-accent);
+  background: #00caff0d;
+  color: var(--care-text);
+}
+
+.patient-appointment-tabs strong {
+  color: var(--care-accent);
+}
+
 .booking-payment-options {
   display: grid;
   gap: 10px;
@@ -754,7 +784,8 @@ html[data-theme="dark"] .care-page.patient-portal,
   }
 
   .patient-portal .booking-filters,
-  .patient-portal .appointment-payment-actions {
+  .patient-portal .appointment-payment-actions,
+  .patient-appointment-tabs {
     grid-template-columns: 1fr;
   }
 

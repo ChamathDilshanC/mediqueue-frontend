@@ -98,6 +98,7 @@ export function PatientPortal({
   const [paymentBusy, setPaymentBusy] = useState<string | null>(null);
   const [paymentStage, setPaymentStage] = useState<"connecting" | "redirecting" | null>(null);
   const [appointmentPage, setAppointmentPage] = useState(0);
+  const [appointmentTab, setAppointmentTab] = useState<"ACTIVE" | "INVALID">("ACTIVE");
   const [sessionPage, setSessionPage] = useState(0);
   const appointmentPageSize = 6;
   const sessionPageSize = 6;
@@ -303,12 +304,17 @@ export function PatientPortal({
     (sessionPage + 1) * sessionPageSize,
   );
   const sessionPages = Math.ceil(visibleSlots.length / sessionPageSize);
-  const visibleAppointments = (overview?.appointments ?? []).slice(
+  const filteredAppointments = (overview?.appointments ?? []).filter((appointment) =>
+    appointmentTab === "ACTIVE"
+      ? ["PENDING", "BOOKED", "CHECKED_IN"].includes(appointment.status)
+      : ["REJECTED", "CANCELLED", "NO_SHOW"].includes(appointment.status),
+  );
+  const pagedAppointments = filteredAppointments.slice(
     appointmentPage * appointmentPageSize,
     (appointmentPage + 1) * appointmentPageSize,
   );
   const appointmentPages = Math.ceil(
-    (overview?.appointments.length ?? 0) / appointmentPageSize,
+    filteredAppointments.length / appointmentPageSize,
   );
   return (
     <PatientShell name={overview?.profiles[0]?.name}>
@@ -642,13 +648,48 @@ export function PatientPortal({
           <section className="account-card" id="my-appointments">
             <HeartPulse size={24} />
             <h2>{si ? "මගේ හමුවීම්" : "My appointments"}</h2>
+            <div className="patient-appointment-tabs" role="tablist">
+              {(["ACTIVE", "INVALID"] as const).map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  role="tab"
+                  aria-selected={appointmentTab === tab}
+                  onClick={() => {
+                    setAppointmentTab(tab);
+                    setAppointmentPage(0);
+                  }}
+                >
+                  {tab === "ACTIVE"
+                    ? si
+                      ? "සක්‍රීය"
+                      : "Active"
+                    : si
+                      ? "අවලංගුයි"
+                      : "Invalid"}
+                  <strong>
+                    {(overview?.appointments ?? []).filter((appointment) =>
+                      tab === "ACTIVE"
+                        ? ["PENDING", "BOOKED", "CHECKED_IN"].includes(appointment.status)
+                        : ["REJECTED", "CANCELLED", "NO_SHOW"].includes(appointment.status),
+                    ).length}
+                  </strong>
+                </button>
+              ))}
+            </div>
             <div className="patient-list">
-              {overview?.appointments.length === 0 && (
+              {filteredAppointments.length === 0 && (
                 <p>
-                  {si ? "තවම හමුවීම් නොමැත" : "You have no appointments yet."}
+                  {appointmentTab === "ACTIVE"
+                    ? si
+                      ? "සක්‍රීය හමුවීම් නොමැත"
+                      : "No active appointments."
+                    : si
+                      ? "අවලංගු හමුවීම් නොමැත"
+                      : "No invalid appointments."}
                 </p>
               )}
-              {visibleAppointments.map((a) => (
+              {pagedAppointments.map((a) => (
                 <article key={a.id}>
                   <strong>{a.doctor}</strong>
                   <p>{date(a.starts_at, a.timezone || "Asia/Colombo")}</p>
@@ -672,25 +713,6 @@ export function PatientPortal({
                           <span>{item.name}</span><span>LKR {Number(item.amount).toLocaleString()}</span>
                         </div>
                       ))}
-                      {appointmentPages > 1 && (
-                        <div className="patient-pagination">
-                          <button
-                            className="button secondary"
-                            disabled={appointmentPage === 0}
-                            onClick={() => setAppointmentPage((page) => page - 1)}
-                          >
-                            {si ? "පෙර" : "Previous"}
-                          </button>
-                          <span>{appointmentPage + 1} / {appointmentPages}</span>
-                          <button
-                            className="button secondary"
-                            disabled={appointmentPage >= appointmentPages - 1}
-                            onClick={() => setAppointmentPage((page) => page + 1)}
-                          >
-                            {si ? "ඊළඟ" : "Next"}
-                          </button>
-                        </div>
-                      )}
                       <b>{si ? "මුළු එකතුව" : "Total"}: LKR {Number(a.quotation_total || 0).toLocaleString()}</b>
                       {["PENDING", "BOOKED", "CHECKED_IN"].includes(a.status) && a.payment_status !== "PAID" && (
                         <div className="appointment-payment-actions">
@@ -736,6 +758,25 @@ export function PatientPortal({
                   )}
                 </article>
               ))}
+              {appointmentPages > 1 && (
+                <div className="patient-pagination">
+                  <button
+                    className="button secondary"
+                    disabled={appointmentPage === 0}
+                    onClick={() => setAppointmentPage((page) => page - 1)}
+                  >
+                    {si ? "පෙර" : "Previous"}
+                  </button>
+                  <span>{appointmentPage + 1} / {appointmentPages}</span>
+                  <button
+                    className="button secondary"
+                    disabled={appointmentPage >= appointmentPages - 1}
+                    onClick={() => setAppointmentPage((page) => page + 1)}
+                  >
+                    {si ? "ඊළඟ" : "Next"}
+                  </button>
+                </div>
+              )}
             </div>
           </section>
           <section className="account-card patient-records" id="my-stays">
