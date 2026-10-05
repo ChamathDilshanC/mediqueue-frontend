@@ -473,7 +473,7 @@ body,
 /* Compact authentication screens without hiding fields or clipping content. */
 .app-shell .auth-layout.container {
   min-height: 0;
-  padding-block: 18px;
+  padding-block: 6px;
   align-items: start;
   gap: 48px;
 }
@@ -482,7 +482,7 @@ body,
 }
 .app-shell .auth-form-wrap {
   margin-top: 0;
-  padding: 12px 20px;
+  padding: 8px 20px;
 }
 .app-shell .auth-form-wrap .auth-mark {
   display: inline-flex;
@@ -498,13 +498,13 @@ body,
   margin-bottom: 16px;
 }
 .app-shell .auth-form-wrap h1 {
-  margin-bottom: 6px;
+  margin-bottom: 10px;
 }
 .app-shell .auth-form-wrap .auth-subtitle {
-  margin-bottom: 14px;
+  margin-bottom: 20px;
 }
 .app-shell .auth-form-wrap .auth-divider {
-  margin-block: 12px;
+  margin-block: 18px;
 }
 .app-shell .auth-form-wrap .form-field {
   margin-bottom: 12px;
@@ -514,10 +514,10 @@ body,
 }
 .app-shell .auth-form-wrap .submit-button {
   min-height: 44px;
-  margin-top: 4px;
+  margin-top: 10px;
 }
 .app-shell .auth-form-wrap .auth-switch {
-  margin-top: 14px;
+  margin-top: 20px;
 }
 .app-shell .auth-form-wrap .auth-privacy {
   margin-top: 16px;
@@ -561,7 +561,7 @@ body,
   }
 }
 .app-shell .auth-form-wrap .form-field {
-  margin-bottom: 8px;
+  margin-bottom: 16px;
   line-height: 1.5;
 }
 .app-shell .auth-form-wrap .field-title {
@@ -570,7 +570,7 @@ body,
 .app-shell .auth-form-wrap .input-wrap {
   height: 44px;
   min-height: 44px;
-  margin-top: 6px;
+  margin-top: 10px;
 }
 .app-shell .auth-form-wrap .auth-subtitle {
   line-height: 1.5;
