@@ -1478,6 +1478,14 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
               </button>
             )}
           </div>
+          {config.canEdit && !config.canDelete && (
+            <div className="resource-permission-note" role="status">
+              <ShieldCheck size={15} aria-hidden="true" />
+              {language === "si"
+                ? "මකා දැමීම සඳහා පරිපාලක අවසරය අවශ්‍යයි."
+                : "Delete actions require hospital administrator permission."}
+            </div>
+          )}
 
           {/* Search / Filter */}
           <div className="flex flex-wrap items-center gap-3 pt-1">

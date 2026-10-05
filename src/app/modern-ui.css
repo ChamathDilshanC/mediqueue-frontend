@@ -349,6 +349,21 @@ body::-webkit-scrollbar,
 .resource-details-toggle svg {
   transition: transform 180ms ease;
 }
+.resource-permission-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+  padding: 8px 12px;
+  border: 1px solid color-mix(in srgb, var(--ui-accent) 22%, var(--ui-border));
+  border-radius: 10px;
+  color: var(--ui-muted);
+  background: color-mix(in srgb, var(--ui-accent) 5%, var(--ui-surface));
+  font-size: 12px;
+}
+.resource-permission-note svg {
+  color: var(--ui-accent);
+}
 .resource-workspace input[type="text"] {
   min-height: 44px;
 }
