@@ -1041,7 +1041,7 @@ export function AnimatedSidebarMenuButton({
         <motion.span
           layoutId={context.layoutId}
           transition={context.reduce ? { duration: 0 } : SPRING_LAYOUT}
-          className="absolute inset-0 rounded-xl bg-muted"
+          className="sidebar-active-motion absolute inset-0 rounded-xl bg-muted"
         />
       ) : null}
       {icon ? (

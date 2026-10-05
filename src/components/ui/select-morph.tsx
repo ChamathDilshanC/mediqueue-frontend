@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, ChevronDown } from "lucide-react";
-import { useReducedMotion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
   createContext,
   type ReactNode,
@@ -269,66 +269,85 @@ export function MorphSelectContent({
       <div hidden aria-hidden>
         {children}
       </div>
-      {context.open && (
-        <div
-          ref={panel}
-          className={cn("mq-select-panel", className)}
-          onKeyDown={(event) => {
-            if (event.key === "Escape") {
-              event.preventDefault();
-              event.stopPropagation();
-              context.setOpen(false);
-              document.getElementById(context.triggerId)?.focus();
-              return;
+      <AnimatePresence initial={false}>
+        {context.open && (
+          <motion.div
+            initial={
+              context.reduce ? false : { opacity: 0, y: -8, scale: 0.97 }
             }
-            const options = Array.from(
-              panel.current?.querySelectorAll<HTMLButtonElement>(
-                '[role="option"]:not(:disabled)',
-              ) ?? [],
-            );
-            const index = options.indexOf(
-              document.activeElement as HTMLButtonElement,
-            );
-            let next = -1;
-            if (event.key === "ArrowDown") next = (index + 1) % options.length;
-            if (event.key === "ArrowUp")
-              next = (index - 1 + options.length) % options.length;
-            if (event.key === "Home" && index >= 0) next = 0;
-            if (event.key === "End" && index >= 0) next = options.length - 1;
-            if (next >= 0) {
-              event.preventDefault();
-              options[next]?.focus();
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={
+              context.reduce
+                ? { opacity: 0 }
+                : { opacity: 0, y: -6, scale: 0.98 }
             }
-          }}
-        >
-          {searchable && (
-            <div className="mq-select-search">
-              <input
-                type="search"
-                aria-label={searchPlaceholder}
-                placeholder={searchPlaceholder}
-                value={context.searchQuery}
-                onChange={(event) => context.setSearchQuery(event.target.value)}
-              />
-            </div>
-          )}
-          <ul
-            id={context.listId}
-            role="listbox"
-            aria-labelledby={context.triggerId}
-            className="mq-select-options"
+            transition={{
+              duration: context.reduce ? 0 : 0.18,
+              ease: "easeOut",
+            }}
+            style={{ transformOrigin: "top center" }}
+            ref={panel}
+            className={cn("mq-select-panel", className)}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                event.preventDefault();
+                event.stopPropagation();
+                context.setOpen(false);
+                document.getElementById(context.triggerId)?.focus();
+                return;
+              }
+              const options = Array.from(
+                panel.current?.querySelectorAll<HTMLButtonElement>(
+                  '[role="option"]:not(:disabled)',
+                ) ?? [],
+              );
+              const index = options.indexOf(
+                document.activeElement as HTMLButtonElement,
+              );
+              let next = -1;
+              if (event.key === "ArrowDown")
+                next = (index + 1) % options.length;
+              if (event.key === "ArrowUp")
+                next = (index - 1 + options.length) % options.length;
+              if (event.key === "Home" && index >= 0) next = 0;
+              if (event.key === "End" && index >= 0) next = options.length - 1;
+              if (next >= 0) {
+                event.preventDefault();
+                options[next]?.focus();
+              }
+            }}
           >
-            {children}
-          </ul>
-          {empty && (
-            <p className="mq-select-empty" role="status">
-              {document.documentElement.lang === "si"
-                ? "තේරීම් හමු නොවීය"
-                : "No options found"}
-            </p>
-          )}
-        </div>
-      )}
+            {searchable && (
+              <div className="mq-select-search">
+                <input
+                  type="search"
+                  aria-label={searchPlaceholder}
+                  placeholder={searchPlaceholder}
+                  value={context.searchQuery}
+                  onChange={(event) =>
+                    context.setSearchQuery(event.target.value)
+                  }
+                />
+              </div>
+            )}
+            <ul
+              id={context.listId}
+              role="listbox"
+              aria-labelledby={context.triggerId}
+              className="mq-select-options"
+            >
+              {children}
+            </ul>
+            {empty && (
+              <p className="mq-select-empty" role="status">
+                {document.documentElement.lang === "si"
+                  ? "තේරීම් හමු නොවීය"
+                  : "No options found"}
+              </p>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

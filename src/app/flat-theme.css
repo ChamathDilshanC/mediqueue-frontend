@@ -450,3 +450,22 @@ body,
     padding-inline: 18px;
   }
 }
+
+/* Keep the sidebar's moving selection indicator visible. */
+.app-shell span.sidebar-active-motion {
+  background: color-mix(
+    in srgb,
+    var(--flat-accent) 15%,
+    var(--flat-bg)
+  ) !important;
+  border: 1px solid var(--flat-accent) !important;
+  border-radius: 10px !important;
+}
+.mq-select-trigger > svg {
+  transition: transform 180ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mq-select-trigger > svg {
+    transition: none;
+  }
+}
