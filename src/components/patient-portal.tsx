@@ -96,6 +96,7 @@ export function PatientPortal({
     "ONLINE" | "PAY_AT_HOSPITAL"
   >("PAY_AT_HOSPITAL");
   const [paymentBusy, setPaymentBusy] = useState<string | null>(null);
+  const [paymentStage, setPaymentStage] = useState<"connecting" | "redirecting" | null>(null);
   const request = useCallback(
     async (path: string, init?: RequestInit) => {
       const response = await fetch(`/api/backend/patient/${path}`, {
@@ -204,6 +205,7 @@ export function PatientPortal({
   }
   async function choosePayment(appointmentId: string, method: "ONLINE" | "PAY_AT_HOSPITAL") {
     setPaymentBusy(appointmentId);
+    setPaymentStage(method === "ONLINE" ? "connecting" : null);
     setError("");
     try {
       const result = await request(`appointments/${appointmentId}/payment`, {
@@ -211,6 +213,7 @@ export function PatientPortal({
         body: JSON.stringify({ method }),
       });
       if (result.checkout_url) {
+        setPaymentStage("redirecting");
         window.location.href = result.checkout_url;
         return;
       }
@@ -220,6 +223,7 @@ export function PatientPortal({
       setError((e as Error).message);
     } finally {
       setPaymentBusy(null);
+      setPaymentStage(null);
     }
   }
   async function bookAppointment() {
@@ -236,11 +240,13 @@ export function PatientPortal({
         }),
       });
       if (selectedPaymentMethod === "ONLINE") {
+        setPaymentStage("connecting");
         const payment = await request(`appointments/${booking.id}/payment`, {
           method: "POST",
           body: JSON.stringify({ method: "ONLINE" }),
         });
         if (payment.checkout_url) {
+          setPaymentStage("redirecting");
           window.location.href = payment.checkout_url;
           return;
         }
@@ -266,6 +272,7 @@ export function PatientPortal({
       setError((e as Error).message);
     } finally {
       setBusy(false);
+      setPaymentStage(null);
     }
   }
   const selected = centers.find((c) => c.id === center);
@@ -637,7 +644,17 @@ export function PatientPortal({
                             disabled={paymentBusy === a.id}
                             onClick={() => void choosePayment(a.id, "ONLINE")}
                           >
-                            {paymentBusy === a.id ? (si ? "පූරණය වෙමින්..." : "Opening...") : si ? "Online ගෙවන්න" : "Pay online"}
+                            {paymentBusy === a.id
+                              ? paymentStage === "redirecting"
+                                ? si
+                                  ? "Stripe වෙත යමින්..."
+                                  : "Opening Stripe..."
+                                : si
+                                  ? "Stripe සම්බන්ධ වෙමින්..."
+                                  : "Connecting to Stripe..."
+                              : si
+                                ? "Online ගෙවන්න"
+                                : "Pay online"}
                           </button>
                           <button
                             className="button secondary"

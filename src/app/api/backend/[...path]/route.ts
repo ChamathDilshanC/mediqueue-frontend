@@ -53,6 +53,9 @@ async function proxy(request: NextRequest, context: Context) {
   const body = ["POST", "PUT", "PATCH"].includes(request.method)
     ? await request.text()
     : undefined;
+  const isPaymentRequest =
+    request.method === "POST" && path.at(-1) === "payment";
+  const upstreamTimeout = isPaymentRequest ? 30000 : 15000;
 
   const getHeaders = (bearerToken: string) => {
     const headers: Record<string, string> = {
@@ -81,7 +84,7 @@ async function proxy(request: NextRequest, context: Context) {
             headers: getHeaders(token),
             body,
             cache: "no-store",
-            signal: AbortSignal.timeout(15000),
+            signal: AbortSignal.timeout(upstreamTimeout),
           },
         )
       : new Response(null, { status: 401 });
@@ -94,7 +97,7 @@ async function proxy(request: NextRequest, context: Context) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ refresh_token: refresh }),
           cache: "no-store",
-          signal: AbortSignal.timeout(15000),
+          signal: AbortSignal.timeout(upstreamTimeout),
         },
       );
       if (!refreshed.ok) {
@@ -123,7 +126,7 @@ async function proxy(request: NextRequest, context: Context) {
           headers: getHeaders(session.access_token),
           body,
           cache: "no-store",
-          signal: AbortSignal.timeout(15000),
+          signal: AbortSignal.timeout(upstreamTimeout),
         },
       );
 
