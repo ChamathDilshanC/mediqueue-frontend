@@ -38,6 +38,8 @@ const bedSchema = z.object({
   type: z.string(),
   status: z.string(),
   active: z.boolean(),
+  room_id: z.string().nullable().optional(),
+  room_name: z.string().nullable().optional(),
   admission: staySchema.nullable(),
 });
 const snapshotSchema = z.object({
@@ -414,6 +416,7 @@ export function WardBedBoard() {
                         <strong>{b.number}</strong>
                         <span className="ward-bed-type">
                           {b.type.replaceAll("_", " ")}
+                          {b.room_name ? ` · ${b.room_name}` : ""}
                         </span>
                         <div className="ward-tile-patient">
                           {current ? (
@@ -493,7 +496,7 @@ export function WardBedBoard() {
                     </span>
                   </div>
                   <p className="ward-detail-location">
-                    {snapshot.ward.name} · {bed.type}
+                    {snapshot.ward.name} · {bed.room_name ?? (si ? "කාමරයක් තෝරා නැත" : "No room assigned")} · {bed.type}
                   </p>
                   {bed.admission ? (
                     <>

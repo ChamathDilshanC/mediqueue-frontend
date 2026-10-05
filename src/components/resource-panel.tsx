@@ -757,7 +757,9 @@ function FormDialog({
                         ...(config.key === "ward-admissions" &&
                         f.key === "ward_id"
                           ? { bed_id: "" }
-                          : {}),
+                          : config.key === "beds" && f.key === "ward_id"
+                            ? { room_id: "" }
+                            : {}),
                       }))
                     }
                   >
@@ -780,17 +782,22 @@ function FormDialog({
                       {(refCache[f.refResource!] ?? [])
                         .filter((opt) => {
                           if (
-                            config.key !== "ward-admissions" ||
-                            f.key !== "bed_id"
+                            config.key === "ward-admissions" &&
+                            f.key === "bed_id"
                           )
-                            return true;
-                          return (
-                            opt.ward_id === formData.ward_id &&
-                            opt.is_active === true &&
-                            (opt.status === "AVAILABLE" ||
-                              (editing?.admission_status === "ADMITTED" &&
-                                opt.id === editing.bed_id))
-                          );
+                            return (
+                              opt.ward_id === formData.ward_id &&
+                              opt.is_active === true &&
+                              (opt.status === "AVAILABLE" ||
+                                (editing?.admission_status === "ADMITTED" &&
+                                  opt.id === editing.bed_id))
+                            );
+                          if (config.key === "beds" && f.key === "room_id")
+                            return (
+                              !formData.ward_id ||
+                              opt.ward_id === formData.ward_id
+                            );
+                          return true;
                         })
                         .map((opt) => (
                           <MorphSelectItem
