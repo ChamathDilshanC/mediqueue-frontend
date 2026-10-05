@@ -1,9 +1,9 @@
 .hospital-finder {
-  --finder-bg: #fff;
-  --finder-text: #203d45;
-  --finder-muted: #71868d;
-  --finder-border: #e1e9e6;
-  --finder-soft: #f3f7f5;
+  --finder-bg: #ffffff;
+  --finder-text: #000000;
+  --finder-muted: #828282;
+  --finder-border: #e7e7e7;
+  --finder-soft: #ffffff;
   background: var(--finder-bg);
   color: var(--finder-text);
   padding: 28px;
@@ -13,11 +13,11 @@
   scroll-margin-top: 85px;
 }
 [data-theme="dark"] .hospital-finder {
-  --finder-bg: #172326;
-  --finder-text: #e0eeee;
-  --finder-muted: #9eb2b6;
-  --finder-border: #304145;
-  --finder-soft: #202f32;
+  --finder-bg: #000000;
+  --finder-text: #ffffff;
+  --finder-muted: #aeaeae;
+  --finder-border: #0065F8;
+  --finder-soft: #000000;
 }
 .hospital-finder .care-section-heading {
   align-items: center;
@@ -58,7 +58,7 @@
   color: inherit;
 }
 .finder-tools .active {
-  box-shadow: inset 0 0 0 1px #3c7867;
+  box-shadow: inset 0 0 0 1px #4300FF;
 }
 .hospital-map-wrap {
   position: relative;
@@ -81,7 +81,7 @@
   height: 350px;
   width: 100%;
   z-index: 0;
-  background: #e3ece5;
+  background: #ffffff;
   font-family: inherit;
 }
 .hospital-map .leaflet-popup-content {
@@ -90,7 +90,7 @@
 .map-select-button {
   display: block;
   margin-top: 9px;
-  background: #3b7062;
+  background: #4300FF;
   color: white;
   border: 0;
   padding: 8px 12px;
@@ -103,16 +103,16 @@
   height: 34px;
   border-radius: 50% 50% 50% 0;
   transform: rotate(-45deg);
-  background: #3c7668;
-  color: #fff;
+  background: #4300FF;
+  color: #ffffff;
   border: 3px solid white;
   font-size: 24px;
   line-height: 27px;
   text-align: center;
-  box-shadow: 0 3px 10px #183f4930;
+  box-shadow: 0 3px 10px #00000030;
 }
 .hospital-map-pin.selected {
-  background: #cf8e42;
+  background: #4300FF;
 }
 .hospital-map-pin b {
   display: block;
@@ -125,8 +125,8 @@
   left: 10px;
   right: 10px;
   padding: 12px;
-  background: #fff9e9;
-  color: #734916;
+  background: #ffffff;
+  color: #4300FF;
   z-index: 1;
   font-size: 12px;
   border-radius: 10px;
@@ -156,8 +156,8 @@
   min-width: 0;
 }
 .hospital-result.chosen {
-  border-color: #69998a;
-  box-shadow: 0 0 0 2px #69998a18;
+  border-color: #4300FF;
+  box-shadow: 0 0 0 2px #4300FF18;
   background: var(--finder-soft);
 }
 .hospital-result-top {
@@ -171,8 +171,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #eaf2ed;
-  color: #3c7668;
+  background: #ffffff;
+  color: #4300FF;
   border-radius: 13px;
   flex-shrink: 0;
 }
@@ -192,8 +192,8 @@
   white-space: nowrap;
   padding: 6px 9px;
   border-radius: 20px;
-  background: #ecf4e4;
-  color: #527843;
+  background: #ffffff;
+  color: #4300FF;
 }
 .hospital-result p {
   display: flex;
@@ -241,18 +241,18 @@
   font-size: 11px;
   padding: 8px 10px;
   border-radius: 8px;
-  background: #f2f5f4;
-  color: #728882;
+  background: #f4f4f4;
+  color: #838383;
 }
 .booking-steps li.done {
-  background: #e5f0e9;
-  color: #3b7660;
+  background: #ffffff;
+  color: #4300FF;
 }
 .booking-enrolled {
   display: flex;
   gap: 8px;
   align-items: center;
-  color: #46806a;
+  color: #4300FF;
   font-size: 12px;
   margin: 17px 0;
 }
@@ -275,15 +275,15 @@
 .session-availability {
   display: inline-flex;
   font-size: 11px;
-  color: #3b7660;
-  background: #eaf3ee;
+  color: #4300FF;
+  background: #ffffff;
   padding: 5px 9px;
   border-radius: 7px;
   margin: 6px 10px 6px 0;
 }
 .session-availability.full {
-  color: #aa6e36;
-  background: #fff1df;
+  color: #4300FF;
+  background: #ffffff;
 }
 .care-booking-notice {
   display: flex;
@@ -291,9 +291,9 @@
   align-items: center;
   padding: 16px 20px;
   border-radius: 13px;
-  background: #e6f1e9;
-  border: 1px solid #c6ddcd;
-  color: #33634b;
+  background: #ffffff;
+  border: 1px solid #4300FF;
+  color: #4300FF;
   font-size: 13px;
   margin: 22px 0;
 }
@@ -301,7 +301,7 @@
   position: fixed;
   inset: 0;
   z-index: 2000;
-  background: #0d292d70;
+  background: #00000070;
   backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
@@ -314,8 +314,8 @@
   padding: 30px;
   border-radius: 23px;
   background: white;
-  color: #203d45;
-  box-shadow: 0 24px 90px #08242a40;
+  color: #000000;
+  box-shadow: 0 24px 90px #00000040;
   max-height: 90dvh;
   overflow: auto;
 }
@@ -337,10 +337,10 @@
   font-size: 13px;
   line-height: 1.9;
   margin: 9px 0;
-  color: #6b828a;
+  color: #7e7e7e;
 }
 .booking-dialog a {
-  color: #41786a;
+  color: #4300FF;
   font-size: 13px;
 }
 .queue-live-heading {
@@ -348,14 +348,14 @@
   gap: 8px;
   align-items: center;
   font-size: 11px;
-  color: #668a79;
+  color: #818181;
   margin: 23px 0 12px;
 }
 .queue-live-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #79ac88;
+  background: #4300FF;
 }
 .queue-summary-grid {
   display: grid;
@@ -364,9 +364,9 @@
 }
 .queue-summary-card {
   padding: 18px;
-  border: 1px solid #e2eae6;
+  border: 1px solid #e8e8e8;
   border-radius: 15px;
-  background: #fbfdfc;
+  background: #ffffff;
 }
 .queue-summary-card h3 {
   font-size: 14px;
@@ -382,12 +382,12 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 7px;
-  color: #46806a;
+  color: #4300FF;
 }
 .queue-metrics strong {
   font-size: 25px;
   font-weight: 600;
-  color: #234850;
+  color: #0065F8;
 }
 .queue-metrics strong small {
   font-size: 10px;
@@ -396,25 +396,25 @@
 .queue-metrics span {
   flex-basis: 100%;
   font-size: 10px;
-  color: #758a90;
+  color: #868686;
 }
 .queue-summary-card p {
   font-size: 11px;
   margin: 18px 0 7px;
-  color: #6b828a;
+  color: #7e7e7e;
 }
 .queue-summary-card p strong {
   float: right;
-  color: #365d52;
+  color: #4300FF;
 }
 .queue-summary-card > small {
   font-size: 10px;
-  color: #82928e;
+  color: #8e8e8e;
   line-height: 1.6;
 }
 .queue-estimate-note {
   font-size: 11px;
-  color: #7c8e8a;
+  color: #8a8a8a;
   margin: 12px 0 22px;
 }
 .own-queue-metrics {
@@ -434,7 +434,7 @@
 .own-queue-metrics span {
   flex-basis: 100%;
   font-size: 11px;
-  color: #71868d;
+  color: #828282;
 }
 .branch-location-picker {
   width: 100%;
@@ -448,7 +448,7 @@
 }
 .branch-location-picker p {
   font-size: 12px;
-  color: #7b8c86;
+  color: #888888;
   margin: 10px 0;
   line-height: 1.7;
 }
@@ -457,32 +457,32 @@
   height: 240px;
   border-radius: 12px;
   z-index: 0;
-  border: 1px solid #d9e4dd;
+  border: 1px solid #ffffff;
 }
 [data-theme="dark"] .queue-summary-card {
-  background: #1d2c30;
-  border-color: #35464b;
+  background: #000000;
+  border-color: #0065F8;
 }
 [data-theme="dark"] .queue-metrics strong,
 [data-theme="dark"] .queue-summary-card p strong {
-  color: #c7e1d6;
+  color: #4300FF;
 }
 [data-theme="dark"] .booking-dialog {
-  background: #172326;
-  color: #e0eeee;
+  background: #000000;
+  color: #ffffff;
 }
 [data-theme="dark"] .booking-steps li {
-  background: #233438;
+  background: #000000;
 }
 [data-theme="dark"] .booking-steps li.done,
 [data-theme="dark"] .session-availability {
-  background: #253f33;
-  color: #b6d7c7;
+  background: #000000;
+  color: #4300FF;
 }
 [data-theme="dark"] .care-booking-notice {
-  background: #213d30;
-  color: #b8dac5;
-  border-color: #345943;
+  background: #000000;
+  color: #4300FF;
+  border-color: #4300FF;
 }
 @media (max-width: 750px) {
   .hospital-finder {

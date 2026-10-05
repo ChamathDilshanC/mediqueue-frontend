@@ -64,7 +64,7 @@ function OverviewDashboard() {
             cache: "no-store",
             signal,
           }),
-          fetch("/api/backend/appointments?limit=10", {
+          fetch("/api/backend/appointment-inbox?limit=10", {
             cache: "no-store",
             signal,
           }),
@@ -83,8 +83,8 @@ function OverviewDashboard() {
           loading: false,
         });
 
-        if (Array.isArray(appointmentsData))
-          setRecentAppointments(appointmentsData.slice(0, 5));
+        if (Array.isArray(appointmentsData.items))
+          setRecentAppointments(appointmentsData.items.slice(0, 5));
         if (Array.isArray(doctorsData))
           setRecentDoctors(doctorsData.slice(0, 5));
         if (Array.isArray(departmentsData))
@@ -106,39 +106,41 @@ function OverviewDashboard() {
       label: si ? "අංශ" : "Departments",
       value: stats.departments,
       icon: <DoorOpen size={18} />,
-      color: "bg-teal-50 text-teal-600 dark:bg-teal-950/40 dark:text-teal-400",
-      gradient: "from-teal-50",
+      color:
+        "bg-transparent text-[var(--flat-accent)] dark:bg-transparent dark:text-[var(--flat-accent)]",
+      gradient: "from-transparent",
     },
     {
       label: si ? "වෛද්‍යවරු" : "Doctors",
       value: stats.doctors,
       icon: <Stethoscope size={18} />,
-      color: "bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400",
-      gradient: "from-blue-50",
+      color:
+        "bg-transparent text-[var(--flat-accent)] dark:bg-transparent dark:text-[var(--flat-accent)]",
+      gradient: "from-transparent",
     },
     {
       label: si ? "රෝගීන්" : "Patients",
       value: stats.patients,
       icon: <Users size={18} />,
       color:
-        "bg-green-50 text-green-600 dark:bg-green-950/40 dark:text-green-400",
-      gradient: "from-green-50",
+        "bg-transparent text-[var(--flat-accent)] dark:bg-transparent dark:text-[var(--flat-accent)]",
+      gradient: "from-transparent",
     },
     {
       label: si ? "සජීවී පෝලිම්" : "Active Queues",
       value: stats.queues,
       icon: <Activity size={18} />,
       color:
-        "bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400",
-      gradient: "from-amber-50",
+        "bg-transparent text-[var(--flat-accent)] dark:bg-transparent dark:text-[var(--flat-accent)]",
+      gradient: "from-transparent",
     },
     {
       label: si ? "හමුවීම්" : "Appointments",
       value: stats.appointments,
       icon: <CalendarClock size={18} />,
       color:
-        "bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400",
-      gradient: "from-purple-50",
+        "bg-transparent text-[var(--flat-accent)] dark:bg-transparent dark:text-[var(--flat-accent)]",
+      gradient: "from-transparent",
     },
   ];
 
@@ -162,22 +164,22 @@ function OverviewDashboard() {
         {cards.map((card) => (
           <div
             key={card.label}
-            className="flex flex-col p-5 bg-white dark:bg-[#1e1e1e] rounded-2xl border border-[#f3f4f6] dark:border-gray-800 shadow-sm relative overflow-hidden"
+            className="flex flex-col p-5 bg-white dark:bg-[#1e1e1e] rounded-2xl border border-[#f4f4f4] dark:border-gray-800 shadow-sm relative overflow-hidden"
           >
             <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-medium text-[#6b7280] dark:text-[#9ca3af]">
+              <span className="text-sm font-medium text-[#727272] dark:text-[#a2a2a2]">
                 {card.label}
               </span>
               <div className={`p-2 rounded-lg ${card.color}`}>{card.icon}</div>
             </div>
             {stats.loading ? (
-              <Loader2 size={24} className="animate-spin text-[#d1d5db]" />
+              <Loader2 size={24} className="animate-spin text-[#d5d5d5]" />
             ) : (
-              <strong className="text-3xl font-semibold text-[#111827] dark:text-gray-100 mb-1">
+              <strong className="text-3xl font-semibold text-[#000000] dark:text-gray-100 mb-1">
                 {card.value}
               </strong>
             )}
-            <small className="text-xs text-[#9ca3af] font-medium">
+            <small className="text-xs text-[#a2a2a2] font-medium">
               {si ? "සම්බන්ධිත දත්ත" : "Live data"}
             </small>
             <div
@@ -190,26 +192,26 @@ function OverviewDashboard() {
       {/* Tables Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Appointments */}
-        <div className="bg-white dark:bg-[#1e1e1e] rounded-3xl border border-[#f3f4f6] dark:border-gray-800 shadow-sm overflow-hidden flex flex-col">
-          <div className="p-5 border-b border-[#f9fafb] dark:border-gray-800 bg-[#fafcfa] dark:bg-[#1a1a1a] flex items-center justify-between">
-            <h3 className="font-bold text-[#111827] dark:text-gray-100">
+        <div className="bg-white dark:bg-[#1e1e1e] rounded-3xl border border-[#f4f4f4] dark:border-gray-800 shadow-sm overflow-hidden flex flex-col">
+          <div className="p-5 border-b border-[#ffffff] dark:border-gray-800 bg-[#ffffff] dark:bg-[#1a1a1a] flex items-center justify-between">
+            <h3 className="font-bold text-[#000000] dark:text-gray-100">
               {si ? "මෑත හමුවීම්" : "Recent Appointments"}
             </h3>
             <button
               onClick={() => router.push("/dashboard?resource=appointments")}
-              className="text-xs text-[#76aa32] font-semibold hover:underline"
+              className="text-xs text-[#4300FF] font-semibold hover:underline"
             >
               {si ? "සියල්ල බලන්න →" : "View all →"}
             </button>
           </div>
           <div className="p-0">
             {recentAppointments.length === 0 ? (
-              <div className="p-8 text-center text-[#9ca3af] text-sm">
+              <div className="p-8 text-center text-[#a2a2a2] text-sm">
                 {si ? "හමුවීම් හමු නොවීය" : "No appointments found"}
               </div>
             ) : (
               <table className="w-full text-sm text-left">
-                <thead className="text-xs text-[#6b7280] dark:text-[#9ca3af] uppercase bg-[#f9fafb]/50 dark:bg-gray-800/50">
+                <thead className="text-xs text-[#727272] dark:text-[#a2a2a2] uppercase bg-[#ffffff]/50 dark:bg-gray-800/50">
                   <tr>
                     <th className="px-5 py-3 font-medium">
                       {si ? "රෝගියා" : "Patient"}
@@ -226,29 +228,31 @@ function OverviewDashboard() {
                   {recentAppointments.map((apt, i) => (
                     <tr
                       key={String(apt.id ?? i)}
-                      className="hover:bg-[#f9fafb]/50 dark:bg-gray-800/50 transition-colors"
+                      className="hover:bg-[#ffffff]/50 dark:bg-gray-800/50 transition-colors"
                     >
-                      <td className="px-5 py-3 font-medium text-[#111827] dark:text-gray-100">
-                        <span className="text-xs text-[#6b7280] dark:text-[#9ca3af] font-mono">
-                          {String(apt.patient_id ?? "").slice(0, 8)}…
+                      <td className="px-5 py-3 font-medium text-[#000000] dark:text-gray-100">
+                        <span className="text-xs text-[#727272] dark:text-[#a2a2a2] font-mono">
+                          {String(
+                            apt.patient_name || (si ? "රෝගියා" : "Patient"),
+                          )}
                         </span>
                       </td>
                       <td className="px-5 py-3">
                         <span
                           className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                             String(apt.status) === "BOOKED"
-                              ? "bg-blue-50 text-blue-600"
+                              ? "bg-transparent text-[var(--flat-accent)]"
                               : String(apt.status) === "CHECKED_IN"
-                                ? "bg-amber-50 text-amber-600"
+                                ? "bg-transparent text-[var(--flat-accent)]"
                                 : String(apt.status) === "COMPLETED"
-                                  ? "bg-green-50 text-green-600"
-                                  : "bg-[#f3f4f6] dark:bg-gray-800 text-[#6b7280] dark:text-[#9ca3af]"
+                                  ? "bg-transparent text-[var(--flat-accent)]"
+                                  : "bg-[#f4f4f4] dark:bg-gray-800 text-[#727272] dark:text-[#a2a2a2]"
                           }`}
                         >
                           {String(apt.status ?? "").replace(/_/g, " ")}
                         </span>
                       </td>
-                      <td className="px-5 py-3 text-right text-[#6b7280] dark:text-[#9ca3af] text-xs">
+                      <td className="px-5 py-3 text-right text-[#727272] dark:text-[#a2a2a2] text-xs">
                         {apt.created_at
                           ? new Date(
                               String(apt.created_at),
@@ -264,26 +268,26 @@ function OverviewDashboard() {
         </div>
 
         {/* Doctors */}
-        <div className="bg-white dark:bg-[#1e1e1e] rounded-3xl border border-[#f3f4f6] dark:border-gray-800 shadow-sm overflow-hidden flex flex-col">
-          <div className="p-5 border-b border-[#f9fafb] dark:border-gray-800 bg-[#fafcfa] dark:bg-[#1a1a1a] flex items-center justify-between">
-            <h3 className="font-bold text-[#111827] dark:text-gray-100">
+        <div className="bg-white dark:bg-[#1e1e1e] rounded-3xl border border-[#f4f4f4] dark:border-gray-800 shadow-sm overflow-hidden flex flex-col">
+          <div className="p-5 border-b border-[#ffffff] dark:border-gray-800 bg-[#ffffff] dark:bg-[#1a1a1a] flex items-center justify-between">
+            <h3 className="font-bold text-[#000000] dark:text-gray-100">
               {si ? "වෛද්‍යවරු" : "Doctors"}
             </h3>
             <button
               onClick={() => router.push("/dashboard?resource=doctors")}
-              className="text-xs text-[#76aa32] font-semibold hover:underline"
+              className="text-xs text-[#4300FF] font-semibold hover:underline"
             >
               {si ? "සියල්ල බලන්න →" : "View all →"}
             </button>
           </div>
           <div className="p-0">
             {recentDoctors.length === 0 ? (
-              <div className="p-8 text-center text-[#9ca3af] text-sm">
+              <div className="p-8 text-center text-[#a2a2a2] text-sm">
                 {si ? "වෛද්‍යවරු හමු නොවීය" : "No doctors found"}
               </div>
             ) : (
               <table className="w-full text-sm text-left">
-                <thead className="text-xs text-[#6b7280] dark:text-[#9ca3af] uppercase bg-[#f9fafb]/50 dark:bg-gray-800/50">
+                <thead className="text-xs text-[#727272] dark:text-[#a2a2a2] uppercase bg-[#ffffff]/50 dark:bg-gray-800/50">
                   <tr>
                     <th className="px-5 py-3 font-medium">
                       {si ? "වෛද්‍යවරයා" : "Doctor"}
@@ -297,17 +301,17 @@ function OverviewDashboard() {
                   {recentDoctors.map((doc, i) => (
                     <tr
                       key={String(doc.id ?? i)}
-                      className="hover:bg-[#f9fafb]/50 dark:bg-gray-800/50 transition-colors"
+                      className="hover:bg-[#ffffff]/50 dark:bg-gray-800/50 transition-colors"
                     >
-                      <td className="px-5 py-3 font-medium text-[#111827] dark:text-gray-100 flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                      <td className="px-5 py-3 font-medium text-[#000000] dark:text-gray-100 flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-transparent text-[var(--flat-accent)] flex items-center justify-center font-bold text-xs flex-shrink-0">
                           {String(doc.name ?? "?")
                             .substring(0, 2)
                             .toUpperCase()}
                         </div>
                         {String(doc.name ?? "—")}
                       </td>
-                      <td className="px-5 py-3 text-right text-[#6b7280] dark:text-[#9ca3af]">
+                      <td className="px-5 py-3 text-right text-[#727272] dark:text-[#a2a2a2]">
                         {String(doc.specialty ?? "—") || "—"}
                       </td>
                     </tr>
@@ -319,27 +323,27 @@ function OverviewDashboard() {
         </div>
 
         {/* Departments */}
-        <div className="bg-white dark:bg-[#1e1e1e] rounded-3xl border border-[#f3f4f6] dark:border-gray-800 shadow-sm overflow-hidden flex flex-col lg:col-span-2">
-          <div className="p-5 border-b border-[#f9fafb] dark:border-gray-800 bg-[#fafcfa] dark:bg-[#1a1a1a] flex items-center justify-between">
-            <h3 className="font-bold text-[#111827] dark:text-gray-100 flex items-center gap-2">
-              <DoorOpen size={18} className="text-[#76aa32]" />
+        <div className="bg-white dark:bg-[#1e1e1e] rounded-3xl border border-[#f4f4f4] dark:border-gray-800 shadow-sm overflow-hidden flex flex-col lg:col-span-2">
+          <div className="p-5 border-b border-[#ffffff] dark:border-gray-800 bg-[#ffffff] dark:bg-[#1a1a1a] flex items-center justify-between">
+            <h3 className="font-bold text-[#000000] dark:text-gray-100 flex items-center gap-2">
+              <DoorOpen size={18} className="text-[#4300FF]" />
               {si ? "රෝහල් අංශ (Departments)" : "Hospital Departments"}
             </h3>
             <button
               onClick={() => router.push("/dashboard?resource=departments")}
-              className="text-xs text-[#76aa32] font-semibold hover:underline"
+              className="text-xs text-[#4300FF] font-semibold hover:underline"
             >
               {si ? "සියල්ල බලන්න →" : "View all →"}
             </button>
           </div>
           <div className="p-0">
             {recentDepartments.length === 0 ? (
-              <div className="p-8 text-center text-[#9ca3af] text-sm">
+              <div className="p-8 text-center text-[#a2a2a2] text-sm">
                 {si ? "අංශ හමු නොවීය" : "No departments found"}
               </div>
             ) : (
               <table className="w-full text-sm text-left">
-                <thead className="text-xs text-[#6b7280] dark:text-[#9ca3af] uppercase bg-[#f9fafb]/50 dark:bg-gray-800/50">
+                <thead className="text-xs text-[#727272] dark:text-[#a2a2a2] uppercase bg-[#ffffff]/50 dark:bg-gray-800/50">
                   <tr>
                     <th className="px-5 py-3 font-medium">
                       {si ? "අංශයේ නම" : "Department"}
@@ -362,9 +366,9 @@ function OverviewDashboard() {
                   {recentDepartments.map((dept, i) => (
                     <tr
                       key={String(dept.id ?? i)}
-                      className="hover:bg-[#f9fafb]/50 dark:bg-gray-800/50 transition-colors"
+                      className="hover:bg-[#ffffff]/50 dark:bg-gray-800/50 transition-colors"
                     >
-                      <td className="px-5 py-3 font-medium text-[#111827] dark:text-gray-100">
+                      <td className="px-5 py-3 font-medium text-[#000000] dark:text-gray-100">
                         {String(dept.name ?? "—")}
                       </td>
                       <td className="px-5 py-3">
@@ -372,18 +376,18 @@ function OverviewDashboard() {
                           {String(dept.code || "—")}
                         </span>
                       </td>
-                      <td className="px-5 py-3 text-[#6b7280] dark:text-[#9ca3af] text-xs">
+                      <td className="px-5 py-3 text-[#727272] dark:text-[#a2a2a2] text-xs">
                         {String(dept.location || "—")}
                       </td>
-                      <td className="px-5 py-3 text-[#6b7280] dark:text-[#9ca3af] text-xs">
+                      <td className="px-5 py-3 text-[#727272] dark:text-[#a2a2a2] text-xs">
                         {String(dept.head_of_dept || "—")}
                       </td>
                       <td className="px-5 py-3 text-right">
                         <span
                           className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
                             dept.is_active !== false
-                              ? "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/40 dark:text-green-400"
-                              : "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-400"
+                              ? "bg-transparent text-[var(--flat-accent)] border-[var(--flat-line)] dark:bg-transparent dark:text-[var(--flat-accent)]"
+                              : "bg-transparent text-[var(--flat-accent)] border-[var(--flat-line)] dark:bg-transparent dark:text-[var(--flat-accent)]"
                           }`}
                         >
                           {dept.is_active !== false ? "ACTIVE" : "INACTIVE"}
@@ -475,16 +479,16 @@ export function Dashboard() {
   return (
     <>
       <SiteHeader simple />
-      <main className="staff-workspace flex-1 w-full bg-[#f8f9fa] dark:bg-[#121619] min-h-screen pb-12">
+      <main className="staff-workspace flex-1 w-full bg-[#ffffff] dark:bg-[#000000] min-h-screen pb-12">
         <div className="px-6 md:px-10 lg:px-12 pt-6">
           {/* Page Header */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 mt-4">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white dark:bg-[#1e1e1e] border border-[#e2ead8] rounded-full text-xs font-medium text-[#61714d] mb-4 shadow-sm">
-                <ShieldCheck size={14} className="text-[#76aa32]" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white dark:bg-[#1e1e1e] border border-[#ffffff] rounded-full text-xs font-medium text-[#4300FF] mb-4 shadow-sm">
+                <ShieldCheck size={14} className="text-[#4300FF]" />
                 {t.account}
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-[#111827] dark:text-gray-100 mb-2">
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-[#000000] dark:text-gray-100 mb-2">
                 {resource === "overview"
                   ? si
                     ? "ප්‍රධාන පුවරුව"
@@ -502,7 +506,7 @@ export function Dashboard() {
                           "ප්‍රධාන පුවරුව")
                         : (resourceConfigs[resource]?.en.plural ?? "Dashboard")}
               </h1>
-              <p className="text-[#6b7280] dark:text-[#9ca3af] text-sm md:text-base">
+              <p className="text-[#727272] dark:text-[#a2a2a2] text-sm md:text-base">
                 {resource === "overview"
                   ? si
                     ? "MediQueue පද්ධතිය එකම තැනකින් කළමනාකරණය කරන්න."
@@ -592,7 +596,7 @@ export function Dashboard() {
               }}
             />
           ) : (
-            <div className="p-12 text-center text-[#9ca3af]">
+            <div className="p-12 text-center text-[#a2a2a2]">
               {si ? "සම්පත හමු නොවීය" : "Resource not found"}
             </div>
           )}

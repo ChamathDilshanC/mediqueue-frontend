@@ -117,6 +117,11 @@ test("sign in displays the requested loader, verifies profile and signs out", as
   ).toBeVisible();
   await expect(page).toHaveURL("/account");
   await expect(page.getByText("Test User", { exact: true })).toBeVisible();
+  await expect(page.getByText("Test Hospital", { exact: true })).toBeVisible();
+  await expect(page.getByText("Main Branch", { exact: true })).toBeVisible();
+  expect(await page.locator("main").innerText()).not.toMatch(
+    /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i,
+  );
   const cookies = await context.cookies();
   for (const name of ["mq_access", "mq_refresh"]) {
     const cookie = cookies.find((c) => c.name === name);

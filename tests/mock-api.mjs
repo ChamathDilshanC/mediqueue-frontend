@@ -11,6 +11,8 @@ const profile = {
       user_id: "00000000-0000-4000-8000-000000000001",
       tenant_id: "00000000-0000-4000-8000-000000000004",
       branch_id: "00000000-0000-4000-8000-000000000005",
+      hospital_name: "Test Hospital",
+      branch_name: "Main Branch",
       role: "admin",
       active: true,
     },

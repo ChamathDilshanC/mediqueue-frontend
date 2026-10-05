@@ -37,7 +37,7 @@ function polygonCollapsed(point: string, vertexCount: number): string {
 // All coordinates are percentages of the snapshot reference box: Chrome 150
 // renders absolute px clip-path coordinates on ::view-transition-new(root)
 // unscaled on fractional display scales (e.g. Windows 150%) for the first
-// transition after load, so px values land at the wrong position (#989).
+// transition after load, so px values land at the wrong position (#8d8d8d).
 function getThemeTransitionClipPaths(
   variant: TransitionVariant,
   cx: number,

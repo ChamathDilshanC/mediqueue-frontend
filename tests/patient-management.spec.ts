@@ -66,6 +66,17 @@ test("patient sign in, enrollment, booking, records and cancellation", async ({
             : [],
         },
       });
+    if (path.endsWith("/doctors/center"))
+      return route.fulfill({
+        json: [
+          { id: "doctor", name: "Dr. Test", specialty: "General medicine" },
+          {
+            id: "unscheduled",
+            name: "Dr. Without Schedule",
+            specialty: "Cardiology",
+          },
+        ],
+      });
     if (path.endsWith("/schedules/center"))
       return route.fulfill({
         json: [
@@ -107,6 +118,12 @@ test("patient sign in, enrollment, booking, records and cancellation", async ({
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL("/patient");
   await page.getByLabel("Hospital / medical center").selectOption("center");
+  await expect(
+    page.getByText("Dr. Without Schedule", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("No upcoming sessions published for this doctor yet."),
+  ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Book session" }),
   ).toBeDisabled();

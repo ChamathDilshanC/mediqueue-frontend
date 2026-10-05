@@ -105,6 +105,7 @@ test("patient finds nearest hospital, enrolls, confirms a session and sees live 
           ward_stays: [],
         },
       });
+    if (path.includes("/doctors/")) return route.fulfill({ json: [] });
     if (path.endsWith("/schedules/colombo"))
       return route.fulfill({
         json: [

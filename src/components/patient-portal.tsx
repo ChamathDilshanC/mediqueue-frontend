@@ -66,6 +66,10 @@ export function PatientPortal() {
   const router = useRouter();
   const [centers, setCenters] = useState<Center[]>([]);
   const [center, setCenter] = useState("");
+  const [doctors, setDoctors] = useState<
+    { id: string; name: string; specialty: string }[]
+  >([]);
+  const [doctorsError, setDoctorsError] = useState(false);
   const [slots, setSlots] = useState<Slot[]>([]);
   const [overview, setOverview] = useState<Overview | null>(null);
   const [error, setError] = useState("");
@@ -128,6 +132,8 @@ export function PatientPortal() {
   }, [request]);
   useEffect(() => {
     setSlots([]);
+    setDoctors([]);
+    setDoctorsError(false);
     setSessionsError("");
     setConfirmSlot(null);
     if (!center) {
@@ -136,6 +142,13 @@ export function PatientPortal() {
     }
     setSessionsLoading(true);
     const controller = new AbortController();
+    void request(`doctors/${center}`)
+      .then((data) => {
+        if (!controller.signal.aborted) setDoctors(data);
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setDoctorsError(true);
+      });
     void request(`schedules/${center}`)
       .then((data) => {
         if (!controller.signal.aborted) setSlots(data);
@@ -363,6 +376,45 @@ export function PatientPortal() {
                     onChange={(e) => setSessionDate(e.target.value)}
                   />
                 </div>
+                {doctorsError && (
+                  <p role="alert">
+                    {si
+                      ? "වෛද්‍ය විස්තර ලබාගත නොහැක. නැවත උත්සාහ කරන්න."
+                      : "Doctor details could not be loaded. Retry sessions to try again."}
+                  </p>
+                )}
+                {doctors
+                  .filter((d) =>
+                    `${d.name} ${d.specialty}`
+                      .toLowerCase()
+                      .includes(doctorSearch.toLowerCase()),
+                  )
+                  .map((d) => {
+                    const hasSessions = slots.some((s) => s.doctor === d.name);
+                    return (
+                      <article key={d.id} className="booking-doctor">
+                        <strong>{d.name}</strong>
+                        <p>{d.specialty}</p>
+                        <p>
+                          {hasSessions
+                            ? si
+                              ? "පහත හමුවීමක් තෝරන්න"
+                              : "Choose an available session below"
+                            : si
+                              ? "මෙම වෛද්‍යවරයා සඳහා ඉදිරි කාලසටහනක් තවම පළ කර නැත."
+                              : "No upcoming sessions published for this doctor yet."}
+                        </p>
+                        {hasSessions && (
+                          <button
+                            className="button secondary"
+                            onClick={() => setDoctorSearch(d.name)}
+                          >
+                            {si ? "හමුවීම් බලන්න" : "View sessions"}
+                          </button>
+                        )}
+                      </article>
+                    );
+                  })}
                 {sessionsLoading ? (
                   <Loader />
                 ) : sessionsError ? (
@@ -376,7 +428,11 @@ export function PatientPortal() {
                     </button>
                   </div>
                 ) : slots.length === 0 ? (
-                  <p>{si ? "ඉදිරි කාලසටහන් නොමැත" : "No upcoming sessions."}</p>
+                  <p>
+                    {si
+                      ? "ඉදිරි කාලසටහන් නොමැත"
+                      : "No upcoming sessions. The hospital must publish a doctor’s schedule before appointments can be booked."}
+                  </p>
                 ) : (
                   visibleSlots.map((s) => (
                     <article key={s.id} className="booking-session">
@@ -520,6 +576,7 @@ export function PatientPortal() {
                     {Object.entries(r)
                       .filter(
                         ([k]) =>
+                          !/(^id$|_ids?$)/.test(k) &&
                           ![
                             "id",
                             "patient_id",

@@ -132,11 +132,6 @@ export function Account() {
                 <UserRound size={23} />
                 <h2>{t.profile}</h2>
                 <h3>{profile.display_name || t.account}</h3>
-                <p className="account-id">
-                  {t.accountId}
-                  <br />
-                  <span className="latin">{profile.id}</span>
-                </p>
                 <span className="availability available">
                   <Check size={12} />
                   {t.active}
@@ -151,11 +146,14 @@ export function Account() {
                   <ul className="membership-list">
                     {profile.memberships.map((m) => (
                       <li key={m.id}>
-                        <strong>{roles[m.role]}</strong>
+                        <strong>{m.hospital_name || t.memberships}</strong>
+                        <span>{roles[m.role]}</span>
                         <span>{m.active ? t.active : t.inactive}</span>
                         <small>
                           {t.branch}:{" "}
-                          <span className="latin">{m.branch_id}</span>
+                          <span className="latin">
+                            {m.branch_name || t.unavailable}
+                          </span>
                         </small>
                         {m.active && (
                           <button

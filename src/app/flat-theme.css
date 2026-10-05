@@ -1,0 +1,360 @@
+/* One palette, pure white/black surfaces, and an open layout without card effects. */
+:root,
+html[data-theme="light"] {
+  --palette-violet: #4300ff;
+  --palette-blue: #0065f8;
+  --palette-cyan: #00caff;
+  --palette-mint: #00ffde;
+  --flat-bg: #ffffff;
+  --flat-text: #000000;
+  --flat-muted: #595959;
+  --flat-line: #d6d6d6;
+  --flat-accent: var(--palette-violet);
+}
+html[data-theme="dark"] {
+  --flat-bg: #000000;
+  --flat-text: #ffffff;
+  --flat-muted: #b8b8b8;
+  --flat-line: #383838;
+  --flat-accent: var(--palette-cyan);
+}
+html[data-theme] {
+  --background: var(--flat-bg);
+  --foreground: var(--flat-text);
+  --card: var(--flat-bg);
+  --card-foreground: var(--flat-text);
+  --popover: var(--flat-bg);
+  --popover-foreground: var(--flat-text);
+  --primary: var(--palette-violet);
+  --primary-foreground: #ffffff;
+  --secondary: var(--flat-bg);
+  --secondary-foreground: var(--flat-text);
+  --muted: var(--flat-bg);
+  --muted-foreground: var(--flat-muted);
+  --accent: var(--flat-bg);
+  --accent-foreground: var(--flat-accent);
+  --destructive: var(--flat-accent);
+  --border: var(--flat-line);
+  --input: var(--flat-line);
+  --ring: var(--flat-accent);
+  --ink: var(--flat-text);
+  --line: var(--flat-line);
+  --green: var(--palette-violet);
+  --green-dark: var(--flat-accent);
+  --soft: var(--flat-bg);
+  --content-primary: var(--flat-text);
+  --content-secondary: var(--flat-muted);
+  --content-muted: var(--flat-muted);
+  --nav-color: var(--flat-text);
+  --surface-soft: var(--flat-bg);
+  --theme-bg: var(--flat-bg);
+  --theme-text: var(--flat-text);
+  --theme-surface: var(--flat-bg);
+  --theme-border: var(--flat-line);
+  --brand-light: #ffffff;
+  --brand-dark: #000000;
+  --brand-accent: var(--flat-accent);
+  --brand-accent-soft: var(--flat-bg);
+  --brand-deep-accent: var(--flat-accent);
+  --workspace-blue: var(--palette-blue);
+  --workspace-blue-soft: var(--flat-bg);
+  --workspace-border: var(--flat-line);
+  --workspace-text: var(--flat-text);
+  --workspace-muted: var(--flat-muted);
+  --ui-surface: var(--flat-bg);
+  --ui-canvas: var(--flat-bg);
+  --ui-text: var(--flat-text);
+  --ui-muted: var(--flat-muted);
+  --ui-border: var(--flat-line);
+  --ui-accent: var(--flat-accent);
+  --ui-tint: var(--flat-bg);
+  --sidebar: var(--flat-bg);
+  --sidebar-foreground: var(--flat-text);
+  --sidebar-primary: var(--flat-accent);
+  --sidebar-primary-foreground: var(--flat-bg);
+  --sidebar-accent: var(--flat-bg);
+  --sidebar-accent-foreground: var(--flat-accent);
+  --sidebar-border: var(--flat-line);
+  --sidebar-ring: var(--flat-accent);
+}
+html[data-theme] :is(.care-shell, .ward-board) {
+  --care-bg: var(--flat-bg);
+  --care-panel: var(--flat-bg);
+  --care-text: var(--flat-text);
+  --care-muted: var(--flat-muted);
+  --care-line: var(--flat-line);
+  --care-accent: var(--flat-accent);
+  --wb-bg: var(--flat-bg);
+  --wb-soft: var(--flat-bg);
+  --wb-border: var(--flat-line);
+  --wb-text: var(--flat-text);
+  --wb-muted: var(--flat-muted);
+}
+html,
+body,
+.app-shell,
+.app-main {
+  background: var(--flat-bg) !important;
+  color: var(--flat-text);
+}
+/* Remove shadows/gradients regardless of the page's previous utility classes. */
+.app-shell *,
+.mq-modal,
+.mq-modal * {
+  box-shadow: none !important;
+  text-shadow: none !important;
+  background-image: none !important;
+}
+.app-shell :is(main, section, article, aside, header, footer),
+.app-shell div[class*="bg-"],
+.app-shell
+  :is(
+    [class*="card"],
+    .auth-form-wrap,
+    .auth-visual-side,
+    .auth-feature,
+    .appointment-inbox,
+    .appointment-row,
+    .hospital-result,
+    .queue-summary-card,
+    .booking-session,
+    .care-sidebar-note,
+    .benefit,
+    .cta,
+    .resource-workspace > section
+  ) {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+.app-shell
+  :is(
+    .auth-audience,
+    .auth-feature > span,
+    .auth-mark,
+    .eyebrow-pill,
+    .status-pill,
+    .appointment-avatar,
+    .hospital-building,
+    .distance-pill,
+    .care-avatar,
+    .queue-stage,
+    .booking-steps li,
+    .appointment-summary button,
+    .care-sidebar nav a,
+    .care-mobile-nav a
+  ) {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+.app-shell div[class*="border"][class*="rounded"] {
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+.app-shell :is(h1, h2, h3, h4, strong, label, th, td) {
+  color: var(--flat-text);
+}
+.app-shell :is(p, small, .back-link) {
+  color: var(--flat-muted);
+}
+.app-shell [class*="text-gray-"],
+.app-shell [class*="text-slate-"] {
+  color: var(--flat-muted) !important;
+}
+.app-shell [class*="text-[#"],
+.app-shell [class*="dark:text-gray-"] {
+  color: var(--flat-text) !important;
+}
+.app-shell [class*="text-green-"],
+.app-shell [class*="text-teal-"],
+.app-shell [class*="text-blue-"],
+.app-shell [class*="text-red-"],
+.app-shell [class*="text-amber-"],
+.app-shell [class*="text-purple-"] {
+  color: var(--flat-accent) !important;
+}
+.app-shell
+  :is(
+    .brand-dot,
+    .hero h1 > span,
+    .auth-visual-side h2 > span,
+    .field-title a,
+    .auth-switch a,
+    .auth-feature > span,
+    .hospital-building,
+    .auth-mark,
+    .appointment-avatar,
+    .care-topbar-title
+  ) {
+  color: var(--flat-accent) !important;
+}
+.app-shell :is(.auth-audience-option, .care-sidebar nav a, .care-mobile-nav a) {
+  color: var(--flat-muted);
+}
+.app-shell
+  :is(
+    .auth-audience-option[aria-current],
+    .care-sidebar nav a[aria-current],
+    .care-mobile-nav a[aria-current],
+    .appointment-summary button[aria-pressed="true"]
+  ) {
+  color: var(--flat-accent) !important;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 8px;
+}
+/* Controls remain identifiable; they no longer have elevated or tinted shells. */
+.app-shell
+  :is(.input-wrap, .table-search, .finder-search, .appointment-search) {
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--flat-line) !important;
+  border-radius: 0 !important;
+}
+.app-shell :is(input, textarea, select),
+.mq-modal :is(input, textarea, select),
+.app-shell .mq-select-trigger,
+.mq-modal .mq-select-trigger {
+  color: var(--flat-text) !important;
+  background: var(--flat-bg) !important;
+  border-color: var(--flat-line) !important;
+  border-radius: 4px !important;
+  accent-color: var(--palette-violet);
+}
+.input-wrap input,
+.appointment-search input,
+.finder-search input {
+  border: 0 !important;
+}
+.app-shell .button,
+.mq-modal .button {
+  border-radius: 4px !important;
+  background: transparent !important;
+  color: var(--flat-accent) !important;
+  border-color: var(--flat-line) !important;
+}
+.app-shell .button.primary,
+.mq-modal .button.primary {
+  background: var(--palette-violet) !important;
+  color: #ffffff !important;
+  border-color: var(--palette-violet) !important;
+}
+.app-shell .button.primary:hover,
+.mq-modal .button.primary:hover {
+  background: var(--palette-blue) !important;
+  border-color: var(--palette-blue) !important;
+}
+.app-shell :is(.icon-button, .theme-toggle, .sidebar-close, .care-icon-button) {
+  color: var(--flat-text) !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+.app-shell
+  :is(
+    .appointment-status,
+    .session-availability,
+    .booking-enrolled,
+    .care-booking-notice,
+    .queue-status,
+    .ward-day-note,
+    .form-error,
+    .care-inline-error,
+    .appointment-notice
+  ) {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  color: var(--flat-accent) !important;
+}
+.app-shell :is(.status-dot, .ward-live-dot, .queue-live-dot) {
+  background: var(--palette-mint) !important;
+}
+.app-shell .auth-layout .auth-visual-side {
+  min-height: auto;
+}
+.app-shell .auth-form-wrap {
+  padding-inline: 0;
+}
+.app-shell .auth-feature {
+  padding-inline: 0;
+  gap: 20px;
+}
+.app-shell .auth-feature > span {
+  width: 28px;
+  height: 28px;
+}
+.app-shell .auth-audience {
+  padding: 0;
+  gap: 24px;
+}
+.app-shell .auth-audience-option {
+  justify-items: start;
+  text-align: left;
+}
+.app-shell .appointment-row {
+  padding-inline: 0;
+  border-bottom: 1px solid var(--flat-line) !important;
+}
+.app-shell .appointment-summary button {
+  padding-inline: 0;
+}
+.app-shell .hospital-result {
+  border-bottom: 1px solid var(--flat-line) !important;
+}
+.app-shell :is(.scene-grid, .scene-orbit, .hero-glow, .gradient-menu-glow) {
+  display: none;
+}
+.app-shell .auth-privacy {
+  border-color: var(--flat-line);
+}
+/* True overlays must cover underlying content without returning to card styling. */
+.mq-modal,
+.mq-modal > div,
+.mq-modal > section,
+.app-shell .mq-select-panel,
+.app-shell [data-slot="sidebar"] > div,
+.app-shell [role="dialog"],
+.app-shell .leaflet-popup-content-wrapper {
+  background: var(--flat-bg) !important;
+  color: var(--flat-text) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.mq-modal::backdrop {
+  background: #00000099;
+  backdrop-filter: none;
+}
+.app-shell .mq-select-option {
+  border-radius: 0;
+  color: var(--flat-text) !important;
+}
+.app-shell .mq-select-option[aria-selected="true"] {
+  color: var(--flat-accent) !important;
+}
+.app-shell .mq-select-option:hover {
+  text-decoration: underline;
+}
+.app-shell :focus-visible,
+.mq-modal :focus-visible {
+  outline-color: var(--flat-accent) !important;
+}
+.app-shell .ward-bed {
+  background: transparent !important;
+  border-color: var(--flat-line) !important;
+  color: var(--flat-text) !important;
+}
+.app-shell .ward-bed[aria-pressed="true"] {
+  border-color: var(--flat-accent) !important;
+}
+
+/* Inline icon badges also follow the open, unfilled layout. */
+.app-shell span[class*="bg-"],
+.mq-modal span[class*="bg-"] {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+.app-shell :is(h1, h2, h3, h4, label, th, td) {
+  color: var(--flat-text) !important;
+}

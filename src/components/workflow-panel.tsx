@@ -253,7 +253,8 @@ export function WorkflowPanel({
           {rows.map((a) => (
             <article key={String(a.id)}>
               <strong>
-                {String(a.id).slice(0, 8)} · {String(a.status)}
+                {String(a.patient_name || (si ? "හමුවීම" : "Appointment"))} ·{" "}
+                {String(a.status)}
               </strong>
               <div className="flex flex-wrap gap-2">
                 {["admin", "staff", "reception"].includes(role) &&

@@ -118,6 +118,22 @@ test("authentication layouts fit mobile in both languages and themes", async ({
       ]) {
         await page.goto(path);
         await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+        const appearance = await page.evaluate(() => {
+          const panel = document.querySelector(".auth-form-wrap")!;
+          const style = getComputedStyle(panel);
+          return {
+            background: getComputedStyle(document.body).backgroundColor,
+            shadow: style.boxShadow,
+            border: style.borderTopWidth,
+            panelBackground: style.backgroundColor,
+          };
+        });
+        expect(appearance.background).toBe(
+          theme === "light" ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)",
+        );
+        expect(appearance.shadow).toBe("none");
+        expect(appearance.border).toBe("0px");
+        expect(appearance.panelBackground).toBe("rgba(0, 0, 0, 0)");
         expect(
           await page.evaluate(
             () => document.documentElement.scrollWidth <= innerWidth,

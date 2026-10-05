@@ -29,6 +29,8 @@ export const profileSchema = z.object({
       branch_id: z.uuid(),
       role: z.enum(["admin", "staff", "reception", "doctor"]),
       active: z.boolean(),
+      hospital_name: z.string().optional(),
+      branch_name: z.string().optional(),
     }),
   ),
 });

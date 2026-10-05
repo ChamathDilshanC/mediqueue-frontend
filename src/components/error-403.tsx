@@ -10,7 +10,7 @@ export function Error403() {
   const si = language === "si";
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#121619] text-[#17191C] dark:text-gray-100 flex flex-col justify-between transition-colors">
+    <div className="min-h-screen bg-white dark:bg-[#000000] text-[#191919] dark:text-gray-100 flex flex-col justify-between transition-colors">
       <main className="max-w-lg mx-auto px-4 sm:px-6 py-24 w-full flex-1 flex items-center justify-center">
         <div className="w-full text-center space-y-6">
           {/* Ultra-thin single stroke line icon */}
@@ -46,7 +46,7 @@ export function Error403() {
           <div className="pt-4 flex items-center justify-center gap-4 text-xs font-mono">
             <button
               onClick={() => router.push("/account")}
-              className="px-4 py-2 border border-slate-900 dark:border-gray-100 text-slate-900 dark:text-gray-100 hover:bg-slate-900 dark:hover:bg-gray-100 hover:text-white dark:hover:text-[#121619] transition-colors"
+              className="px-4 py-2 border border-slate-900 dark:border-gray-100 text-slate-900 dark:text-gray-100 hover:bg-slate-900 dark:hover:bg-gray-100 hover:text-white dark:hover:text-[#000000] transition-colors"
             >
               {si ? "ගිණුමට යන්න" : "Request Clearance"}
             </button>
