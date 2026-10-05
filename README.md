@@ -180,3 +180,13 @@ dates, stay/bed day counts, planned/actual discharge and staff details. The boar
 refreshes every 30 seconds and supports mobile, dark mode and Sinhala/English.
 Manage dates under Admissions. Patients see their own ward stays under `/patient`.
 Upstream failures show a retry message instead of JSON parser/server diagnostics.
+
+## Patient care space
+
+`/patient` has its own patient-only navigation and responsive care dashboard with
+appointments, health records, owned ward stays and queue tickets. Non-staff accounts
+are redirected here from `/account`. Patients select a center, enroll, then take a
+registration ticket and follow their current queue/room, people ahead and serving
+numbers (15-second polling). Staff complete each station and issue an onward ticket
+using Queue Operations. Configure service stages and room bindings under Queues;
+consultation queues require a room. Users cannot route themselves to clinical queues.

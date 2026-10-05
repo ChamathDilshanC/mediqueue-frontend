@@ -114,6 +114,11 @@ export function AppSidebar() {
     { title: t.features, href: "/#features", icon: Sparkles },
     { title: t.faq, href: "/#faq", icon: CircleHelp },
   ];
+  if (
+    pathname.startsWith("/patient") ||
+    (pathname === "/account" && !membership)
+  )
+    return null;
   return (
     <AnimatedSidebar
       ariaLabel={workspace ? "Workspace navigation" : "Mobile navigation"}

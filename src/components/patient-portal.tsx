@@ -1,9 +1,9 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CalendarDays, FileText, HeartPulse, RefreshCw } from "lucide-react";
-import { SiteHeader } from "./site-header";
+import { PatientShell } from "./patient-shell";
+import { PatientQueue } from "./patient-queue";
 import { useLanguage } from "./providers";
 import { StayDetails } from "./ward-stay";
 import { apiJson } from "@/lib/api-json";
@@ -131,26 +131,45 @@ export function PatientPortal() {
       timeZone: "Asia/Colombo",
     });
   return (
-    <>
-      <SiteHeader simple />
-      <main className="container patient-portal">
-        <div className="patient-heading">
+    <PatientShell name={overview?.profiles[0]?.name}>
+      <main className="patient-portal care-page" id="care-home">
+        <div className="patient-heading care-hero">
           <div>
             <p className="eyebrow">
-              MEDIQUEUE · {si ? "රෝගී සේවා" : "PATIENT SERVICES"}
+              {si ? "ඔබ වෙනුවෙන්, සෑම පියවරකදීම" : "HERE FOR YOU, EVERY STEP"}
             </p>
             <h1>
               {si ? "ඔබේ සෞඛ්‍ය සේවා එකම තැනක" : "Your care, in one place"}
             </h1>
             <p>
               {si
-                ? "හමුවීම් වෙන්කරන්න සහ ඔබගේ වෛද්‍ය වාර්තා බලන්න."
-                : "Book appointments and view your medical records."}
+                ? "ඔබේ හමුවීම්, පෝලිම් සහ සෞඛ්‍ය තොරතුරු පහසුවෙන් කළමනාකරණය කරන්න."
+                : "A calmer hospital visit starts here. Your appointments, queue and health records, together."}
             </p>
           </div>
-          <Link className="button secondary" href="/account">
-            {si ? "මගේ ගිණුම" : "My account"}
-          </Link>
+          <a className="button primary" href="#book-care">
+            {si ? "හමුවීමක් වෙන්කරන්න" : "Book an appointment"} ↗
+          </a>
+        </div>
+        <div className="care-overview-stats">
+          <article>
+            <CalendarDays size={22} />
+            <span>{si ? "ඉදිරි හමුවීම්" : "Upcoming appointments"}</span>
+            <strong>
+              {overview?.appointments.filter((a) => a.status === "BOOKED")
+                .length ?? "—"}
+            </strong>
+          </article>
+          <article>
+            <HeartPulse size={22} />
+            <span>{si ? "මගේ වාර්තා" : "My health records"}</span>
+            <strong>{overview?.records.length ?? "—"}</strong>
+          </article>
+          <article>
+            <FileText size={22} />
+            <span>{si ? "රෝගී පැතිකඩ" : "Patient profiles"}</span>
+            <strong>{overview?.profiles.length ?? "—"}</strong>
+          </article>
         </div>
         {error && (
           <div className="account-error" role="alert">
@@ -169,8 +188,9 @@ export function PatientPortal() {
         {loading && (
           <p role="status">{si ? "පූරණය වෙමින්..." : "Loading your care..."}</p>
         )}
+        <PatientQueue center={center} enrolled={!!enrolled} />
         <div className="patient-grid">
-          <section className="account-card">
+          <section className="account-card" id="book-care">
             <CalendarDays size={24} />
             <h2>{si ? "හමුවීමක් වෙන්කරන්න" : "Book an appointment"}</h2>
             <label htmlFor="center">
@@ -262,7 +282,7 @@ export function PatientPortal() {
               </div>
             )}
           </section>
-          <section className="account-card">
+          <section className="account-card" id="my-appointments">
             <HeartPulse size={24} />
             <h2>{si ? "මගේ හමුවීම්" : "My appointments"}</h2>
             <div className="patient-list">
@@ -291,28 +311,33 @@ export function PatientPortal() {
               ))}
             </div>
           </section>
-          {overview?.ward_stays && overview.ward_stays.length > 0 && (
-            <section className="account-card patient-records">
-              <HeartPulse size={24} />
-              <h2>{si ? "මගේ වෝඩ් නේවාසික තොරතුරු" : "My ward stays"}</h2>
-              <div className="patient-stay-list">
-                {overview.ward_stays.map((stay) => (
-                  <article key={stay.id}>
-                    <h3>{stay.ward}</h3>
-                    <p>
-                      {si ? "ඇඳ" : "Bed"}: {stay.bed || "—"}
-                    </p>
-                    <StayDetails
-                      stay={stay}
-                      language={language}
-                      zone={stay.timezone}
-                    />
-                  </article>
-                ))}
-              </div>
-            </section>
-          )}
-          <section className="account-card patient-records">
+          <section className="account-card patient-records" id="my-stays">
+            <HeartPulse size={24} />
+            <h2>{si ? "මගේ වෝඩ් නේවාසික තොරතුරු" : "My ward stays"}</h2>
+            <div className="patient-stay-list">
+              {!overview?.ward_stays?.length && (
+                <p>
+                  {si
+                    ? "දැනට නේවාසික තොරතුරු නොමැත."
+                    : "No ward stays to display yet."}
+                </p>
+              )}
+              {overview?.ward_stays?.map((stay) => (
+                <article key={stay.id}>
+                  <h3>{stay.ward}</h3>
+                  <p>
+                    {si ? "ඇඳ" : "Bed"}: {stay.bed || "—"}
+                  </p>
+                  <StayDetails
+                    stay={stay}
+                    language={language}
+                    zone={stay.timezone}
+                  />
+                </article>
+              ))}
+            </div>
+          </section>
+          <section className="account-card patient-records" id="my-records">
             <FileText size={24} />
             <h2>{si ? "මගේ වාර්තා සහ බිල්පත්" : "My records and bills"}</h2>
             <p>
@@ -326,7 +351,19 @@ export function PatientPortal() {
               )}
               {overview?.records.map((r) => (
                 <article key={String(r.id)}>
-                  <h3>{String(r.module).replaceAll("-", " ")}</h3>
+                  <h3>
+                    {(
+                      {
+                        "clinical-records": si
+                          ? "සායනික වාර්තාව"
+                          : "Clinical record",
+                        prescriptions: si ? "ඖෂධ වට්ටෝරුව" : "Prescription",
+                        "lab-orders": si ? "පරීක්ෂණ ප්‍රතිඵල" : "Lab result",
+                        invoices: si ? "බිල්පත" : "Invoice",
+                      } as Record<string, string>
+                    )[String(r.module)] ||
+                      String(r.module).replaceAll("-", " ")}
+                  </h3>
                   <dl>
                     {Object.entries(r)
                       .filter(
@@ -353,6 +390,6 @@ export function PatientPortal() {
           </section>
         </div>
       </main>
-    </>
+    </PatientShell>
   );
 }

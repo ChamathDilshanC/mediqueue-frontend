@@ -1883,3 +1883,30 @@ admissionConfig.fields.push({
   showInTable: true,
 });
 admissionConfig.inputFields.push("admitted_at", "planned_discharge_at");
+
+resourceConfigs.queues.fields.push(
+  {
+    key: "service_type",
+    en: "Service stage",
+    si: "සේවා අදියර",
+    type: "select",
+    defaultValue: "GENERAL",
+    showInTable: true,
+    options: [
+      { value: "GENERAL", en: "General", si: "සාමාන්‍ය" },
+      { value: "REGISTRATION", en: "Registration", si: "ලියාපදිංචිය" },
+      { value: "CONSULTATION", en: "Consultation", si: "වෛද්‍ය හමුව" },
+      { value: "DISPENSARY", en: "Dispensary", si: "ඖෂධ නිකුත් කිරීම" },
+    ],
+  },
+  {
+    key: "room_id",
+    en: "Room / counter",
+    si: "කාමරය / කවුන්ටරය",
+    type: "uuid-ref",
+    refResource: "rooms",
+    refLabel: "name",
+    showInTable: true,
+  },
+);
+resourceConfigs.queues.inputFields.push("service_type", "room_id");

@@ -30,6 +30,7 @@ export function WorkflowPanel({
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
+  const [nextQueue, setNextQueue] = useState("");
   const pending = useRef<{ signature: string; key: string } | null>(null);
   const request = useCallback(
     async (path: string, init?: RequestInit) => {
@@ -95,7 +96,10 @@ export function WorkflowPanel({
       setBusy(false);
     }
   }
-  const operate = ["admin", "staff", "doctor"].includes(role);
+  const selectedQueue = rows.find((q) => q.id === queue);
+  const operate =
+    ["admin", "staff", "doctor"].includes(role) ||
+    (role === "reception" && selectedQueue?.service_type === "REGISTRATION");
   return (
     <section className="account-card mb-6">
       <h2>
@@ -116,7 +120,11 @@ export function WorkflowPanel({
             id="live-queue"
             className="border rounded-xl p-3 bg-transparent"
             value={queue}
-            onChange={(e) => setQueue(e.target.value)}
+            onChange={(e) => {
+              setQueue(e.target.value);
+              setNextQueue("");
+              setTokens([]);
+            }}
           >
             <option value="">{si ? "පෝලිම තෝරන්න" : "Choose queue"}</option>
             {rows.map((q) => (
@@ -127,6 +135,34 @@ export function WorkflowPanel({
           </select>
           {queue && (
             <>
+              <div className="my-4 flex flex-wrap items-center gap-3">
+                <span className="eyebrow-pill">
+                  {String(selectedQueue?.service_type || "GENERAL")}
+                </span>
+                <label htmlFor="next-care-queue">
+                  {si ? "ඊළඟ කාමරය / සේවාව" : "Next room / service"}
+                </label>
+                <select
+                  id="next-care-queue"
+                  className="border rounded-xl p-3 bg-transparent"
+                  value={nextQueue}
+                  onChange={(e) => setNextQueue(e.target.value)}
+                >
+                  <option value="">
+                    {si ? "ඊළඟ සේවාව තෝරන්න" : "Choose onward queue"}
+                  </option>
+                  {rows
+                    .filter(
+                      (q) =>
+                        q.id !== queue && q.service_type !== "REGISTRATION",
+                    )
+                    .map((q) => (
+                      <option key={String(q.id)} value={String(q.id)}>
+                        {String(q.name)}
+                      </option>
+                    ))}
+                </select>
+              </div>
               {role !== "doctor" && (
                 <form
                   className="flex flex-wrap gap-3 my-4"
@@ -187,6 +223,22 @@ export function WorkflowPanel({
                         ))}
                       </div>
                     )}
+                    {String(t.status) === "COMPLETED" &&
+                      (operate || role === "reception") && (
+                        <button
+                          className="button secondary mt-3"
+                          disabled={busy || !nextQueue}
+                          onClick={() =>
+                            void command(`journey/tokens/${t.id}/handoff`, {
+                              queue_id: nextQueue,
+                            })
+                          }
+                        >
+                          {si
+                            ? "ඊළඟ සේවාවේ ටිකට් නිකුත් කරන්න"
+                            : "Issue onward ticket"}
+                        </button>
+                      )}
                   </article>
                 ))}
               </div>

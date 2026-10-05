@@ -84,27 +84,28 @@ export function SiteHeader({ simple = false }: { simple?: boolean }) {
     <header className={`site-header ${workspace ? "workspace-header" : ""}`}>
       <div className="header-inner">
         <div className="header-brand-group">
-          {(!simple || workspace || isMobile) && (
-            <AnimatedSidebarTrigger
-              className={
-                workspace
-                  ? "navigation-trigger"
-                  : "navigation-trigger public-trigger"
-              }
-              aria-label={
-                isMobile
-                  ? openMobile
-                    ? t.close
-                    : t.menu
-                  : state === "expanded"
-                    ? "Collapse navigation"
-                    : "Expand navigation"
-              }
-              aria-controls="mobile-navigation"
-            >
-              <PanelLeft size={20} />
-            </AnimatedSidebarTrigger>
-          )}
+          {!pathname.startsWith("/patient") &&
+            (!simple || workspace || isMobile) && (
+              <AnimatedSidebarTrigger
+                className={
+                  workspace
+                    ? "navigation-trigger"
+                    : "navigation-trigger public-trigger"
+                }
+                aria-label={
+                  isMobile
+                    ? openMobile
+                      ? t.close
+                      : t.menu
+                    : state === "expanded"
+                      ? "Collapse navigation"
+                      : "Expand navigation"
+                }
+                aria-controls="mobile-navigation"
+              >
+                <PanelLeft size={20} />
+              </AnimatedSidebarTrigger>
+            )}
           {!workspace && <Brand destination={workspace ? "/account" : "/"} />}
         </div>
         {!simple && (

@@ -13,6 +13,8 @@ test("patient sign in, enrollment, booking, records and cancellation", async ({
   let cancelled = false;
   await page.route("**/api/backend/patient/**", async (route) => {
     const path = new URL(route.request().url()).pathname;
+    if (path.endsWith("/tickets") || path.includes("/queues/"))
+      return route.fulfill({ json: [] });
     if (path.endsWith("/centers"))
       return route.fulfill({
         json: [
@@ -165,7 +167,11 @@ test("reception gets billing but cannot open clinical management", async ({
     nav.getByRole("link", { name: "Clinical records", exact: true }),
   ).toHaveCount(0);
   await page.goto("/dashboard?resource=clinical-records");
-  await expect(page.getByRole("alert").filter({ hasText: "Your role does not have access" })).toBeVisible();
+  await expect(
+    page
+      .getByRole("alert")
+      .filter({ hasText: "Your role does not have access" }),
+  ).toBeVisible();
 });
 
 test("backend proxy checks mutation origin and forwards queue idempotency", async ({

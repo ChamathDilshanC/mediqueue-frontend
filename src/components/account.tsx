@@ -37,7 +37,12 @@ export function Account() {
           return;
         }
         if (!response.ok) throw new Error("Profile unavailable");
-        setProfile(profileSchema.parse(await response.json()));
+        const data = profileSchema.parse(await response.json());
+        if (!data.memberships.some((m) => m.active)) {
+          router.replace("/patient");
+          return;
+        }
+        setProfile(data);
       } catch {
         if (!controller.signal.aborted) setError(true);
       }
