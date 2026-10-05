@@ -6,6 +6,7 @@
 
 export type FieldType =
   | "text"
+  | "quotation"
   | "select"
   | "datetime"
   | "number"
@@ -699,8 +700,18 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
         showInTable: true,
         maxLength: 200,
       },
+      {
+        key: "quotation_template",
+        en: "Default quotation",
+        si: "පෙරනිමි මිල ගණන",
+        type: "quotation",
+        showInTable: false,
+        formOnly: true,
+        placeholder: "Consultation fee | 2500",
+        placeholderSi: "උපදේශන ගාස්තුව | 2500",
+      },
     ],
-    inputFields: ["name", "department_id", "specialty"],
+    inputFields: ["name", "department_id", "specialty", "quotation_template"],
     canCreate: true,
     canEdit: true,
     canDelete: true,

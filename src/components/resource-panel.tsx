@@ -310,7 +310,16 @@ function FormDialog({
     const initial: Record<string, string> = {};
     for (const f of editableFields) {
       if (editing) {
-        initial[f.key] = String(editing[f.key] ?? "");
+        const existingValue = editing[f.key];
+        initial[f.key] =
+          f.type === "quotation" && Array.isArray(existingValue)
+            ? existingValue
+                .map(
+                  (item: { name?: unknown; amount?: unknown }) =>
+                    `${String(item.name ?? "")} | ${String(item.amount ?? "")}`,
+                )
+                .join("\n")
+            : String(existingValue ?? "");
       } else {
         initial[f.key] =
           (f.type === "datetime" && !/planned|ends_at/.test(f.key)
@@ -391,15 +400,37 @@ function FormDialog({
 
     // Build body
     const body: Record<string, unknown> = {};
-    for (const f of editableFields) {
-      const val = formData[f.key] ?? "";
-      if (f.type === "number")
-        body[f.key] = val === "" && !f.required ? null : Number(val);
-      else if (f.type === "datetime")
-        body[f.key] = val ? new Date(val).toISOString() : null;
-      else if (f.type === "uuid-ref" && !val && !f.required) body[f.key] = null;
-      else if (f.type === "boolean") body[f.key] = val === "true";
-      else body[f.key] = val;
+    try {
+      for (const f of editableFields) {
+        const val = formData[f.key] ?? "";
+        if (f.type === "number")
+          body[f.key] = val === "" && !f.required ? null : Number(val);
+        else if (f.type === "quotation") {
+          body[f.key] = val
+            .split("\n")
+            .map((line) => line.trim())
+            .filter(Boolean)
+            .map((line) => {
+              const separator = line.lastIndexOf("|");
+              if (separator < 1) throw new Error("Use: item name | amount");
+              const name = line.slice(0, separator).trim();
+              const amount = Number(line.slice(separator + 1).trim());
+              if (!name || !Number.isFinite(amount) || amount < 0)
+                throw new Error("Use: item name | non-negative amount");
+              return { name, amount };
+            });
+        } else if (f.type === "datetime")
+          body[f.key] = val ? new Date(val).toISOString() : null;
+        else if (f.type === "uuid-ref" && !val && !f.required) body[f.key] = null;
+        else if (f.type === "boolean") body[f.key] = val === "true";
+        else body[f.key] = val;
+      }
+    } catch (parseError) {
+      setError(
+        parseError instanceof Error ? parseError.message : "Invalid quotation",
+      );
+      setSubmitting(false);
+      return;
     }
 
     if (config.key === "wards") {
@@ -801,6 +832,20 @@ function FormDialog({
                       </span>
                     )}
                   </>
+                ) : f.type === "quotation" ? (
+                  <textarea
+                    id={`${config.key}-${f.key}`}
+                    value={formData[f.key] ?? ""}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        [f.key]: e.target.value,
+                      }))
+                    }
+                    placeholder={placeholderText ?? ""}
+                    rows={4}
+                    className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] focus:outline-none focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm md:col-span-2"
+                  />
                 ) : f.type === "number" ? (
                   <input
                     id={`${config.key}-${f.key}`}
