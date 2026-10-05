@@ -62,8 +62,8 @@ export function SiteHeader({ simple = false }: { simple?: boolean }) {
       title: t.how,
       href: "/#how-it-works",
       icon: <HeartPulse size={17} />,
-      gradientFrom: "#4300FF",
-      gradientTo: "#4300FF",
+      gradientFrom: "#00CAFF",
+      gradientTo: "#00CAFF",
     },
     {
       title: t.features,
@@ -76,8 +76,8 @@ export function SiteHeader({ simple = false }: { simple?: boolean }) {
       title: t.faq,
       href: "/#faq",
       icon: <CircleHelp size={17} />,
-      gradientFrom: "#4300FF",
-      gradientTo: "#4300FF",
+      gradientFrom: "#00CAFF",
+      gradientTo: "#00CAFF",
     },
   ];
   return (

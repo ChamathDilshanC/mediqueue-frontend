@@ -14,10 +14,10 @@ const PATTERNS = {
 const RING = {
   idle: "focus-visible:ring-2 focus-visible:ring-[#868686]/50",
   success: "",
-  error: "ring-2 ring-[#4300FF]/70 delay-150",
+  error: "ring-2 ring-[#00CAFF]/70 delay-150",
 } as const;
 
-const SUCCESS = "#4300FF";
+const SUCCESS = "#00CAFF";
 
 const SIZES = {
   sm: {

@@ -57,10 +57,18 @@ type Overview = {
     timezone?: string;
     latitude?: number | null;
     longitude?: number | null;
+    quotation?: { name: string; amount: number }[];
+    quotation_total?: string;
+    payment_status?: string;
+    payment_method?: string | null;
   }[];
   records: Record<string, unknown>[];
 };
-export function PatientPortal() {
+export function PatientPortal({
+  paymentResult,
+}: {
+  paymentResult?: "success" | "cancelled";
+}) {
   const { language } = useLanguage();
   const si = language === "si";
   const router = useRouter();
@@ -82,6 +90,7 @@ export function PatientPortal() {
   const [doctorSearch, setDoctorSearch] = useState("");
   const [sessionDate, setSessionDate] = useState("");
   const [confirmSlot, setConfirmSlot] = useState<Slot | null>(null);
+  const [paymentBusy, setPaymentBusy] = useState<string | null>(null);
   const request = useCallback(
     async (path: string, init?: RequestInit) => {
       const response = await fetch(`/api/backend/patient/${path}`, {
@@ -188,6 +197,26 @@ export function PatientPortal() {
       setBusy(false);
     }
   }
+  async function choosePayment(appointmentId: string, method: "ONLINE" | "PAY_AT_HOSPITAL") {
+    setPaymentBusy(appointmentId);
+    setError("");
+    try {
+      const result = await request(`appointments/${appointmentId}/payment`, {
+        method: "POST",
+        body: JSON.stringify({ method }),
+      });
+      if (result.checkout_url) {
+        window.location.href = result.checkout_url;
+        return;
+      }
+      await load();
+      setNotice(si ? "ගෙවීමේ ක්‍රමය සුරකින ලදී." : "Payment preference saved.");
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setPaymentBusy(null);
+    }
+  }
   const selected = centers.find((c) => c.id === center);
   const enrolled = overview?.profiles.some(
     (p) => p.tenant_id === selected?.tenant_id,
@@ -261,6 +290,28 @@ export function PatientPortal() {
           <p role="status" className="care-booking-notice">
             <CheckCircle2 size={20} />
             {notice}
+          </p>
+        )}
+        {paymentResult === "success" && (
+          <p
+            role="status"
+            className="care-booking-notice payment-result payment-success"
+          >
+            <CheckCircle2 size={20} />
+            {si
+              ? "Stripe checkout සාර්ථකව අවසන් විය. ගෙවීම PAID ලෙස තහවුරු කරන්නේ Stripe webhook එකෙන් පසුවයි."
+              : "Stripe checkout completed. Your appointment will show as paid after the Stripe webhook confirms the payment."}
+          </p>
+        )}
+        {paymentResult === "cancelled" && (
+          <p
+            role="status"
+            className="care-booking-notice payment-result payment-cancelled"
+          >
+            <X size={20} />
+            {si
+              ? "Online ගෙවීම අවලංගු විය. ඔබට රෝහලට පැමිණ ගෙවීමට හෝ නැවත online උත්සාහ කිරීමට හැකිය."
+              : "Online payment was cancelled. You can pay at the hospital or try online payment again."}
           </p>
         )}
         {loading && <Loader />}
@@ -504,6 +555,36 @@ export function PatientPortal() {
                     {appointmentLabels[a.status]?.[si ? 1 : 0] || a.status}
                   </span>
                   {a.review_reason && <p>{a.review_reason}</p>}
+                  {!!a.quotation?.length && (
+                    <div className="appointment-quotation">
+                      <strong>{si ? "රෝහල් quotation" : "Hospital quotation"}</strong>
+                      {a.quotation.map((item) => (
+                        <div key={`${item.name}-${item.amount}`}>
+                          <span>{item.name}</span><span>LKR {Number(item.amount).toLocaleString()}</span>
+                        </div>
+                      ))}
+                      <b>{si ? "මුළු එකතුව" : "Total"}: LKR {Number(a.quotation_total || 0).toLocaleString()}</b>
+                      {["BOOKED", "CHECKED_IN"].includes(a.status) && a.payment_status !== "PAID" && (
+                        <div className="appointment-payment-actions">
+                          <button
+                            className="button primary"
+                            disabled={paymentBusy === a.id}
+                            onClick={() => void choosePayment(a.id, "ONLINE")}
+                          >
+                            {paymentBusy === a.id ? (si ? "පූරණය වෙමින්..." : "Opening...") : si ? "Online ගෙවන්න" : "Pay online"}
+                          </button>
+                          <button
+                            className="button secondary"
+                            disabled={paymentBusy === a.id}
+                            onClick={() => void choosePayment(a.id, "PAY_AT_HOSPITAL")}
+                          >
+                            {si ? "එහිදී ගෙවන්න" : "Pay at hospital"}
+                          </button>
+                        </div>
+                      )}
+                      {a.payment_status === "PAY_AT_HOSPITAL" && <small>{si ? "රෝහලට පැමිණ ගෙවීමට තෝරා ඇත." : "Pay at hospital selected."}</small>}
+                    </div>
+                  )}
                   {["PENDING", "BOOKED"].includes(a.status) && (
                     <button
                       disabled={busy}

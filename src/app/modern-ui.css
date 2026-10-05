@@ -5,7 +5,7 @@
   --ui-text: #000000;
   --ui-muted: #6a6a6a;
   --ui-border: #ffffff;
-  --ui-accent: #4300FF;
+  --ui-accent: #00CAFF;
   --ui-tint: #ffffff;
 }
 html[data-theme="dark"] {
@@ -14,7 +14,7 @@ html[data-theme="dark"] {
   --ui-text: #ffffff;
   --ui-muted: #0065F8;
   --ui-border: #0065F8;
-  --ui-accent: #4300FF;
+  --ui-accent: #00CAFF;
   --ui-tint: #000000;
 }
 body {
@@ -36,10 +36,10 @@ body {
 .staff-workspace .button.primary,
 .mq-modal .button.primary,
 .care-shell .button.primary {
-  background: #4300FF;
-  border-color: #4300FF;
+  background: #00CAFF;
+  border-color: #00CAFF;
   color: #ffffff;
-  box-shadow: 0 3px 8px #4300FF15;
+  box-shadow: 0 3px 8px #00CAFF15;
 }
 .auth-layout .button.primary:hover,
 .staff-workspace .button.primary:hover,
@@ -606,17 +606,17 @@ html[lang="si"] .appointment-summary span {
 }
 .status-pending {
   background: #ffffff;
-  color: #4300FF;
+  color: #00CAFF;
 }
 .status-booked,
 .status-completed {
   background: #ffffff;
-  color: #4300FF;
+  color: #00CAFF;
 }
 .status-rejected,
 .status-no_show {
   background: #ffffff;
-  color: #4300FF;
+  color: #00CAFF;
 }
 .status-checked_in {
   background: #ffffff;

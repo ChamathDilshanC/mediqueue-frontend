@@ -33,6 +33,8 @@ type Appointment = {
   source: string;
   review_reason: string;
   reviewed_at: string | null;
+  quotation?: { name: string; amount: number }[];
+  payment_status?: string;
 };
 type Inbox = {
   items: Appointment[];
@@ -68,6 +70,8 @@ export function AppointmentInbox({ role }: { role: string }) {
     row: Appointment;
     status: string;
   } | null>(null);
+  const [quotationSelection, setQuotationSelection] = useState<Appointment | null>(null);
+  const [quotationText, setQuotationText] = useState("");
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -128,6 +132,36 @@ export function AppointmentInbox({ role }: { role: string }) {
         );
       setNotice(`${selection.row.patient_name} · ${label(selection.status)}`);
       setSelection(null);
+      await mutate();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function saveQuotation() {
+    if (!quotationSelection || busy) return;
+    const quotation = quotationText.split("\n").map((line) => {
+      const [name, amount] = line.split("|");
+      return { name: name?.trim() || "", amount: Number(amount?.trim()) };
+    });
+    if (quotation.some((item) => !item.name || !Number.isFinite(item.amount) || item.amount < 0)) {
+      setError(si ? "භාණ්ඩය සහ වලංගු මුදල ඇතුළත් කරන්න." : "Enter an item name and a valid amount on every line.");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    try {
+      const response = await fetch(`/api/backend/appointments/${quotationSelection.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: quotationSelection.status, quotation }),
+        signal: AbortSignal.timeout(20000),
+      });
+      const result = await response.json();
+      if (!response.ok) throw Error(typeof result.detail === "string" ? result.detail : "Unable to save quotation.");
+      setNotice(si ? "Quotation සාර්ථකව සුරකින ලදී." : "Quotation saved.");
+      setQuotationSelection(null);
       await mutate();
     } catch (e) {
       setError((e as Error).message);
@@ -273,6 +307,19 @@ export function AppointmentInbox({ role }: { role: string }) {
               )}
             </div>
             <div className="appointment-actions">
+              {["admin", "staff", "reception"].includes(role) && (
+                <button
+                  className="button secondary"
+                  disabled={busy}
+                  onClick={() => {
+                    setQuotationSelection(row);
+                    setQuotationText((row.quotation || []).map((item) => `${item.name} | ${item.amount}`).join("\n"));
+                    setError("");
+                  }}
+                >
+                  {si ? "මිල ගණන" : "Quotation"}
+                </button>
+              )}
               {["admin", "staff", "reception"].includes(role) &&
                 (transitions[row.status] || []).map((status) => (
                   <button
@@ -348,6 +395,37 @@ export function AppointmentInbox({ role }: { role: string }) {
                   disabled={busy}
                 />
               </label>
+            )}
+            {quotationSelection && (
+              <ModalSurface
+                label={si ? "Quotation සකසන්න" : "Create appointment quotation"}
+                busy={busy}
+                onClose={() => setQuotationSelection(null)}
+              >
+                <form className="appointment-confirm" onSubmit={(event) => { event.preventDefault(); void saveQuotation(); }}>
+                  <h2>{si ? "වෛද්‍ය ගාස්තු සහ medical items" : "Appointment quotation"}</h2>
+                  <p>{quotationSelection.patient_name} · {quotationSelection.doctor}</p>
+                  <label>
+                    {si ? "එක් පේළියකට: නම | මුදල (LKR)" : "One item per line: name | amount (LKR)"}
+                    <textarea
+                      rows={6}
+                      value={quotationText}
+                      onChange={(event) => setQuotationText(event.target.value)}
+                      placeholder={"Consultation fee | 2500\nBlood test | 1500"}
+                      disabled={busy}
+                    />
+                  </label>
+                  {error && <p role="alert" className="form-error">{error}</p>}
+                  <div className="appointment-actions">
+                    <button type="button" className="button secondary" disabled={busy} onClick={() => setQuotationSelection(null)}>
+                      {si ? "ආපසු" : "Go back"}
+                    </button>
+                    <button type="submit" className="button primary" disabled={busy}>
+                      {busy ? (si ? "සුරකිමින්..." : "Saving...") : si ? "සුරකින්න" : "Save quotation"}
+                    </button>
+                  </div>
+                </form>
+              </ModalSurface>
             )}
             {error && (
               <p role="alert" className="form-error">

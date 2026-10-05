@@ -58,7 +58,7 @@
   color: inherit;
 }
 .finder-tools .active {
-  box-shadow: inset 0 0 0 1px #4300FF;
+  box-shadow: inset 0 0 0 1px #00CAFF;
 }
 .hospital-map-wrap {
   position: relative;
@@ -90,7 +90,7 @@
 .map-select-button {
   display: block;
   margin-top: 9px;
-  background: #4300FF;
+  background: #00CAFF;
   color: white;
   border: 0;
   padding: 8px 12px;
@@ -103,7 +103,7 @@
   height: 34px;
   border-radius: 50% 50% 50% 0;
   transform: rotate(-45deg);
-  background: #4300FF;
+  background: #00CAFF;
   color: #ffffff;
   border: 3px solid white;
   font-size: 24px;
@@ -112,7 +112,7 @@
   box-shadow: 0 3px 10px #00000030;
 }
 .hospital-map-pin.selected {
-  background: #4300FF;
+  background: #00CAFF;
 }
 .hospital-map-pin b {
   display: block;
@@ -126,7 +126,7 @@
   right: 10px;
   padding: 12px;
   background: #ffffff;
-  color: #4300FF;
+  color: #00CAFF;
   z-index: 1;
   font-size: 12px;
   border-radius: 10px;
@@ -156,8 +156,8 @@
   min-width: 0;
 }
 .hospital-result.chosen {
-  border-color: #4300FF;
-  box-shadow: 0 0 0 2px #4300FF18;
+  border-color: #00CAFF;
+  box-shadow: 0 0 0 2px #00CAFF18;
   background: var(--finder-soft);
 }
 .hospital-result-top {
@@ -172,7 +172,7 @@
   align-items: center;
   justify-content: center;
   background: #ffffff;
-  color: #4300FF;
+  color: #00CAFF;
   border-radius: 13px;
   flex-shrink: 0;
 }
@@ -193,7 +193,7 @@
   padding: 6px 9px;
   border-radius: 20px;
   background: #ffffff;
-  color: #4300FF;
+  color: #00CAFF;
 }
 .hospital-result p {
   display: flex;
@@ -246,13 +246,13 @@
 }
 .booking-steps li.done {
   background: #ffffff;
-  color: #4300FF;
+  color: #00CAFF;
 }
 .booking-enrolled {
   display: flex;
   gap: 8px;
   align-items: center;
-  color: #4300FF;
+  color: #00CAFF;
   font-size: 12px;
   margin: 17px 0;
 }
@@ -275,14 +275,14 @@
 .session-availability {
   display: inline-flex;
   font-size: 11px;
-  color: #4300FF;
+  color: #00CAFF;
   background: #ffffff;
   padding: 5px 9px;
   border-radius: 7px;
   margin: 6px 10px 6px 0;
 }
 .session-availability.full {
-  color: #4300FF;
+  color: #00CAFF;
   background: #ffffff;
 }
 .care-booking-notice {
@@ -292,10 +292,21 @@
   padding: 16px 20px;
   border-radius: 13px;
   background: #ffffff;
-  border: 1px solid #4300FF;
-  color: #4300FF;
+  border: 1px solid #00CAFF;
+  color: #00CAFF;
   font-size: 13px;
   margin: 22px 0;
+}
+.payment-result {
+  margin-top: 10px;
+}
+.payment-success {
+  border-color: #00a86b;
+  color: #007a4d;
+}
+.payment-cancelled {
+  border-color: #d97706;
+  color: #a04f00;
 }
 .booking-dialog-backdrop {
   position: fixed;
@@ -340,8 +351,36 @@
   color: #7e7e7e;
 }
 .booking-dialog a {
-  color: #4300FF;
+  color: #00CAFF;
   font-size: 13px;
+}
+.appointment-quotation {
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid #00CAFF;
+  border-radius: 12px;
+  background: color-mix(in srgb, #00CAFF 7%, transparent);
+}
+.appointment-quotation > strong {
+  display: block;
+  margin-bottom: 8px;
+}
+.appointment-quotation > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 0;
+  font-size: 12px;
+}
+.appointment-quotation > b {
+  display: block;
+  margin-top: 8px;
+}
+.appointment-payment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
 }
 .queue-live-heading {
   display: flex;
@@ -355,7 +394,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #4300FF;
+  background: #00CAFF;
 }
 .queue-summary-grid {
   display: grid;
@@ -382,7 +421,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 7px;
-  color: #4300FF;
+  color: #00CAFF;
 }
 .queue-metrics strong {
   font-size: 25px;
@@ -405,7 +444,7 @@
 }
 .queue-summary-card p strong {
   float: right;
-  color: #4300FF;
+  color: #00CAFF;
 }
 .queue-summary-card > small {
   font-size: 10px;
@@ -465,7 +504,7 @@
 }
 [data-theme="dark"] .queue-metrics strong,
 [data-theme="dark"] .queue-summary-card p strong {
-  color: #4300FF;
+  color: #00CAFF;
 }
 [data-theme="dark"] .booking-dialog {
   background: #000000;
@@ -477,12 +516,12 @@
 [data-theme="dark"] .booking-steps li.done,
 [data-theme="dark"] .session-availability {
   background: #000000;
-  color: #4300FF;
+  color: #00CAFF;
 }
 [data-theme="dark"] .care-booking-notice {
   background: #000000;
-  color: #4300FF;
-  border-color: #4300FF;
+  color: #00CAFF;
+  border-color: #00CAFF;
 }
 @media (max-width: 750px) {
   .hospital-finder {

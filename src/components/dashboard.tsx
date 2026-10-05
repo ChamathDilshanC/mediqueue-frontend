@@ -199,7 +199,7 @@ function OverviewDashboard() {
             </h3>
             <button
               onClick={() => router.push("/dashboard?resource=appointments")}
-              className="text-xs text-[#4300FF] font-semibold hover:underline"
+              className="text-xs text-[#00CAFF] font-semibold hover:underline"
             >
               {si ? "සියල්ල බලන්න →" : "View all →"}
             </button>
@@ -275,7 +275,7 @@ function OverviewDashboard() {
             </h3>
             <button
               onClick={() => router.push("/dashboard?resource=doctors")}
-              className="text-xs text-[#4300FF] font-semibold hover:underline"
+              className="text-xs text-[#00CAFF] font-semibold hover:underline"
             >
               {si ? "සියල්ල බලන්න →" : "View all →"}
             </button>
@@ -326,12 +326,12 @@ function OverviewDashboard() {
         <div className="bg-white dark:bg-[#1e1e1e] rounded-3xl border border-[#f4f4f4] dark:border-gray-800 shadow-sm overflow-hidden flex flex-col lg:col-span-2">
           <div className="p-5 border-b border-[#ffffff] dark:border-gray-800 bg-[#ffffff] dark:bg-[#1a1a1a] flex items-center justify-between">
             <h3 className="font-bold text-[#000000] dark:text-gray-100 flex items-center gap-2">
-              <DoorOpen size={18} className="text-[#4300FF]" />
+              <DoorOpen size={18} className="text-[#00CAFF]" />
               {si ? "රෝහල් අංශ (Departments)" : "Hospital Departments"}
             </h3>
             <button
               onClick={() => router.push("/dashboard?resource=departments")}
-              className="text-xs text-[#4300FF] font-semibold hover:underline"
+              className="text-xs text-[#00CAFF] font-semibold hover:underline"
             >
               {si ? "සියල්ල බලන්න →" : "View all →"}
             </button>
@@ -484,8 +484,8 @@ export function Dashboard() {
           {/* Page Header */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 mt-4">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white dark:bg-[#1e1e1e] border border-[#ffffff] rounded-full text-xs font-medium text-[#4300FF] mb-4 shadow-sm">
-                <ShieldCheck size={14} className="text-[#4300FF]" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white dark:bg-[#1e1e1e] border border-[#ffffff] rounded-full text-xs font-medium text-[#00CAFF] mb-4 shadow-sm">
+                <ShieldCheck size={14} className="text-[#00CAFF]" />
                 {t.account}
               </div>
               <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-[#000000] dark:text-gray-100 mb-2">

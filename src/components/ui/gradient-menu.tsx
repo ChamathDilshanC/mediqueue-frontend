@@ -23,8 +23,8 @@ const menuItems: GradientMenuItem[] = [
     title: "Overview",
     href: "/dashboard",
     icon: <IoGridOutline />,
-    gradientFrom: "#4300FF",
-    gradientTo: "#4300FF",
+    gradientFrom: "#00CAFF",
+    gradientTo: "#00CAFF",
   },
   {
     title: "Patients",
@@ -37,22 +37,22 @@ const menuItems: GradientMenuItem[] = [
     title: "Appointments",
     href: "/dashboard?resource=appointments",
     icon: <IoCalendarOutline />,
-    gradientFrom: "#4300FF",
-    gradientTo: "#4300FF",
+    gradientFrom: "#00CAFF",
+    gradientTo: "#00CAFF",
   },
   {
     title: "Queues",
     href: "/dashboard?resource=queues",
     icon: <IoChatbubblesOutline />,
-    gradientFrom: "#4300FF",
+    gradientFrom: "#00CAFF",
     gradientTo: "#0065F8",
   },
   {
     title: "Audit",
     href: "/dashboard?resource=audit-events",
     icon: <IoHeartOutline />,
-    gradientFrom: "#4300FF",
-    gradientTo: "#4300FF",
+    gradientFrom: "#00CAFF",
+    gradientTo: "#00CAFF",
   },
 ];
 
