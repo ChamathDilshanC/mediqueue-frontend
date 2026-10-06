@@ -22,9 +22,25 @@ export function json(body: unknown, status = 200) {
     headers: { "Cache-Control": "no-store" },
   });
 }
+// Hospital/branch selection belongs to one signed-in user; it must never carry over
+// to the next person who signs in on a shared workstation.
+export const BRANCH_COOKIES = ["active_tenant_id", "active_branch_id"] as const;
+export function clearBranchSelection(response: NextResponse) {
+  for (const cookie of BRANCH_COOKIES)
+    response.cookies.set(cookie, "", { path: "/", sameSite: "lax", maxAge: 0 });
+}
 export function clearSession(response: NextResponse) {
   for (const cookie of [ACCESS_COOKIE, REFRESH_COOKIE])
     response.cookies.set(cookie, "", { ...options, maxAge: 0 });
+  clearBranchSelection(response);
+}
+/** A new sign-in (password, OAuth, recovery): store tokens and drop any previous user's selection. */
+export function startSession(
+  response: NextResponse,
+  session: ReturnType<typeof authResultSchema.parse>,
+) {
+  clearBranchSelection(response);
+  setSession(response, session);
 }
 export function setSession(
   response: NextResponse,

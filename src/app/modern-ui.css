@@ -815,6 +815,26 @@ html[lang="si"] .appointment-summary span {
   background: #ffffff;
   color: #0065F8;
 }
+.appointment-payment {
+  display: flex;
+  width: fit-content;
+  margin-top: 8px;
+  padding: 4px 8px;
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ui-text);
+}
+.payment-paid,
+.payment-refunded {
+  color: #0065f8;
+}
+.payment-review_required,
+.payment-refund_required {
+  border-color: #d97706;
+  color: #b45309;
+}
 .appointment-reason {
   margin-top: 10px;
   overflow-wrap: anywhere;

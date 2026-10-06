@@ -13,9 +13,11 @@ import {
   REFRESH_COOKIE,
   apiError,
   backend,
+  clearBranchSelection,
   clearSession,
   json,
   setSession,
+  startSession,
   requestOrigin,
 } from "@/lib/auth-server";
 import { startGoogle } from "@/lib/oauth-server";
@@ -44,7 +46,7 @@ export async function POST(request: NextRequest, context: Context) {
       const session = authResultSchema.parse(await refreshed.json());
       if (!session.access_token) return apiError(503);
       const response = json({ success: true });
-      setSession(response, session);
+      startSession(response, session);
       return response;
     } catch {
       return apiError(503);
@@ -135,7 +137,7 @@ export async function POST(request: NextRequest, context: Context) {
       success: true,
       confirmationRequired: !session.access_token,
     });
-    setSession(response, session);
+    startSession(response, session);
     return response;
   } catch {
     return apiError(503);
@@ -187,23 +189,27 @@ export async function GET(request: NextRequest, context: Context) {
     }
     const profileData = profileSchema.parse(await upstream.json());
     const response = json(profileData);
-    if (profileData.memberships && profileData.memberships.length > 0) {
-      const activeMem =
-        profileData.memberships.find((m) => m.active) || profileData.memberships[0];
-      if (activeMem?.tenant_id && !request.cookies.get("active_tenant_id")?.value) {
-        response.cookies.set("active_tenant_id", activeMem.tenant_id, {
-          path: "/",
-          httpOnly: false,
-          sameSite: "lax",
-        });
-      }
-      if (activeMem?.branch_id && !request.cookies.get("active_branch_id")?.value) {
-        response.cookies.set("active_branch_id", activeMem.branch_id, {
-          path: "/",
-          httpOnly: false,
-          sameSite: "lax",
-        });
-      }
+    // Keep the selected hospital/branch only while it is one of this user's active
+    // memberships; otherwise select their first active membership (or none).
+    const active = profileData.memberships.filter((m) => m.active);
+    const selectedBranch = request.cookies.get("active_branch_id")?.value;
+    const selectedTenant = request.cookies.get("active_tenant_id")?.value;
+    const selectionValid = active.some(
+      (m) => m.branch_id === selectedBranch && m.tenant_id === selectedTenant,
+    );
+    if (!selectionValid) {
+      const fallback = active[0];
+      if (fallback?.tenant_id && fallback.branch_id) {
+        for (const [name, value] of [
+          ["active_tenant_id", fallback.tenant_id],
+          ["active_branch_id", fallback.branch_id],
+        ] as const)
+          response.cookies.set(name, value, {
+            path: "/",
+            httpOnly: false,
+            sameSite: "lax",
+          });
+      } else clearBranchSelection(response);
     }
     if (rotated) setSession(response, rotated);
     return response;

@@ -10,7 +10,7 @@ import {
   MapPin,
   X,
 } from "lucide-react";
-import { appointmentLabels } from "./appointment-inbox";
+import { appointmentLabels, paymentLabels, paymentLocked } from "./appointment-inbox";
 import { ModalSurface } from "./ui/modal-surface";
 import { PatientShell } from "./patient-shell";
 import { PatientQueue } from "./patient-queue";
@@ -719,7 +719,7 @@ export function PatientPortal({
                         </div>
                       ))}
                       <b>{si ? "මුළු එකතුව" : "Total"}: LKR {Number(a.quotation_total || 0).toLocaleString()}</b>
-                      {["PENDING", "BOOKED", "CHECKED_IN"].includes(a.status) && a.payment_status !== "PAID" && (
+                      {["PENDING", "BOOKED", "CHECKED_IN"].includes(a.status) && !paymentLocked.has(a.payment_status ?? "") && (
                         <div className="appointment-payment-actions">
                           <button
                             className="button primary"
@@ -748,6 +748,11 @@ export function PatientPortal({
                         </div>
                       )}
                       {a.payment_status === "PAY_AT_HOSPITAL" && <small>{si ? "රෝහලට පැමිණ ගෙවීමට තෝරා ඇත." : "Pay at hospital selected."}</small>}
+                      {a.payment_status && paymentLocked.has(a.payment_status) && (
+                        <span className={`appointment-payment payment-${a.payment_status.toLowerCase()}`}>
+                          {paymentLabels[a.payment_status]?.[si ? 1 : 0] ?? a.payment_status}
+                        </span>
+                      )}
                     </div>
                   )}
                   {["PENDING", "BOOKED"].includes(a.status) && (

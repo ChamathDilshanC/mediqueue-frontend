@@ -21,6 +21,22 @@ export const appointmentLabels: Record<string, [string, string]> = {
   CANCELLED: ["Cancelled", "අවලංගුයි"],
   NO_SHOW: ["Did not attend", "පැමිණ නැත"],
 };
+export const paymentLabels: Record<string, [string, string]> = {
+  PAY_AT_HOSPITAL: ["Pay at hospital", "රෝහලේදී ගෙවීම"],
+  CHECKOUT_STARTED: ["Online payment started", "Online ගෙවීම ආරම්භ කර ඇත"],
+  PAID: ["Paid", "ගෙවා ඇත"],
+  REVIEW_REQUIRED: ["Payment needs review", "ගෙවීම පරීක්ෂා කළ යුතුයි"],
+  REFUND_REQUIRED: ["Refund required", "මුදල් ආපසු දිය යුතුයි"],
+  REFUNDED: ["Refunded", "මුදල් ආපසු දී ඇත"],
+};
+// Money was received: the quotation can no longer change.
+export const paymentLocked = new Set([
+  "PAID",
+  "REVIEW_REQUIRED",
+  "REFUND_REQUIRED",
+  "REFUNDED",
+]);
+type Resolution = "REFUND" | "ACCEPT";
 type Appointment = {
   id: string;
   patient_name: string;
@@ -73,6 +89,11 @@ export function AppointmentInbox({ role }: { role: string }) {
   const [quotationSelection, setQuotationSelection] = useState<Appointment | null>(null);
   const [quotationText, setQuotationText] = useState("");
   const [reason, setReason] = useState("");
+  const [resolution, setResolution] = useState<{
+    row: Appointment;
+    action: Resolution;
+  } | null>(null);
+  const [resolutionNote, setResolutionNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -133,6 +154,41 @@ export function AppointmentInbox({ role }: { role: string }) {
         );
       setNotice(`${selection.row.patient_name} · ${label(selection.status)}`);
       setSelection(null);
+      await mutate();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function resolvePayment() {
+    if (!resolution || busy) return;
+    setBusy(true);
+    setError("");
+    try {
+      const response = await fetch(
+        `/api/backend/appointments/${resolution.row.id}/payment-resolution`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: resolution.action,
+            note: resolutionNote.trim(),
+          }),
+          signal: AbortSignal.timeout(30000),
+        },
+      );
+      const result = await response.json();
+      if (!response.ok)
+        throw Error(
+          typeof result.detail === "string"
+            ? result.detail
+            : "Unable to update the payment.",
+        );
+      setNotice(
+        `${resolution.row.patient_name} · ${paymentLabels[result.payment_status]?.[si ? 1 : 0] ?? result.payment_status}`,
+      );
+      setResolution(null);
       await mutate();
     } catch (e) {
       setError((e as Error).message);
@@ -302,6 +358,13 @@ export function AppointmentInbox({ role }: { role: string }) {
               >
                 {label(row.status)}
               </span>
+              {row.payment_status && paymentLabels[row.payment_status] && (
+                <span
+                  className={`appointment-payment payment-${row.payment_status.toLowerCase()}`}
+                >
+                  {paymentLabels[row.payment_status][si ? 1 : 0]}
+                </span>
+              )}
               {row.review_reason && (
                 <p className="appointment-reason">{row.review_reason}</p>
               )}
@@ -316,7 +379,39 @@ export function AppointmentInbox({ role }: { role: string }) {
               )}
             </div>
             <div className="appointment-actions">
-              {["admin", "staff", "reception"].includes(role) && (
+              {["admin", "reception"].includes(role) &&
+                row.payment_status === "REVIEW_REQUIRED" &&
+                !["CANCELLED", "REJECTED"].includes(row.status) && (
+                  <button
+                    className="button primary"
+                    disabled={busy}
+                    onClick={() => {
+                      setResolution({ row, action: "ACCEPT" });
+                      setResolutionNote("");
+                      setError("");
+                    }}
+                  >
+                    {si ? "ගෙවීම පිළිගන්න" : "Accept payment"}
+                  </button>
+                )}
+              {["admin", "reception"].includes(role) &&
+                ["REVIEW_REQUIRED", "REFUND_REQUIRED"].includes(
+                  row.payment_status ?? "",
+                ) && (
+                  <button
+                    className="button secondary"
+                    disabled={busy}
+                    onClick={() => {
+                      setResolution({ row, action: "REFUND" });
+                      setResolutionNote("");
+                      setError("");
+                    }}
+                  >
+                    {si ? "මුදල් ආපසු දෙන්න" : "Refund"}
+                  </button>
+                )}
+              {["admin", "staff", "reception"].includes(role) &&
+                !paymentLocked.has(row.payment_status ?? "") && (
                 <button
                   className="button secondary"
                   disabled={busy}
@@ -365,7 +460,7 @@ export function AppointmentInbox({ role }: { role: string }) {
           <button
             aria-label="Next appointments page"
             className="button secondary"
-            disabled={isLoading || !data || (page + 1) * 20 >= data.total}
+            disabled={isLoading || !data || (page + 1) * pageSize >= data.total}
             onClick={() => setPage(page + 1)}
           >
             <ChevronRight size={18} />
@@ -431,6 +526,88 @@ export function AppointmentInbox({ role }: { role: string }) {
                     ? "යාවත්කාලීන වෙමින්..."
                     : "Updating..."
                   : actionLabel(selection.status)}
+              </button>
+            </div>
+          </form>
+        </ModalSurface>
+      )}
+      {resolution && (
+        <ModalSurface
+          label={
+            resolution.action === "REFUND"
+              ? si
+                ? "මුදල් ආපසු දෙන්න"
+                : "Refund payment"
+              : si
+                ? "ගෙවීම පිළිගන්න"
+                : "Accept payment"
+          }
+          busy={busy}
+          onClose={() => setResolution(null)}
+        >
+          <form
+            className="appointment-confirm"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void resolvePayment();
+            }}
+          >
+            <h2>
+              {resolution.action === "REFUND"
+                ? si
+                  ? "මුදල් ආපසු දෙන්න"
+                  : "Refund payment"
+                : si
+                  ? "ගෙවීම පිළිගන්න"
+                  : "Accept payment"}
+            </h2>
+            <p>
+              {resolution.row.patient_name} · {resolution.row.doctor}
+            </p>
+            <p>
+              {resolution.action === "REFUND"
+                ? si
+                  ? "Online ගෙවීම් සම්පූර්ණයෙන්ම Stripe හරහා ආපසු ගෙවනු ලැබේ."
+                  : "Online payments are refunded in full through Stripe."
+                : si
+                  ? "ලැබුණු මුදල වත්මන් quotation එකට ගැලපෙන බව තහවුරු කරන්න."
+                  : "Confirm the amount received matches what the patient owes."}
+            </p>
+            <label>
+              {si ? "සටහන (විකල්ප)" : "Note (optional)"}
+              <textarea
+                maxLength={500}
+                value={resolutionNote}
+                onChange={(e) => setResolutionNote(e.target.value)}
+                disabled={busy}
+              />
+            </label>
+            {error && (
+              <p role="alert" className="form-error">
+                {error}
+              </p>
+            )}
+            <div className="appointment-actions">
+              <button
+                type="button"
+                className="button secondary"
+                disabled={busy}
+                onClick={() => setResolution(null)}
+              >
+                {si ? "ආපසු" : "Go back"}
+              </button>
+              <button type="submit" className="button primary" disabled={busy}>
+                {busy
+                  ? si
+                    ? "යාවත්කාලීන වෙමින්..."
+                    : "Updating..."
+                  : resolution.action === "REFUND"
+                    ? si
+                      ? "මුදල් ආපසු දෙන්න"
+                      : "Refund"
+                    : si
+                      ? "පිළිගන්න"
+                      : "Accept"}
               </button>
             </div>
           </form>

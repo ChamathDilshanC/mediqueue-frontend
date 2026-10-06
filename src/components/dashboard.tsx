@@ -1,6 +1,7 @@
 "use client";
 
 import { AppointmentInbox } from "./appointment-inbox";
+import { DashboardActivity } from "./dashboard-activity";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -525,6 +526,12 @@ export function Dashboard() {
                       : resourceConfigs[resource].en.description
                     : ""}
               </p>
+            </div>
+            {/* Collapsed height is reserved; the expanded list overlays the page. */}
+            <div className="relative h-20 w-full md:w-[380px] shrink-0">
+              <div className="absolute inset-x-0 top-0 z-30">
+                <DashboardActivity />
+              </div>
             </div>
           </div>
 

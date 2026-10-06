@@ -1,7 +1,7 @@
 import { createHash, randomBytes } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { authResultSchema } from "./auth-contract";
-import { json, setSession, requestOrigin } from "./auth-server";
+import { json, startSession, requestOrigin } from "./auth-server";
 
 export const OAUTH_COOKIE = "mq_google_verifier";
 const cookieOptions = {
@@ -96,7 +96,7 @@ export async function finishGoogle(request: NextRequest) {
     if (!session.access_token || !session.refresh_token)
       return redirect("/login?auth_error=googleFailed");
     const response = redirect(patient ? "/patient" : "/account");
-    setSession(response, session);
+    startSession(response, session);
     return response;
   } catch {
     return redirect("/login?auth_error=googleFailed");
