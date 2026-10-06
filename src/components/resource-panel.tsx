@@ -1149,8 +1149,8 @@ function DeleteConfirm({
               disabled={deleting}
               className="button primary flex items-center gap-2"
               style={{
-                background: "#0f766e",
-                borderColor: "#0f766e",
+                background: "#0065f8",
+                borderColor: "#0065f8",
                 color: "white",
               }}
             >
@@ -1200,21 +1200,23 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
     [config.fields],
   );
 
+  // Read the cache through a ref: depending on the state it writes would recreate
+  // this callback on every load and re-run the effect below in an endless loop.
+  const refCacheRef = useRef(refCache);
+  refCacheRef.current = refCache;
   const loadRefs = useCallback(async (force = false) => {
-    const request = ++refRequest.current;
-    setRefsLoading(true);
-    setRefsError("");
     const resources = [
       ...new Set(refFields.map((field) => field.refResource!)),
     ];
+    if (resources.length === 0) return;
     if (
       !force &&
-      resources.length > 0 &&
-      resources.every((resource) => refCache[resource] !== undefined)
-    ) {
-      setRefsLoading(false);
+      resources.every((resource) => refCacheRef.current[resource] !== undefined)
+    )
       return;
-    }
+    const request = ++refRequest.current;
+    setRefsLoading(true);
+    setRefsError("");
     const results = await Promise.allSettled(
       resources.map(async (resource) => {
         const records: Row[] = [];
@@ -1250,7 +1252,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
           : "Some options could not be loaded. Please retry.",
       );
     setRefsLoading(false);
-  }, [refCache, refFields, language]);
+  }, [refFields, language]);
 
   const fetcher = useCallback(
     async (url: string) => {

@@ -158,7 +158,7 @@ function HospitalMap({
         L.circleMarker(point, {
           radius: 9,
           color: "#ffffff",
-          fillColor: "#115e59",
+          fillColor: "#4300ff",
           fillOpacity: 1,
           weight: 3,
         })

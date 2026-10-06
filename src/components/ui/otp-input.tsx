@@ -17,7 +17,7 @@ const RING = {
   error: "ring-2 ring-[var(--mq-accent)]/70 delay-150",
 } as const;
 
-const SUCCESS = "#0f766e";
+const SUCCESS = "#0065f8";
 
 const SIZES = {
   sm: {

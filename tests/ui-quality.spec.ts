@@ -128,14 +128,14 @@ test("authentication layouts fit mobile in both languages and themes", async ({
             panelBackground: style.backgroundColor,
           };
         });
-        // Clinical design: tinted page canvas with a bordered, opaque form card.
+        // Brand design: pure white/black canvas with a bordered, opaque form card.
         expect(appearance.background).toBe(
-          theme === "light" ? "rgb(243, 246, 247)" : "rgb(10, 17, 20)",
+          theme === "light" ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)",
         );
         expect(appearance.shadow).not.toBe("none");
         expect(appearance.border).toBe("1px");
         expect(appearance.panelBackground).toBe(
-          theme === "light" ? "rgb(255, 255, 255)" : "rgb(16, 25, 29)",
+          theme === "light" ? "rgb(255, 255, 255)" : "rgb(11, 11, 16)",
         );
         expect(
           await page.evaluate(

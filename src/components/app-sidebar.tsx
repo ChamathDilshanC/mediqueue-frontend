@@ -417,7 +417,9 @@ export function AppSidebar() {
               <AnimatedSidebarMenuButton
                 href={href}
                 icon={<Icon size={19} />}
-                isActive={pathname === href}
+                // The shared highlight can mark only one item: inside the workspace,
+                // the resource tabs above own it, never the footer's dashboard link.
+                isActive={pathname === href && !(workspace && href === "/dashboard")}
               >
                 {title}
               </AnimatedSidebarMenuButton>
