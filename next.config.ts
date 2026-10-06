@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 const config: NextConfig = {
+  // Self-contained server for the container image; Vercel ignores this setting.
+  output: "standalone",
   turbopack: { root: process.cwd() },
   async headers() {
     return [
