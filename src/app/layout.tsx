@@ -10,11 +10,11 @@ import "leaflet/dist/leaflet.css";
 import "./globals.css";
 import "./patient-discovery.css";
 import "./modern-ui.css";
-import "./flat-theme.css";
+import "./clinical-theme.css";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
+const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(

@@ -157,7 +157,7 @@ export function OrganizationRegistration() {
               </div>
 
               <div style={{ background: 'var(--background)', padding: '0 1rem', zIndex: 1 }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: status === 'verified' ? '#00CAFF' : status === 'rejected' ? '#00CAFF' : 'var(--muted)', color: status !== 'pending_review' ? '#ffffff' : 'var(--muted-foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', fontWeight: 'bold' }}>3</div>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: status === 'verified' ? '#0f766e' : status === 'rejected' ? '#0f766e' : 'var(--muted)', color: status !== 'pending_review' ? '#ffffff' : 'var(--muted-foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', fontWeight: 'bold' }}>3</div>
                 <small style={{ marginTop: '0.75rem', display: 'block', fontWeight: '500' }}>{status === 'rejected' ? 'Rejected' : 'Approved'}</small>
               </div>
             </div>

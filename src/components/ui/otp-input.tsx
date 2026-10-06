@@ -12,12 +12,12 @@ const PATTERNS = {
 
 // success draws its own ring in svg, so no css ring here
 const RING = {
-  idle: "focus-visible:ring-2 focus-visible:ring-[#868686]/50",
+  idle: "focus-visible:ring-2 focus-visible:ring-[var(--mq-muted)]/50",
   success: "",
-  error: "ring-2 ring-[#00CAFF]/70 delay-150",
+  error: "ring-2 ring-[var(--mq-accent)]/70 delay-150",
 } as const;
 
-const SUCCESS = "#00CAFF";
+const SUCCESS = "#0f766e";
 
 const SIZES = {
   sm: {
@@ -47,7 +47,7 @@ const SIZES = {
 } as const;
 
 const SLOT_CLASS =
-  "bg-[#ffffff] dark:bg-[#262626] text-center font-medium text-transparent caret-transparent outline-none transition-shadow duration-200 selection:bg-transparent disabled:cursor-not-allowed disabled:opacity-50";
+  "bg-[var(--mq-surface)] dark:bg-[var(--mq-surface-2)] text-center font-medium text-transparent caret-transparent outline-none transition-shadow duration-200 selection:bg-transparent disabled:cursor-not-allowed disabled:opacity-50";
 
 const ROLL_SPRING = { type: "spring", stiffness: 500, damping: 34 } as const;
 const CARET_SPRING = { type: "spring", stiffness: 500, damping: 40 } as const;

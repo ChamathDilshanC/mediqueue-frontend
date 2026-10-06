@@ -62,22 +62,22 @@ export function SiteHeader({ simple = false }: { simple?: boolean }) {
       title: t.how,
       href: "/#how-it-works",
       icon: <HeartPulse size={17} />,
-      gradientFrom: "#00CAFF",
-      gradientTo: "#00CAFF",
+      gradientFrom: "#0f766e",
+      gradientTo: "#0f766e",
     },
     {
       title: t.features,
       href: "/#features",
       icon: <Sparkles size={17} />,
-      gradientFrom: "#0065F8",
-      gradientTo: "#0065F8",
+      gradientFrom: "#115e59",
+      gradientTo: "#115e59",
     },
     {
       title: t.faq,
       href: "/#faq",
       icon: <CircleHelp size={17} />,
-      gradientFrom: "#00CAFF",
-      gradientTo: "#00CAFF",
+      gradientFrom: "#0f766e",
+      gradientTo: "#0f766e",
     },
   ];
   return (

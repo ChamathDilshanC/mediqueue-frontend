@@ -128,12 +128,15 @@ test("authentication layouts fit mobile in both languages and themes", async ({
             panelBackground: style.backgroundColor,
           };
         });
+        // Clinical design: tinted page canvas with a bordered, opaque form card.
         expect(appearance.background).toBe(
-          theme === "light" ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)",
+          theme === "light" ? "rgb(243, 246, 247)" : "rgb(10, 17, 20)",
         );
-        expect(appearance.shadow).toBe("none");
-        expect(appearance.border).toBe("0px");
-        expect(appearance.panelBackground).toBe("rgba(0, 0, 0, 0)");
+        expect(appearance.shadow).not.toBe("none");
+        expect(appearance.border).toBe("1px");
+        expect(appearance.panelBackground).toBe(
+          theme === "light" ? "rgb(255, 255, 255)" : "rgb(16, 25, 29)",
+        );
         expect(
           await page.evaluate(
             () => document.documentElement.scrollWidth <= innerWidth,

@@ -668,17 +668,29 @@ export function WardBedBoard() {
                   </button>
                 </div>
                 {patientMode === "existing" ? (
-                  <select value={patientId} onChange={(event) => setPatientId(event.target.value)}>
-                    <option value="">{si ? "රෝගියෙකු තෝරන්න" : "Select a patient"}</option>
-                    {patients.map((patient) => (
-                      <option key={patient.id} value={patient.id}>{patient.external_ref || patient.id} {patient.mobile ? `· ${patient.mobile}` : ""}</option>
-                    ))}
-                  </select>
+                  <label className="mq-field">
+                    <span className="mq-field-label">{si ? "රෝගියා" : "Patient"}</span>
+                    <select value={patientId} onChange={(event) => setPatientId(event.target.value)}>
+                      <option value="">{si ? "රෝගියෙකු තෝරන්න" : "Select a patient"}</option>
+                      {patients.map((patient) => (
+                        <option key={patient.id} value={patient.id}>{patient.external_ref || patient.id} {patient.mobile ? `· ${patient.mobile}` : ""}</option>
+                      ))}
+                    </select>
+                  </label>
                 ) : (
                   <div className="ward-admission-fields">
-                    <input value={patientName} onChange={(event) => setPatientName(event.target.value)} placeholder={si ? "රෝගියාගේ නම" : "Patient name"} />
-                    <input value={patientMobile} onChange={(event) => setPatientMobile(event.target.value)} placeholder={si ? "ජංගම දුරකථනය" : "Mobile number"} />
-                    <input value={patientNic} onChange={(event) => setPatientNic(event.target.value)} placeholder={si ? "ජා.හැ. අංකය (විකල්ප)" : "NIC (optional)"} />
+                    <label className="mq-field">
+                      <span className="mq-field-label">{si ? "රෝගියාගේ නම" : "Patient name"}</span>
+                      <input value={patientName} onChange={(event) => setPatientName(event.target.value)} placeholder={si ? "උදා: නිමල් පෙරේරා" : "e.g. Nimal Perera"} autoComplete="name" />
+                    </label>
+                    <label className="mq-field">
+                      <span className="mq-field-label">{si ? "ජංගම දුරකථනය" : "Mobile number"}</span>
+                      <input value={patientMobile} onChange={(event) => setPatientMobile(event.target.value)} placeholder="07XXXXXXXX" inputMode="tel" autoComplete="tel" />
+                    </label>
+                    <label className="mq-field">
+                      <span className="mq-field-label">{si ? "ජා.හැ. අංකය (විකල්ප)" : "NIC (optional)"}</span>
+                      <input value={patientNic} onChange={(event) => setPatientNic(event.target.value)} placeholder={si ? "විකල්ප" : "Optional"} />
+                    </label>
                   </div>
                 )}
                 <div className="ward-admission-actions">

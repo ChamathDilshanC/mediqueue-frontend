@@ -1,4 +1,5 @@
 "use client";
+import { statusLabel, statusTone } from "@/lib/status-tone";
 import { useEffect, useState } from "react";
 import { useLanguage } from "./providers";
 import { z } from "zod";
@@ -81,30 +82,54 @@ export function OperationsReport() {
     );
   if (!data)
     return (
-      <p role="status">
-        {si ? "වාර්තාව පූරණය වෙමින්..." : "Loading report..."}
-      </p>
+      <div
+        className="patient-grid"
+        role="status"
+        aria-label={si ? "වාර්තාව පූරණය වෙමින්" : "Loading report"}
+      >
+        {[0, 1].map((i) => (
+          <section key={i} className="account-card flex flex-col gap-3">
+            <span className="mq-skeleton block h-6 w-40" />
+            {[0, 1, 2, 3].map((j) => (
+              <span key={j} className="mq-skeleton block h-9 w-full" />
+            ))}
+          </section>
+        ))}
+      </div>
     );
+  const statusTotal = Object.values(data.appointment_statuses).reduce(
+    (sum, value) => sum + value,
+    0,
+  );
   return (
-    <div className="patient-grid">
-      <section className="account-card">
-        <h2>{si ? "මෙහෙයුම් ගණනය" : "Operations totals"}</h2>
+    <div className="patient-grid mq-stagger">
+      <section className="account-card" aria-labelledby="report-totals">
+        <h2 id="report-totals">{si ? "මෙහෙයුම් ගණනය" : "Operations totals"}</h2>
         <dl className="report-values">
           {Object.entries(data.totals).map(([key, value]) => (
             <div key={key}>
-              <dt>{si ? labels[key] : key.replaceAll("_", " ")}</dt>
-              <dd>{value.toLocaleString()}</dd>
+              <dt>{si ? labels[key] : statusLabel(key)}</dt>
+              <dd className="tabular-nums">{value.toLocaleString()}</dd>
             </div>
           ))}
         </dl>
       </section>
-      <section className="account-card">
-        <h2>{si ? "හමුවීම් තත්ත්ව" : "Appointment statuses"}</h2>
+      <section className="account-card" aria-labelledby="report-statuses">
+        <h2 id="report-statuses">{si ? "හමුවීම් තත්ත්ව" : "Appointment statuses"}</h2>
         <dl className="report-values">
           {Object.entries(data.appointment_statuses).map(([key, value]) => (
-            <div key={key}>
-              <dt>{key.replaceAll("_", " ")}</dt>
-              <dd>{value}</dd>
+            <div key={key} className="!grid grid-cols-[1fr_auto] gap-2">
+              <dt>
+                <span className={`mq-badge ${statusTone(key)}`}>{statusLabel(key)}</span>
+              </dt>
+              <dd className="tabular-nums">{value.toLocaleString()}</dd>
+              <span
+                className="mq-meter col-span-2"
+                role="img"
+                aria-label={`${statusLabel(key)}: ${statusTotal ? Math.round((value / statusTotal) * 100) : 0}%`}
+              >
+                <span style={{ width: `${statusTotal ? (value / statusTotal) * 100 : 0}%` }} />
+              </span>
             </div>
           ))}
         </dl>
@@ -139,11 +164,22 @@ export function OperationsReport() {
           ) : (
             <dl className="report-values">
               {data.low_stock.map((r) => (
-                <div key={r.id}>
+                <div key={r.id} className="!grid grid-cols-[1fr_auto] gap-2">
                   <dt>{r.name}</dt>
-                  <dd>
+                  <dd className="tabular-nums">
                     {r.quantity} / {r.reorder_level}
                   </dd>
+                  <span
+                    className="mq-meter warning col-span-2"
+                    role="img"
+                    aria-label={`${r.name}: ${r.quantity} ${si ? "ඇත, අවම" : "in stock, reorder level"} ${r.reorder_level}`}
+                  >
+                    <span
+                      style={{
+                        width: `${Math.min(100, r.reorder_level ? (r.quantity / r.reorder_level) * 100 : 0)}%`,
+                      }}
+                    />
+                  </span>
                 </div>
               ))}
             </dl>

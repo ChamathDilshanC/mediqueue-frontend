@@ -59,6 +59,7 @@ import MorphSelect, {
   MorphSelectValue,
 } from "./ui/select-morph";
 import type { ResourceConfig, FieldDef } from "@/lib/resource-config";
+import { statusLabel, statusTone } from "@/lib/status-tone";
 
 /* ─────────────────── Helpers ─────────────────── */
 
@@ -66,7 +67,7 @@ function getFieldIcon(key: string, type: string) {
   const k = key.toLowerCase();
   const iconProps = {
     size: 14,
-    className: "text-[#00CAFF] dark:text-[#00CAFF] shrink-0",
+    className: "text-[var(--mq-accent)] dark:text-[var(--mq-accent)] shrink-0",
   };
 
   if (k.includes("hospital")) return <Hospital {...iconProps} />;
@@ -164,53 +165,9 @@ function quotationAmount(value: string, names: string[]) {
 
 /* ─────────────────── Helpers ─────────────────── */
 
-function statusColor(status: string) {
-  const s = status.toUpperCase();
-  if (
-    ["ACTIVE", "BOOKED", "WAITING", "TRUE", "AVAILABLE", "ADMITTED"].includes(s)
-  )
-    return "bg-transparent text-[var(--flat-accent)] border-[var(--flat-line)] dark:bg-transparent dark:text-[var(--flat-accent)] dark:border-[var(--flat-line)]";
-  if (
-    [
-      "CHECKED_IN",
-      "SERVING",
-      "CALLED",
-      "RESERVED",
-      "CLEANING",
-      "TRANSFERRED",
-    ].includes(s)
-  )
-    return "bg-transparent text-[var(--flat-accent)] border-[var(--flat-line)] dark:bg-transparent dark:text-[var(--flat-accent)] dark:border-[var(--flat-line)]";
-  if (["COMPLETED", "DISCHARGED", "OCCUPIED"].includes(s))
-    return "bg-transparent text-[var(--flat-accent)] border-[var(--flat-line)] dark:bg-transparent dark:text-[var(--flat-accent)] dark:border-[var(--flat-line)]";
-  if (
-    [
-      "CANCELLED",
-      "NO_SHOW",
-      "FALSE",
-      "INACTIVE",
-      "REJECTED",
-      "MAINTENANCE",
-    ].includes(s)
-  )
-    return "bg-transparent text-[var(--flat-accent)] border-[var(--flat-line)] dark:bg-transparent dark:text-[var(--flat-accent)] dark:border-[var(--flat-line)]";
-  return "bg-[#ffffff] dark:bg-gray-800 text-[#545454] dark:text-[#a2a2a2] border-[#e7e7e7] dark:border-gray-700";
-}
-
 function StatusBadge({ value }: { value: string }) {
-  const display =
-    value === "TRUE"
-      ? "ACTIVE"
-      : value === "FALSE"
-        ? "INACTIVE"
-        : value.replace(/_/g, " ");
-  return (
-    <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold border uppercase tracking-wider ${statusColor(value)}`}
-    >
-      {display}
-    </span>
-  );
+  const state = value === "TRUE" ? "ACTIVE" : value === "FALSE" ? "INACTIVE" : value;
+  return <span className={`mq-badge ${statusTone(state)}`}>{statusLabel(state)}</span>;
 }
 
 function formatRefDisplay(
@@ -246,7 +203,7 @@ function cellValue(
   language: string,
 ): ReactNode {
   if (value === null || value === undefined || value === "")
-    return <span className="text-[#d5d5d5]">—</span>;
+    return <span className="text-[var(--mq-subtle)]">—</span>;
 
   if (field.type === "boolean")
     return <StatusBadge value={value ? "TRUE" : "FALSE"} />;
@@ -259,13 +216,13 @@ function cellValue(
     const match = items.find((r) => r.id === value);
     if (match) {
       return (
-        <span className="text-sm text-[#0065F8] dark:text-[#d5d5d5]">
+        <span className="mq-cell-truncate text-[var(--mq-text)]">
           {formatRefDisplay(field.refResource, field.refLabel, match)}
         </span>
       );
     }
     return (
-      <span className="text-[#a2a2a2] text-xs font-mono">
+      <span className="text-xs text-[var(--mq-subtle)]">
         {language === "si" ? "විස්තර නොමැත" : "Details unavailable"}
       </span>
     );
@@ -276,21 +233,21 @@ function cellValue(
     typeof value === "string"
   ) {
     return (
-      <span className="text-sm text-[#0065F8] dark:text-[#d5d5d5]">
+      <time dateTime={value} className="tabular-nums">
         {hospitalDate(value, language === "si" ? "si" : "en")}
-      </span>
+      </time>
     );
   }
 
   if (typeof value === "object")
     return (
-      <span className="text-xs text-[#727272] dark:text-[#a2a2a2]">
+      <span className="text-xs text-[var(--mq-subtle)]">
         {language === "si" ? "විස්තර" : "Details"}
       </span>
     );
 
   return (
-    <span className="text-sm text-[#000000] dark:text-gray-100">
+    <span className="mq-cell-truncate" title={String(value)}>
       {String(value)}
     </span>
   );
@@ -598,21 +555,21 @@ function FormDialog({
   return (
     <ModalSurface label={title} onClose={onClose} busy={submitting}>
       <div
-        className={`resource-edit-dialog w-full ${modalWidthClass} max-h-[90vh] bg-white dark:bg-[#181818] rounded-3xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border border-gray-200/50 dark:border-gray-800/50 overflow-hidden animate-in fade-in zoom-in-95 duration-300 flex flex-col my-auto`}
+        className={`resource-edit-dialog w-full ${modalWidthClass} max-h-[90vh] bg-white dark:bg-[var(--mq-surface)] rounded-3xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border border-gray-200/50 dark:border-gray-800/50 overflow-hidden animate-in fade-in zoom-in-95 duration-300 flex flex-col my-auto`}
       >
         {/* Multistep Header */}
-        <div className="flex flex-col px-6 pt-5 pb-4 border-b border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[#181818] shrink-0">
+        <div className="flex flex-col px-6 pt-5 pb-4 border-b border-gray-100 dark:border-gray-800/50 bg-white dark:bg-[var(--mq-surface)] shrink-0">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#00CAFF]/20 to-[#00CAFF]/5 text-[#00CAFF] dark:text-[#00CAFF] border border-[#00CAFF]/30 flex items-center justify-center shrink-0 shadow-xs">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[var(--mq-accent)]/20 to-[var(--mq-accent)]/5 text-[var(--mq-accent)] dark:text-[var(--mq-accent)] border border-[var(--mq-accent)]/30 flex items-center justify-center shrink-0 shadow-xs">
                 {editing ? <Pencil size={20} /> : <Sparkles size={20} />}
               </div>
               <div>
-                <h3 className="text-lg font-bold text-[#000000] dark:text-gray-100">
+                <h3 className="text-lg font-bold text-[var(--mq-text)] dark:text-gray-100">
                   {title}
                 </h3>
                 {steps.length > 1 && (
-                  <p className="text-xs text-[#00CAFF] dark:text-[#00CAFF] font-semibold mt-0.5 flex items-center gap-1.5">
+                  <p className="text-xs text-[var(--mq-accent)] dark:text-[var(--mq-accent)] font-semibold mt-0.5 flex items-center gap-1.5">
                     <Sparkles size={12} className="shrink-0 animate-pulse" />
                     {language === "si"
                       ? `පියවර ${currentStep + 1}/${steps.length}: ${stepTitlesSi[currentStep] ?? `පියවර ${currentStep + 1}`}`
@@ -626,9 +583,9 @@ function FormDialog({
               aria-label={language === "si" ? "වසන්න" : "Close dialog"}
               disabled={submitting}
               onClick={onClose}
-              className="p-2 hover:bg-[#f4f4f4] dark:hover:bg-gray-800 rounded-lg transition-colors"
+              className="p-2 hover:bg-[var(--mq-surface-3)] dark:hover:bg-gray-800 rounded-lg transition-colors"
             >
-              <X size={18} className="text-[#727272] dark:text-[#a2a2a2]" />
+              <X size={18} className="text-[var(--mq-muted)] dark:text-[var(--mq-muted)]" />
             </button>
           </div>
 
@@ -637,7 +594,7 @@ function FormDialog({
             <div className="flex flex-col gap-2 pt-1">
               <div className="w-full h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-[#00CAFF] to-[#00CAFF] transition-all duration-300 ease-out"
+                  className="h-full bg-gradient-to-r from-[var(--mq-accent)] to-[var(--mq-accent)] transition-all duration-300 ease-out"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
@@ -653,7 +610,7 @@ function FormDialog({
                     }}
                     className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl border transition-all shrink-0 ${
                       idx === currentStep
-                        ? "bg-[#00CAFF]/10 border-[#00CAFF] text-[#00CAFF] dark:text-[#00CAFF] shadow-xs"
+                        ? "bg-[var(--mq-accent)]/10 border-[var(--mq-accent)] text-[var(--mq-accent)] dark:text-[var(--mq-accent)] shadow-xs"
                         : idx < currentStep
                           ? "bg-transparent dark:bg-transparent border-[var(--flat-line)] text-[var(--flat-accent)] dark:text-[var(--flat-accent)]"
                           : "bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-400"
@@ -727,7 +684,7 @@ function FormDialog({
                   className="text-[13px] font-semibold tracking-wide text-gray-700 dark:text-gray-300 ml-1 flex items-center justify-between"
                 >
                   <span className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-lg bg-[#00CAFF]/10 dark:bg-[#00CAFF]/20 flex items-center justify-center shrink-0 border border-[#00CAFF]/20">
+                    <span className="w-6 h-6 rounded-lg bg-[var(--mq-accent)]/10 dark:bg-[var(--mq-accent)]/20 flex items-center justify-center shrink-0 border border-[var(--mq-accent)]/20">
                       {getFieldIcon(f.key, f.type)}
                     </span>
                     <span>
@@ -740,7 +697,7 @@ function FormDialog({
                     </span>
                   </span>
                   {placeholderText && (
-                    <span className="text-[11px] font-normal text-[#00CAFF] dark:text-[#00CAFF]">
+                    <span className="text-[11px] font-normal text-[var(--mq-accent)] dark:text-[var(--mq-accent)]">
                       {placeholderText}
                     </span>
                   )}
@@ -763,7 +720,7 @@ function FormDialog({
                       }))
                     }
                   >
-                    <MorphSelectTrigger className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] w-full flex items-center justify-between focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm">
+                    <MorphSelectTrigger className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[var(--mq-surface)] dark:hover:bg-[var(--mq-surface)] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] w-full flex items-center justify-between focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm">
                       <MorphSelectValue
                         placeholder={`— ${language === "si" ? "තෝරන්න" : "Select"} —`}
                       />
@@ -817,7 +774,7 @@ function FormDialog({
                       setFormData((prev) => ({ ...prev, [f.key]: val }))
                     }
                   >
-                    <MorphSelectTrigger className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] w-full flex items-center justify-between focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm">
+                    <MorphSelectTrigger className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[var(--mq-surface)] dark:hover:bg-[var(--mq-surface)] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] w-full flex items-center justify-between focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm">
                       <MorphSelectValue
                         placeholder={`— ${language === "si" ? "තෝරන්න" : "Select"} —`}
                       />
@@ -843,7 +800,7 @@ function FormDialog({
                       setFormData((prev) => ({ ...prev, [f.key]: val }))
                     }
                   >
-                    <MorphSelectTrigger className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] w-full flex items-center justify-between focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm">
+                    <MorphSelectTrigger className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[var(--mq-surface)] dark:hover:bg-[var(--mq-surface)] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] w-full flex items-center justify-between focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm">
                       <MorphSelectValue
                         placeholder={`— ${language === "si" ? "තෝරන්න" : "Select"} —`}
                       />
@@ -880,7 +837,7 @@ function FormDialog({
                           [f.key]: val ? new Date(val).toISOString() : "",
                         }));
                       }}
-                      className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] focus:outline-none focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm"
+                      className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[var(--mq-surface)] dark:hover:bg-[var(--mq-surface)] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] focus:outline-none focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm"
                       required={f.required}
                     />
                     {formData[f.key] && (
@@ -930,7 +887,7 @@ function FormDialog({
                               }
                               placeholder="LKR"
                               aria-label={`${itemName} price`}
-                              className="w-28 px-3 py-2 bg-gray-50/50 dark:bg-[#121212] border border-gray-200 dark:border-gray-800 rounded-xl text-sm"
+                              className="w-28 px-3 py-2 bg-gray-50/50 dark:bg-[var(--mq-surface)] border border-gray-200 dark:border-gray-800 rounded-xl text-sm"
                             />
                           </label>
                         );
@@ -951,7 +908,7 @@ function FormDialog({
                           : "Additional item: name | amount"
                       }
                       rows={3}
-                      className="w-full px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] focus:outline-none focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm"
+                      className="w-full px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[var(--mq-surface)] dark:hover:bg-[var(--mq-surface)] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] focus:outline-none focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm"
                     />
                   </div>
                 ) : f.type === "number" ? (
@@ -965,7 +922,7 @@ function FormDialog({
                         [f.key]: e.target.value,
                       }))
                     }
-                    className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] focus:outline-none focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm"
+                    className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[var(--mq-surface)] dark:hover:bg-[var(--mq-surface)] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] focus:outline-none focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm"
                     required={f.required}
                     min={f.min ?? 0}
                     step={f.step ?? "any"}
@@ -983,13 +940,13 @@ function FormDialog({
                     }
                     placeholder={placeholderText ?? ""}
                     maxLength={f.maxLength}
-                    className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[#121212] dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] focus:outline-none focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm"
+                    className="px-4 py-3 bg-gray-50/50 hover:bg-gray-50 dark:bg-[var(--mq-surface)] dark:hover:bg-[var(--mq-surface)] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl text-[14px] focus:outline-none focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800/50 focus:border-gray-300 dark:focus:border-gray-700 transition-all shadow-sm"
                     required={f.required}
                   />
                 )}
 
                 {isAutoGeneratedField && !editing && (
-                  <div className="flex items-center justify-between text-[11px] font-medium text-[#00CAFF] dark:text-[#00CAFF] bg-[#00CAFF]/10 dark:bg-[#00CAFF]/20 px-3 py-1.5 rounded-xl border border-[#00CAFF]/20 mt-0.5">
+                  <div className="flex items-center justify-between text-[11px] font-medium text-[var(--mq-accent)] dark:text-[var(--mq-accent)] bg-[var(--mq-accent)]/10 dark:bg-[var(--mq-accent)]/20 px-3 py-1.5 rounded-xl border border-[var(--mq-accent)]/20 mt-0.5">
                     <span className="flex items-center gap-1.5">
                       <Sparkles size={12} className="animate-pulse shrink-0" />
                       {language === "si"
@@ -1161,15 +1118,15 @@ function DeleteConfirm({
       onClose={onClose}
       busy={deleting}
     >
-      <div className="w-full max-w-md bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-2xl border border-[#f4f4f4] dark:border-gray-800 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div className="w-full max-w-md bg-white dark:bg-[var(--mq-surface)] rounded-2xl shadow-2xl border border-[var(--mq-line)] dark:border-gray-800 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         <div className="p-6 flex flex-col items-center text-center">
           <div className="w-14 h-14 rounded-full bg-transparent flex items-center justify-center mb-4">
             <Trash2 size={24} className="text-[var(--flat-accent)]" />
           </div>
-          <h3 className="text-lg font-bold text-[#000000] dark:text-gray-100 mb-2">
+          <h3 className="text-lg font-bold text-[var(--mq-text)] dark:text-gray-100 mb-2">
             {language === "si" ? "මකා දැමීම තහවුරු කරන්න" : "Confirm Delete"}
           </h3>
-          <p className="text-[#727272] dark:text-[#a2a2a2] text-sm mb-6">
+          <p className="text-[var(--mq-muted)] dark:text-[var(--mq-muted)] text-sm mb-6">
             {language === "si"
               ? `මෙම ${config.si.singular} ස්ථිරවම මකා දැමේ. මෙය ආපසු හැරවිය නොහැක.`
               : `This ${config.en.singular.toLowerCase()} will be permanently deleted. This action cannot be undone.`}
@@ -1192,8 +1149,8 @@ function DeleteConfirm({
               disabled={deleting}
               className="button primary flex items-center gap-2"
               style={{
-                background: "#00CAFF",
-                borderColor: "#00CAFF",
+                background: "#0f766e",
+                borderColor: "#0f766e",
                 color: "white",
               }}
             >
@@ -1380,7 +1337,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
           onClose={() => setDischargeRow(null)}
           busy={discharging}
         >
-          <div className="bg-white dark:bg-[#181818] rounded-3xl p-6 max-w-md w-full space-y-4">
+          <div className="bg-white dark:bg-[var(--mq-surface)] rounded-3xl p-6 max-w-md w-full space-y-4">
             <h3>
               {language === "si" ? "රෝගියා පිටත් කරන්න" : "Discharge patient"}
             </h3>
@@ -1466,35 +1423,24 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
         />
       )}
 
-      <section className="w-full bg-white dark:bg-[#1e1e1e] rounded-3xl border border-[#f4f4f4] dark:border-gray-800 shadow-sm overflow-hidden flex flex-col">
+      <section
+        className="w-full flex flex-col"
+        aria-label={meta.plural}
+      >
         {/* Header */}
-        <div className="flex flex-col p-6 border-b border-[#ffffff] dark:border-gray-800 bg-[#ffffff] dark:bg-[#1a1a1a] gap-4">
-          <div className="flex items-center justify-between">
-            <div className="flex flex-col">
-              <h2 className="text-xl font-bold text-[#000000] dark:text-gray-100">
+        <div className="mq-panel-header flex-col !items-stretch gap-4 !py-5">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="resource-heading flex flex-col">
+              <h2 className="text-xl font-bold text-[var(--mq-text)]">
                 {meta.plural}
               </h2>
-              <p className="text-sm text-[#727272] dark:text-[#a2a2a2] mt-1">
+              <p className="mt-1 text-sm text-[var(--mq-muted)]">
                 {meta.description}
               </p>
             </div>
-            {config.canCreate && config.inputFields.length > 0 && (
-              <button
-                onClick={() => {
-                  void loadRefs(true);
-                  setShowCreate(true);
-                }}
-                className="button primary flex items-center gap-2"
-              >
-                <Plus size={16} />
-                {language === "si"
-                  ? `නව ${config.si.singular}`
-                  : `New ${config.en.singular}`}
-              </button>
-            )}
           </div>
           {config.canEdit && !config.canDelete && (
-            <div className="resource-permission-note" role="status">
+            <div className="resource-permission-note flex items-center gap-2" role="status">
               <ShieldCheck size={15} aria-hidden="true" />
               {language === "si"
                 ? "මකා දැමීම සඳහා පරිපාලක අවසරය අවශ්‍යයි."
@@ -1503,13 +1449,16 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
           )}
 
           {/* Search / Filter */}
-          <div className="flex flex-wrap items-center gap-3 pt-1">
-            <div className="relative flex-1 min-w-[200px] max-w-md">
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a2a2a2]"
-                size={16}
-              />
+          <div className="flex flex-wrap items-center gap-3" role="search">
+            <label className="mq-search">
+              <span className="sr-only">
+                {language === "si"
+                  ? `${meta.plural} සොයන්න`
+                  : `Search ${meta.plural.toLowerCase()}`}
+              </span>
+              <Search size={16} aria-hidden="true" />
               <input
+                type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={
@@ -1517,31 +1466,51 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
                     ? `${meta.plural} සොයන්න...`
                     : `Search ${meta.plural.toLowerCase()}...`
                 }
-                className="w-full pl-9 pr-4 py-2 bg-white dark:bg-[#1e1e1e] border border-[#e7e7e7] dark:border-gray-700 text-[#000000] dark:text-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00CAFF]/20 focus:border-[#00CAFF] transition-all"
               />
-            </div>
-            <span className="px-3 py-1.5 bg-[#ffffff] dark:bg-gray-800 text-[#727272] dark:text-[#a2a2a2] rounded-full text-xs font-semibold border border-[#f4f4f4] dark:border-gray-800">
-              {rows.length} {language === "si" ? "වාර්තා" : "records"}
+            </label>
+            <span className="mq-count-chip" aria-live="polite">
+              {filteredRows.length} {language === "si" ? "වාර්තා" : "records"}
             </span>
+            {config.canCreate && config.inputFields.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  void loadRefs(true);
+                  setShowCreate(true);
+                }}
+                className="button primary ml-auto"
+                aria-label={
+                  language === "si"
+                    ? `නව ${config.si.singular} එකතු කරන්න`
+                    : `Add a new ${config.en.singular.toLowerCase()}`
+                }
+              >
+                <Plus size={16} aria-hidden="true" />
+                {language === "si"
+                  ? `නව ${config.si.singular}`
+                  : `New ${config.en.singular}`}
+              </button>
+            )}
           </div>
         </div>
 
         {/* Table */}
-        <div className="flex-1 overflow-x-auto">
+        <div className="mq-table-wrap flex-1">
           {error ? (
-            <div className="p-12 text-center flex flex-col items-center justify-center">
-              <div className="w-12 h-12 rounded-full bg-transparent text-[var(--flat-accent)] flex items-center justify-center mb-4">
-                <X size={24} />
+            <div className="p-12 text-center flex flex-col items-center justify-center" role="alert">
+              <div className="mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-[var(--mq-danger-soft)] text-[var(--mq-danger)]">
+                <X size={22} aria-hidden="true" />
               </div>
-              <h3 className="text-lg font-semibold text-[#000000] dark:text-gray-100 mb-2">
+              <h3 className="mb-2 text-lg font-semibold text-[var(--mq-text)]">
                 {language === "si"
                   ? "දත්ත පූරණය කළ නොහැක"
                   : "Unable to load data"}
               </h3>
-              <p className="text-[#727272] dark:text-[#a2a2a2] text-sm mb-6 max-w-md">
+              <p className="mb-6 max-w-md text-sm text-[var(--mq-muted)]">
                 {error}
               </p>
               <button
+                type="button"
                 className="button secondary"
                 onClick={() => void mutateRows()}
               >
@@ -1549,84 +1518,78 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
               </button>
             </div>
           ) : loading ? (
-            <div className="p-16 flex flex-col items-center justify-center">
-              <Loader2 size={32} className="animate-spin text-[#00CAFF] mb-4" />
-              <p className="text-[#727272] dark:text-[#a2a2a2] text-sm">
-                {language === "si" ? "පූරණය වෙමින්…" : "Loading…"}
-              </p>
+            <div
+              className="flex flex-col gap-3 p-6"
+              role="status"
+              aria-label={language === "si" ? "පූරණය වෙමින්" : "Loading records"}
+            >
+              {Array.from({ length: 6 }, (_, i) => (
+                <span key={i} className="mq-skeleton block h-11 w-full" />
+              ))}
             </div>
           ) : filteredRows.length === 0 ? (
             <div className="p-16 flex flex-col items-center justify-center text-center">
-              <div className="w-16 h-16 rounded-2xl bg-[#ffffff] dark:bg-gray-800 border border-[#f4f4f4] dark:border-gray-800 flex items-center justify-center text-[#a2a2a2] mb-4">
-                <Search size={28} />
+              <div className="mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-[var(--mq-accent-soft)] text-[var(--mq-accent)]">
+                <Search size={26} aria-hidden="true" />
               </div>
-              <h3 className="text-lg font-semibold text-[#000000] dark:text-gray-100 mb-2">
+              <h3 className="mb-2 text-lg font-semibold text-[var(--mq-text)]">
                 {language === "si"
                   ? `${meta.plural} හමු නොවීය`
                   : `No ${meta.plural.toLowerCase()} found`}
               </h3>
-              <p className="text-[#727272] dark:text-[#a2a2a2] text-sm mb-6 max-w-sm">
+              <p className="mb-6 max-w-sm text-sm text-[var(--mq-muted)]">
                 {language === "si"
                   ? "ඔබේ සෙවුම් පෙරීම් ඉවත් කරන්න හෝ නව වාර්තාවක් එකතු කරන්න."
                   : "Try clearing your search or add a new record."}
               </p>
             </div>
           ) : (
-            <table className="resource-data-table w-full text-sm text-left">
-              <thead className="text-xs text-[#727272] dark:text-[#a2a2a2] uppercase bg-[#ffffff]/50 dark:bg-gray-800/50 border-b border-[#f4f4f4] dark:border-gray-800">
+            <table className="resource-data-table mq-table mq-responsive mq-sticky-first">
+              <caption>{meta.plural}</caption>
+              <thead>
                 <tr>
                   {tableFields.map((f) => (
-                    <th
-                      key={f.key}
-                      className="px-6 py-4 font-semibold tracking-wider"
-                    >
+                    <th key={f.key} scope="col">
                       {language === "si" ? f.si : f.en}
                     </th>
                   ))}
                   {(config.canEdit || config.canDelete || detailFields.length > 0) && (
-                    <th className="px-6 py-4 font-semibold text-right">
+                    <th scope="col" className="mq-num">
                       {language === "si" ? "ක්‍රියා" : "Actions"}
                     </th>
                   )}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filteredRows.map((row, index) => (
-                  <Fragment key={String(row.id ?? index)}>
-                    <tr className="hover:bg-[#ffffff] dark:bg-[#222222] transition-colors group">
-                    {tableFields.map((f, colIdx) => (
-                      <td
-                        key={f.key}
-                        className={`px-6 py-4 align-top ${colIdx === 0 ? "font-medium text-[#000000] dark:text-gray-100" : "text-[#727272] dark:text-[#a2a2a2]"}`}
-                      >
+              <tbody>
+                {filteredRows.map((row, index) => {
+                  const rowKey = String(row.id ?? index);
+                  return (
+                  <Fragment key={rowKey}>
+                    <tr>
+                    {tableFields.map((f) => (
+                      <td key={f.key} data-label={language === "si" ? f.si : f.en}>
                         {cellValue(f, row[f.key], refCache, language)}
                       </td>
                     ))}
                     {(config.canEdit || config.canDelete || detailFields.length > 0) && (
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-1 resource-row-actions transition-opacity">
+                      <td className="mq-num" data-label={language === "si" ? "ක්‍රියා" : "Actions"}>
+                        <div className="resource-row-actions flex items-center justify-end gap-1">
                           {detailFields.length > 0 && (
                             <button
+                              type="button"
                               className="button secondary resource-details-toggle"
                               onClick={() => {
-                                const rowKey = String(row.id ?? index);
                                 setExpandedRows((current) => ({
                                   ...current,
                                   [rowKey]: !current[rowKey],
                                 }));
                               }}
-                              aria-expanded={Boolean(
-                                expandedRows[String(row.id ?? index)],
-                              )}
+                              aria-expanded={Boolean(expandedRows[rowKey])}
                             >
                               <ChevronDown
                                 size={15}
                                 aria-hidden="true"
-                                className={
-                                  expandedRows[String(row.id ?? index)]
-                                    ? "rotate-180"
-                                    : ""
-                                }
+                                className={`transition-transform duration-300 ${expandedRows[rowKey] ? "rotate-180" : ""}`}
                               />
                               {language === "si" ? "විස්තර" : "Details"}
                             </button>
@@ -1635,6 +1598,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
                             config.canEdit &&
                             row.admission_status === "ADMITTED" && (
                               <button
+                                type="button"
                                 className="button secondary"
                                 onClick={() => {
                                   setDischargeError("");
@@ -1652,6 +1616,7 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
                               row.attendance_status === "PRESENT" ||
                               row.attendance_status === "LATE") && (
                               <button
+                                type="button"
                                 className="button secondary"
                                 onClick={() => void verifyRow(row)}
                               >
@@ -1663,30 +1628,34 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
                             (config.key !== "ward-admissions" ||
                               row.admission_status === "ADMITTED") && (
                               <button
+                                type="button"
                                 onClick={() => {
                                   void loadRefs(true);
                                   setEditRow(row);
                                 }}
-                                className="p-2 text-[#a2a2a2] hover:text-[var(--flat-accent)] rounded-lg hover:bg-transparent transition-colors"
+                                className="mq-icon-action"
+                                aria-label={language === "si" ? "සංස්කරණය" : "Edit"}
                                 title={language === "si" ? "සංස්කරණය" : "Edit"}
                               >
-                                <Pencil size={15} />
+                                <Pencil size={15} aria-hidden="true" />
                               </button>
                             )}
                           {config.canDelete && (
                             <button
+                              type="button"
                               onClick={() => setDeleteRow(row)}
-                              className="p-2 text-[#a2a2a2] hover:text-[var(--flat-accent)] rounded-lg hover:bg-transparent transition-colors"
+                              className="mq-icon-action danger"
+                              aria-label={language === "si" ? "මකන්න" : "Delete"}
                               title={language === "si" ? "මකන්න" : "Delete"}
                             >
-                              <Trash2 size={15} />
+                              <Trash2 size={15} aria-hidden="true" />
                             </button>
                           )}
                         </div>
                       </td>
                     )}
                     </tr>
-                    {expandedRows[String(row.id ?? index)] && (
+                    {expandedRows[rowKey] && (
                       <tr className="resource-details-row">
                       <td
                         colSpan={
@@ -1696,62 +1665,70 @@ export function ResourcePanel({ config }: { config: ResourceConfig }) {
                             : 0)
                         }
                       >
-                        <div className="resource-details-grid">
+                        <dl className="resource-details-grid">
                           {detailFields.map((field) => (
                             <div key={field.key} className="resource-detail-item">
-                              <span>
+                              <dt>
                                 {language === "si" ? field.si : field.en}
-                              </span>
-                              <strong>
+                              </dt>
+                              <dd>
                                 {cellValue(
                                   field,
                                   row[field.key],
                                   refCache,
                                   language,
                                 ) || "—"}
-                              </strong>
+                              </dd>
                             </div>
                           ))}
-                        </div>
+                        </dl>
                       </td>
                       </tr>
                     )}
                   </Fragment>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           )}
         </div>
 
         {/* Pagination */}
-        <div className="flex items-center justify-between p-4 border-t border-[#f4f4f4] dark:border-gray-800 bg-[#ffffff] dark:bg-[#1a1a1a] text-sm text-[#727272] dark:text-[#a2a2a2]">
-          <span>
+        <nav
+          className="mq-table-footer"
+          aria-label={language === "si" ? "පිටු අංකනය" : "Pagination"}
+        >
+          <span aria-live="polite">
             {language === "si"
               ? `${rows.length === 0 ? 0 : page * PAGE_SIZE + 1}–${Math.min((page + 1) * PAGE_SIZE, page * PAGE_SIZE + rows.length)} වාර්තා`
               : `Showing ${rows.length === 0 ? 0 : page * PAGE_SIZE + 1}–${Math.min((page + 1) * PAGE_SIZE, page * PAGE_SIZE + rows.length)} records`}
           </span>
           <div className="flex items-center gap-1">
             <button
-              aria-label="Previous page"
+              type="button"
+              aria-label={language === "si" ? "පෙර පිටුව" : "Previous page"}
+              title={language === "si" ? "පෙර පිටුව" : "Previous page"}
               disabled={page === 0 || loading}
               onClick={() => setPage((c) => c - 1)}
-              className="p-2 rounded-lg border border-transparent hover:bg-[#f4f4f4] dark:bg-gray-800 disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
+              className="mq-icon-action disabled:opacity-40"
             >
-              <ChevronLeft size={16} />
+              <ChevronLeft size={16} aria-hidden="true" />
             </button>
-            <span className="px-4 font-medium text-[#000000] dark:text-gray-100">
+            <span className="px-3 font-semibold text-[var(--mq-text)]">
               {language === "si" ? `පිටුව ${page + 1}` : `Page ${page + 1}`}
             </span>
             <button
-              aria-label="Next page"
+              type="button"
+              aria-label={language === "si" ? "ඊළඟ පිටුව" : "Next page"}
+              title={language === "si" ? "ඊළඟ පිටුව" : "Next page"}
               disabled={rows.length < PAGE_SIZE || loading}
               onClick={() => setPage((c) => c + 1)}
-              className="p-2 rounded-lg border border-transparent hover:bg-[#f4f4f4] dark:bg-gray-800 disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
+              className="mq-icon-action disabled:opacity-40"
             >
-              <ChevronRight size={16} />
+              <ChevronRight size={16} aria-hidden="true" />
             </button>
           </div>
-        </div>
+        </nav>
       </section>
     </div>
   );

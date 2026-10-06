@@ -1,0 +1,1572 @@
+/* ==========================================================================
+   MediQueue clinical design system
+   Calm teal/slate palette, layered surfaces, labelled controls, modern data
+   tables and smooth, interruptible motion. Loaded last; every legacy token used
+   by older stylesheets and Tailwind classes is mapped onto these tokens.
+   ========================================================================== */
+
+:root,
+html[data-theme="light"] {
+  color-scheme: light;
+  --mq-bg: #f3f6f7;
+  --mq-bg-glow-1: rgba(45, 212, 191, 0.16);
+  --mq-bg-glow-2: rgba(14, 116, 144, 0.1);
+  --mq-surface: #ffffff;
+  --mq-surface-2: #f7fafa;
+  --mq-surface-3: #eef3f4;
+  --mq-glass: rgba(255, 255, 255, 0.78);
+  --mq-text: #0f172a;
+  --mq-muted: #556574;
+  --mq-subtle: #8394a2;
+  --mq-line: #e1e8eb;
+  --mq-line-strong: #c9d5da;
+  --mq-accent: #0f766e;
+  --mq-accent-strong: #115e59;
+  --mq-accent-hover: #0d6b64;
+  --mq-accent-soft: #e3f3f0;
+  --mq-accent-soft-2: #cdebe5;
+  --mq-accent-contrast: #ffffff;
+  --mq-mint: #2dd4bf;
+  --mq-success: #15803d;
+  --mq-success-soft: #e7f5ec;
+  --mq-warning: #b45309;
+  --mq-warning-soft: #fdf2e2;
+  --mq-danger: #b91c1c;
+  --mq-danger-soft: #fdecec;
+  --mq-info: #1d4ed8;
+  --mq-info-soft: #e8eefc;
+  --mq-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --mq-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 28px -14px rgba(15, 23, 42, 0.16);
+  --mq-shadow-lg:
+    0 2px 6px rgba(15, 23, 42, 0.05), 0 28px 60px -24px rgba(15, 23, 42, 0.28);
+  --mq-ring: 0 0 0 3px rgba(15, 118, 110, 0.22);
+  /* Legacy luminance tokens: "light" is always the light colour, "dark" the dark one. */
+  --brand-light: #ffffff;
+  --brand-dark: #0f172a;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --mq-bg: #0a1114;
+  --mq-bg-glow-1: rgba(45, 212, 191, 0.09);
+  --mq-bg-glow-2: rgba(56, 189, 248, 0.06);
+  --mq-surface: #10191d;
+  --mq-surface-2: #142127;
+  --mq-surface-3: #1a2a31;
+  --mq-glass: rgba(16, 25, 29, 0.74);
+  --mq-text: #e6eef0;
+  --mq-muted: #9badb5;
+  --mq-subtle: #6f838c;
+  --mq-line: #22323a;
+  --mq-line-strong: #2e434c;
+  --mq-accent: #2dd4bf;
+  --mq-accent-strong: #5eead4;
+  --mq-accent-hover: #4fe0cc;
+  --mq-accent-soft: rgba(45, 212, 191, 0.12);
+  --mq-accent-soft-2: rgba(45, 212, 191, 0.2);
+  --mq-accent-contrast: #042520;
+  --mq-mint: #5eead4;
+  --mq-success: #4ade80;
+  --mq-success-soft: rgba(74, 222, 128, 0.12);
+  --mq-warning: #fbbf24;
+  --mq-warning-soft: rgba(251, 191, 36, 0.12);
+  --mq-danger: #f87171;
+  --mq-danger-soft: rgba(248, 113, 113, 0.12);
+  --mq-info: #7aa2ff;
+  --mq-info-soft: rgba(122, 162, 255, 0.13);
+  --mq-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --mq-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 12px 32px -16px rgba(0, 0, 0, 0.7);
+  --mq-shadow-lg: 0 2px 8px rgba(0, 0, 0, 0.4), 0 30px 70px -24px rgba(0, 0, 0, 0.85);
+  --mq-ring: 0 0 0 3px rgba(45, 212, 191, 0.28);
+  --brand-light: #e6eef0;
+  --brand-dark: #0a1114;
+}
+
+:root {
+  --mq-radius-sm: 10px;
+  --mq-radius: 14px;
+  --mq-radius-lg: 20px;
+  --mq-radius-xl: 28px;
+  --mq-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --mq-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --mq-fast: 160ms;
+  --mq-base: 280ms;
+  --mq-slow: 520ms;
+  --mq-font: var(--font-geist), "Poppins", system-ui, sans-serif;
+}
+
+/* Legacy tokens used by older stylesheets, shadcn primitives and the sidebar. */
+html[data-theme] {
+  --palette-violet: var(--mq-accent);
+  --palette-blue: var(--mq-accent-strong);
+  --palette-cyan: var(--mq-accent);
+  --palette-mint: var(--mq-mint);
+  --flat-bg: var(--mq-surface);
+  --flat-text: var(--mq-text);
+  --flat-muted: var(--mq-muted);
+  --flat-line: var(--mq-line);
+  --flat-accent: var(--mq-accent);
+  --background: var(--mq-bg);
+  --foreground: var(--mq-text);
+  --card: var(--mq-surface);
+  --card-foreground: var(--mq-text);
+  --popover: var(--mq-surface);
+  --popover-foreground: var(--mq-text);
+  --primary: var(--mq-accent);
+  --primary-foreground: var(--mq-accent-contrast);
+  --secondary: var(--mq-surface-2);
+  --secondary-foreground: var(--mq-text);
+  --muted: var(--mq-surface-3);
+  --muted-foreground: var(--mq-muted);
+  --accent: var(--mq-accent-soft);
+  --accent-foreground: var(--mq-accent-strong);
+  --destructive: var(--mq-danger);
+  --border: var(--mq-line);
+  --input: var(--mq-line-strong);
+  --ring: var(--mq-accent);
+  --ink: var(--mq-text);
+  --line: var(--mq-line);
+  --green: var(--mq-accent);
+  --green-dark: var(--mq-accent-strong);
+  --soft: var(--mq-surface-2);
+  --content-primary: var(--mq-text);
+  --content-secondary: var(--mq-muted);
+  --content-muted: var(--mq-subtle);
+  --nav-color: var(--mq-text);
+  --surface-soft: var(--mq-surface-2);
+  --theme-bg: var(--mq-bg);
+  --theme-text: var(--mq-text);
+  --theme-surface: var(--mq-surface);
+  --theme-border: var(--mq-line);
+  --brand-accent: var(--mq-accent);
+  --brand-accent-soft: var(--mq-accent-soft);
+  --brand-deep-accent: var(--mq-accent-strong);
+  --workspace-blue: var(--mq-accent);
+  --workspace-blue-soft: var(--mq-accent-soft);
+  --workspace-border: var(--mq-line);
+  --workspace-text: var(--mq-text);
+  --workspace-muted: var(--mq-muted);
+  --ui-surface: var(--mq-surface);
+  --ui-canvas: var(--mq-surface-2);
+  --ui-text: var(--mq-text);
+  --ui-muted: var(--mq-muted);
+  --ui-border: var(--mq-line);
+  --ui-accent: var(--mq-accent);
+  --ui-tint: var(--mq-accent-soft);
+  --sidebar: var(--mq-glass);
+  --sidebar-foreground: var(--mq-text);
+  --sidebar-primary: var(--mq-accent);
+  --sidebar-primary-foreground: var(--mq-accent-contrast);
+  --sidebar-accent: var(--mq-accent-soft);
+  --sidebar-accent-foreground: var(--mq-accent-strong);
+  --sidebar-border: var(--mq-line);
+  --sidebar-ring: var(--mq-accent);
+  --chart-1: var(--mq-accent);
+  --chart-2: var(--mq-mint);
+  --chart-3: var(--mq-info);
+  --chart-4: var(--mq-warning);
+  --chart-5: var(--mq-danger);
+  --radius: 0.875rem;
+}
+html[data-theme] :is(.care-shell, .ward-board) {
+  --care-bg: transparent;
+  --care-panel: var(--mq-surface);
+  --care-text: var(--mq-text);
+  --care-muted: var(--mq-muted);
+  --care-line: var(--mq-line);
+  --care-accent: var(--mq-accent);
+  --wb-bg: transparent;
+  --wb-soft: var(--mq-surface-2);
+  --wb-border: var(--mq-line);
+  --wb-text: var(--mq-text);
+  --wb-muted: var(--mq-muted);
+}
+
+/* ---------- Base ---------- */
+html,
+body {
+  background: var(--mq-bg) !important;
+  color: var(--mq-text);
+}
+body {
+  font-family: var(--mq-font);
+  font-size: 14px;
+  line-height: 1.55;
+  text-rendering: optimizeLegibility;
+  background-image:
+    radial-gradient(1100px 520px at 8% -10%, var(--mq-bg-glow-1), transparent 60%),
+    radial-gradient(900px 480px at 100% 0%, var(--mq-bg-glow-2), transparent 55%) !important;
+  background-attachment: fixed !important;
+}
+html[lang="si"] body {
+  font-family: AFSandarenu, var(--mq-font);
+}
+.app-shell,
+.app-main,
+.staff-workspace {
+  background: transparent !important;
+  color: var(--mq-text);
+}
+::selection {
+  background: var(--mq-accent-soft-2);
+  color: var(--mq-text);
+}
+:is(h1, h2, h3) {
+  letter-spacing: -0.02em;
+  color: var(--mq-text);
+}
+.app-shell :focus-visible,
+.mq-modal :focus-visible {
+  outline: 2px solid var(--mq-accent) !important;
+  outline-offset: 2px;
+  box-shadow: var(--mq-ring);
+  border-radius: 8px;
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--mq-line-strong) transparent;
+}
+
+/* ---------- Motion ---------- */
+@keyframes mq-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes mq-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes mq-pop {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes mq-shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+@keyframes mq-pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 var(--mq-accent-soft-2);
+  }
+  100% {
+    box-shadow: 0 0 0 10px transparent;
+  }
+}
+.mq-animate-in,
+.staff-workspace > div > *,
+.care-shell main > *,
+.admin-dashboard > *,
+.account-page > * {
+  animation: mq-rise var(--mq-slow) var(--mq-ease) both;
+}
+.staff-workspace > div > :nth-child(2),
+.care-shell main > :nth-child(2) {
+  animation-delay: 60ms;
+}
+.staff-workspace > div > :nth-child(3),
+.care-shell main > :nth-child(3) {
+  animation-delay: 120ms;
+}
+.staff-workspace > div > :nth-child(n + 4),
+.care-shell main > :nth-child(n + 4) {
+  animation-delay: 180ms;
+}
+.mq-stagger > * {
+  animation: mq-rise var(--mq-slow) var(--mq-ease) both;
+}
+.mq-stagger > :nth-child(1) { animation-delay: 30ms; }
+.mq-stagger > :nth-child(2) { animation-delay: 70ms; }
+.mq-stagger > :nth-child(3) { animation-delay: 110ms; }
+.mq-stagger > :nth-child(4) { animation-delay: 150ms; }
+.mq-stagger > :nth-child(5) { animation-delay: 190ms; }
+.mq-stagger > :nth-child(6) { animation-delay: 230ms; }
+.mq-stagger > :nth-child(n + 7) { animation-delay: 270ms; }
+.mq-table tbody tr,
+.appointment-list > .appointment-row,
+.hospital-result,
+.booking-session {
+  animation: mq-rise var(--mq-base) var(--mq-ease) both;
+}
+.mq-table tbody tr:nth-child(2) { animation-delay: 30ms; }
+.mq-table tbody tr:nth-child(3) { animation-delay: 60ms; }
+.mq-table tbody tr:nth-child(4) { animation-delay: 90ms; }
+.mq-table tbody tr:nth-child(5) { animation-delay: 120ms; }
+.mq-table tbody tr:nth-child(n + 6) { animation-delay: 150ms; }
+.appointment-list > .appointment-row:nth-child(2) { animation-delay: 40ms; }
+.appointment-list > .appointment-row:nth-child(3) { animation-delay: 80ms; }
+.appointment-list > .appointment-row:nth-child(n + 4) { animation-delay: 120ms; }
+.mq-skeleton {
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    var(--mq-surface-3) 25%,
+    var(--mq-surface-2) 50%,
+    var(--mq-surface-3) 75%
+  );
+  background-size: 200% 100%;
+  animation: mq-shimmer 1.4s linear infinite;
+}
+
+/* ---------- Surfaces ---------- */
+.mq-panel,
+.mq-stat-card,
+.resource-workspace > section,
+.appointment-inbox,
+.operations-report section,
+.admin-dashboard section,
+.account-page section,
+.ward-board,
+.care-panel,
+.hospital-finder {
+  background: var(--mq-surface);
+  border: 1px solid var(--mq-line);
+  border-radius: var(--mq-radius-lg);
+  box-shadow: var(--mq-shadow);
+}
+.mq-panel,
+.resource-workspace > section {
+  overflow: hidden;
+}
+.mq-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--mq-line);
+  background: linear-gradient(180deg, var(--mq-surface-2), var(--mq-surface));
+}
+.mq-panel-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 650;
+}
+.mq-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--mq-accent);
+  font-size: 13px;
+  font-weight: 600;
+  transition: gap var(--mq-fast) var(--mq-ease), color var(--mq-fast);
+}
+.mq-link:hover {
+  gap: 8px;
+  color: var(--mq-accent-strong);
+}
+
+/* Stat cards */
+.mq-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+.mq-stat-card {
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+  transition:
+    transform var(--mq-base) var(--mq-ease),
+    box-shadow var(--mq-base) var(--mq-ease),
+    border-color var(--mq-base);
+}
+.mq-stat-card::after {
+  content: "";
+  position: absolute;
+  inset: auto -30% -60% auto;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--mq-accent-soft-2), transparent 70%);
+  opacity: 0.7;
+  pointer-events: none;
+  transition: transform var(--mq-slow) var(--mq-ease);
+}
+.mq-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--mq-shadow-lg);
+  border-color: var(--mq-accent-soft-2);
+}
+.mq-stat-card:hover::after {
+  transform: scale(1.25);
+}
+.mq-stat-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--mq-muted);
+  font-size: 13px;
+  font-weight: 550;
+}
+.mq-stat-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: var(--mq-accent-soft);
+  color: var(--mq-accent);
+}
+.mq-stat-value {
+  display: block;
+  margin-top: 14px;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--mq-text);
+}
+.mq-stat-caption {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  color: var(--mq-subtle);
+  font-size: 12px;
+}
+.mq-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--mq-success);
+  animation: mq-pulse-ring 1.8s var(--mq-ease) infinite;
+}
+
+/* Page header */
+.mq-page-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px 5px 8px;
+  border: 1px solid var(--mq-accent-soft-2);
+  border-radius: 999px;
+  background: var(--mq-accent-soft);
+  color: var(--mq-accent-strong);
+  font-size: 12px;
+  font-weight: 600;
+}
+.mq-page-title {
+  margin: 14px 0 6px;
+  font-size: clamp(28px, 3.4vw, 40px);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+.mq-page-subtitle {
+  margin: 0;
+  max-width: 62ch;
+  color: var(--mq-muted);
+  font-size: 15px;
+}
+
+/* ---------- Buttons ---------- */
+.app-shell .button,
+.mq-modal .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--mq-line-strong) !important;
+  border-radius: 12px !important;
+  background: var(--mq-surface) !important;
+  color: var(--mq-text) !important;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: var(--mq-shadow-sm) !important;
+  cursor: pointer;
+  transition:
+    transform var(--mq-fast) var(--mq-ease),
+    box-shadow var(--mq-base) var(--mq-ease),
+    background-color var(--mq-fast),
+    border-color var(--mq-fast),
+    color var(--mq-fast) !important;
+  filter: none !important;
+}
+.app-shell .button :is(span, strong, svg),
+.mq-modal .button :is(span, strong, svg) {
+  color: inherit !important;
+}
+.app-shell .button:hover:not(:disabled),
+.mq-modal .button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: var(--mq-accent) !important;
+  box-shadow: var(--mq-shadow) !important;
+}
+.app-shell .button:active:not(:disabled),
+.mq-modal .button:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+.app-shell .button:disabled,
+.mq-modal .button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.app-shell .button.primary,
+.mq-modal .button.primary,
+.app-shell .auth-audience .auth-audience-option[aria-current="page"],
+.app-shell .ward-filters button[aria-pressed="true"],
+.app-shell .appointment-summary button[aria-pressed="true"] {
+  border-color: transparent !important;
+  background: linear-gradient(180deg, var(--mq-accent-hover), var(--mq-accent)) !important;
+  color: var(--mq-accent-contrast) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.18) inset,
+    0 8px 20px -10px var(--mq-accent) !important;
+}
+.app-shell .button.primary:hover:not(:disabled),
+.mq-modal .button.primary:hover:not(:disabled) {
+  border-color: transparent !important;
+  background: linear-gradient(180deg, var(--mq-accent), var(--mq-accent-strong)) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.18) inset,
+    0 12px 26px -10px var(--mq-accent) !important;
+}
+.app-shell .button.primary :is(span, strong, svg),
+.mq-modal .button.primary :is(span, strong, svg),
+.app-shell .appointment-summary button[aria-pressed="true"] :is(span, strong) {
+  color: var(--mq-accent-contrast) !important;
+}
+.app-shell .button.secondary,
+.mq-modal .button.secondary {
+  color: var(--mq-text) !important;
+}
+.app-shell :is(.icon-button, .theme-toggle, .sidebar-close, .care-icon-button) {
+  border-radius: 12px;
+  transition: background-color var(--mq-fast), transform var(--mq-fast) var(--mq-ease);
+}
+.app-shell :is(.icon-button, .theme-toggle, .sidebar-close, .care-icon-button):hover {
+  background: var(--mq-accent-soft);
+}
+.app-shell :is(.icon-button, .theme-toggle, .sidebar-close, .care-icon-button):active {
+  transform: scale(0.94);
+}
+.mq-icon-action {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: var(--mq-muted);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background-color var(--mq-fast),
+    color var(--mq-fast),
+    border-color var(--mq-fast),
+    transform var(--mq-fast) var(--mq-ease);
+}
+.mq-icon-action:hover {
+  background: var(--mq-accent-soft);
+  border-color: var(--mq-accent-soft-2);
+  color: var(--mq-accent-strong);
+}
+.mq-icon-action.danger:hover {
+  background: var(--mq-danger-soft);
+  border-color: transparent;
+  color: var(--mq-danger);
+}
+.mq-icon-action:active {
+  transform: scale(0.92);
+}
+
+/* ---------- Labels and form controls ---------- */
+.app-shell label,
+.mq-modal label {
+  color: var(--mq-text);
+  font-weight: 550;
+}
+.mq-field {
+  display: grid;
+  gap: 6px;
+}
+.mq-field :is(input, select, textarea) {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px;
+}
+.mq-field textarea {
+  padding: 10px 14px;
+}
+.mq-field-label,
+.app-shell .field-title,
+.mq-modal .resource-edit-form label > span:first-child {
+  color: var(--mq-text);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.app-shell :is(input, textarea, select):not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.mq-modal :is(input, textarea, select):not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.app-shell .mq-select-trigger,
+.mq-modal .mq-select-trigger {
+  border: 1px solid var(--mq-line-strong) !important;
+  border-radius: 12px !important;
+  background: var(--mq-surface) !important;
+  color: var(--mq-text) !important;
+  accent-color: var(--mq-accent);
+  transition:
+    border-color var(--mq-fast),
+    box-shadow var(--mq-base) var(--mq-ease),
+    background-color var(--mq-fast) !important;
+}
+.app-shell :is(input, textarea, select):not([type="checkbox"]):not([type="radio"]):hover,
+.mq-modal :is(input, textarea, select):not([type="checkbox"]):not([type="radio"]):hover,
+.app-shell .mq-select-trigger:hover,
+.mq-modal .mq-select-trigger:hover {
+  border-color: var(--mq-subtle) !important;
+}
+.app-shell :is(input, textarea, select):focus,
+.mq-modal :is(input, textarea, select):focus,
+.app-shell .mq-select-trigger[aria-expanded="true"],
+.mq-modal .mq-select-trigger[aria-expanded="true"] {
+  outline: none !important;
+  border-color: var(--mq-accent) !important;
+  box-shadow: var(--mq-ring) !important;
+}
+.app-shell :is(input, textarea)::placeholder,
+.mq-modal :is(input, textarea)::placeholder {
+  color: var(--mq-subtle);
+}
+.app-shell input[type="checkbox"],
+.app-shell input[type="radio"],
+.mq-modal input[type="checkbox"],
+.mq-modal input[type="radio"] {
+  accent-color: var(--mq-accent);
+}
+/* Search fields: the wrapper is the control, the inner input is borderless. */
+.app-shell :is(.input-wrap, .table-search, .finder-search, .appointment-search) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--mq-line-strong) !important;
+  border-radius: 12px !important;
+  background: var(--mq-surface) !important;
+  transition: border-color var(--mq-fast), box-shadow var(--mq-base) var(--mq-ease);
+}
+.app-shell :is(.input-wrap, .table-search, .finder-search, .appointment-search):focus-within {
+  border-color: var(--mq-accent) !important;
+  box-shadow: var(--mq-ring);
+}
+.app-shell :is(.input-wrap, .finder-search, .appointment-search) > svg {
+  color: var(--mq-subtle);
+  flex-shrink: 0;
+}
+.app-shell
+  :is(.input-wrap, .table-search, .finder-search, .appointment-search)
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  min-height: 0;
+  padding: 0 !important;
+  flex: 1;
+}
+.mq-search {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+  max-width: 420px;
+}
+.mq-search > svg {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--mq-subtle);
+  pointer-events: none;
+}
+.app-shell .mq-search input {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 14px 0 38px !important;
+}
+
+/* Select panels and options */
+.app-shell .mq-select-panel,
+.mq-modal .mq-select-panel {
+  border: 1px solid var(--mq-line) !important;
+  border-radius: 14px !important;
+  background: var(--mq-surface) !important;
+  box-shadow: var(--mq-shadow-lg) !important;
+  animation: mq-pop var(--mq-base) var(--mq-ease) both;
+}
+.app-shell .mq-select-option,
+.mq-modal .mq-select-option {
+  border-radius: 10px;
+  transition: background-color var(--mq-fast), color var(--mq-fast);
+}
+.app-shell .mq-select-option:hover,
+.mq-modal .mq-select-option:hover {
+  background: var(--mq-surface-3);
+}
+.app-shell .mq-select-option[aria-selected="true"],
+.mq-modal .mq-select-option[aria-selected="true"] {
+  background: var(--mq-accent-soft);
+  color: var(--mq-accent-strong);
+}
+.mq-select-trigger > svg {
+  transition: transform var(--mq-base) var(--mq-ease);
+}
+
+/* ---------- Data tables ---------- */
+.mq-table-wrap {
+  position: relative;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.mq-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13.5px;
+  color: var(--mq-text);
+}
+.mq-table caption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.mq-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 12px 16px;
+  background: var(--mq-surface-2) !important;
+  border-bottom: 1px solid var(--mq-line);
+  color: var(--mq-muted) !important;
+  font-size: 11.5px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+}
+.mq-table tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--mq-line);
+  vertical-align: middle;
+  white-space: nowrap;
+  background: var(--mq-surface);
+  color: var(--mq-muted);
+  transition: background-color var(--mq-fast);
+}
+.mq-table tbody td:first-child {
+  color: var(--mq-text);
+  font-weight: 600;
+}
+.mq-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.mq-table tbody tr:hover td {
+  background: var(--mq-surface-2);
+}
+.mq-table tbody tr:hover td:first-child {
+  box-shadow: inset 3px 0 0 var(--mq-accent);
+}
+.mq-table :is(th, td).mq-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+/* Keep the identifying column visible while wide tables scroll sideways. */
+.mq-table.mq-sticky-first :is(th, td):first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+.mq-table.mq-sticky-first thead th:first-child {
+  z-index: 3;
+}
+.mq-table.resource-data-table :is(th, td) {
+  min-width: 0;
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+.mq-table.resource-data-table :is(th, td):first-child {
+  min-width: 160px;
+}
+.mq-table .resource-row-actions > button:not(.mq-icon-action) {
+  min-height: 34px;
+  min-width: 0;
+  padding: 0 12px;
+  font-size: 13px;
+}
+.mq-table .resource-row-actions > .mq-icon-action {
+  min-height: 34px;
+  min-width: 34px;
+}
+.mq-table .resource-details-row td {
+  padding: 0 !important;
+  white-space: normal;
+  background: var(--mq-surface-2);
+}
+.mq-table .resource-details-grid {
+  margin: 0;
+  padding: 16px 20px;
+  gap: 10px;
+  background: transparent;
+  animation: mq-rise var(--mq-base) var(--mq-ease) both;
+}
+.mq-table .resource-detail-item {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--mq-line);
+  border-radius: 12px;
+  background: var(--mq-surface);
+}
+.mq-table .resource-detail-item dt {
+  color: var(--mq-subtle);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.mq-table .resource-detail-item dd {
+  margin: 4px 0 0;
+  color: var(--mq-text);
+  font-weight: 550;
+  overflow-wrap: anywhere;
+}
+/* The page header already names the resource; keep the panel heading for assistive tech. */
+.staff-workspace > div > .resource-workspace .resource-heading {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.mq-cell-truncate {
+  display: inline-block;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
+.mq-avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--mq-accent-soft);
+  color: var(--mq-accent-strong);
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.mq-table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px;
+  border-top: 1px solid var(--mq-line);
+  background: var(--mq-surface-2);
+  color: var(--mq-muted);
+  font-size: 13px;
+}
+.mq-count-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border: 1px solid var(--mq-line);
+  border-radius: 999px;
+  background: var(--mq-surface-2);
+  color: var(--mq-muted);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Phones: each row becomes a labelled card (cells carry data-label). */
+@media (max-width: 760px) {
+  .mq-table.mq-responsive thead {
+    display: none;
+  }
+  .mq-table.mq-responsive,
+  .mq-table.mq-responsive tbody {
+    display: block;
+  }
+  .mq-table.mq-responsive tbody tr {
+    display: block;
+    margin: 12px;
+    border: 1px solid var(--mq-line);
+    border-radius: var(--mq-radius);
+    background: var(--mq-surface);
+    box-shadow: var(--mq-shadow-sm);
+    overflow: hidden;
+  }
+  .mq-table.mq-responsive tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 14px;
+    white-space: normal;
+    text-align: right;
+    position: static;
+  }
+  .mq-table.mq-responsive tbody td[data-label]::before {
+    content: attr(data-label);
+    color: var(--mq-subtle);
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: left;
+    flex-shrink: 0;
+  }
+  .mq-table.mq-responsive tbody td:first-child {
+    background: var(--mq-surface-2);
+    font-size: 15px;
+  }
+  .mq-table.mq-responsive tbody tr:hover td:first-child {
+    box-shadow: none;
+  }
+  .mq-table.mq-responsive .resource-details-row td {
+    display: block;
+    text-align: left;
+  }
+}
+
+/* ---------- Badges ---------- */
+.mq-badge,
+.app-shell .appointment-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: var(--mq-surface-3);
+  color: var(--mq-muted);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.mq-badge::before,
+.app-shell .appointment-status::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.mq-badge.success,
+.app-shell :is(.status-booked, .status-completed, .status-checked_in, .payment-paid) {
+  background: var(--mq-success-soft) !important;
+  color: var(--mq-success) !important;
+}
+.mq-badge.warning,
+.app-shell :is(.status-pending, .payment-review_required, .payment-refund_required, .payment-checkout_started) {
+  background: var(--mq-warning-soft) !important;
+  color: var(--mq-warning) !important;
+}
+.mq-badge.danger,
+.app-shell :is(.status-rejected, .status-cancelled, .status-no_show) {
+  background: var(--mq-danger-soft) !important;
+  color: var(--mq-danger) !important;
+}
+.mq-badge.info,
+.app-shell :is(.payment-pay_at_hospital, .payment-refunded) {
+  background: var(--mq-info-soft) !important;
+  color: var(--mq-info) !important;
+}
+.mq-badge.accent {
+  background: var(--mq-accent-soft);
+  color: var(--mq-accent-strong);
+}
+
+/* ---------- Appointment inbox ---------- */
+.app-shell .appointment-inbox {
+  padding: 20px;
+}
+.app-shell .appointment-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 6px;
+  border-radius: 16px;
+  background: var(--mq-surface-2);
+  border: 1px solid var(--mq-line);
+}
+.app-shell .appointment-tabs button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border: 1px solid transparent !important;
+  border-radius: 12px !important;
+  background: transparent !important;
+  color: var(--mq-muted);
+  font-weight: 600;
+  transition: background-color var(--mq-base) var(--mq-ease), color var(--mq-fast), box-shadow var(--mq-base);
+}
+.app-shell .appointment-tabs button[aria-selected="true"] {
+  background: var(--mq-surface) !important;
+  color: var(--mq-text);
+  box-shadow: var(--mq-shadow);
+  border-color: var(--mq-line) !important;
+}
+.app-shell .appointment-tabs button strong {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--mq-accent-soft);
+  color: var(--mq-accent-strong);
+  font-variant-numeric: tabular-nums;
+}
+.app-shell .appointment-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0;
+}
+.app-shell .appointment-toolbar .appointment-search {
+  flex: 1;
+  min-width: 220px;
+}
+.app-shell .appointment-list {
+  display: grid;
+  gap: 10px;
+}
+.app-shell .appointment-row {
+  display: grid !important;
+  grid-template-columns: minmax(200px, 1.3fr) minmax(180px, 1fr) minmax(150px, 0.8fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px !important;
+  border: 1px solid var(--mq-line) !important;
+  border-radius: var(--mq-radius) !important;
+  background: var(--mq-surface) !important;
+  transition:
+    transform var(--mq-base) var(--mq-ease),
+    box-shadow var(--mq-base) var(--mq-ease),
+    border-color var(--mq-fast);
+}
+.app-shell .appointment-row:hover {
+  transform: translateY(-2px);
+  border-color: var(--mq-accent-soft-2) !important;
+  box-shadow: var(--mq-shadow);
+}
+.app-shell .appointment-person {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.app-shell .appointment-avatar {
+  display: grid !important;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px !important;
+  background: var(--mq-accent-soft) !important;
+  color: var(--mq-accent-strong) !important;
+  font-weight: 700;
+}
+.app-shell .appointment-person h3,
+.app-shell .appointment-session strong {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 650;
+}
+.app-shell :is(.appointment-person p, .appointment-session p, .appointment-session small) {
+  margin: 2px 0 0;
+  color: var(--mq-muted);
+  font-size: 13px;
+}
+.app-shell .appointment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.app-shell .appointment-actions .button {
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+.app-shell .appointment-payment {
+  margin-top: 6px;
+}
+.app-shell .appointment-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--mq-success-soft);
+  color: var(--mq-success) !important;
+  font-weight: 600;
+  animation: mq-pop var(--mq-base) var(--mq-ease) both;
+}
+.app-shell .appointment-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  color: var(--mq-muted);
+}
+.app-shell .appointment-pagination > div {
+  display: flex;
+  gap: 8px;
+}
+@media (max-width: 900px) {
+  .app-shell .appointment-row {
+    grid-template-columns: 1fr;
+  }
+  .app-shell .appointment-actions {
+    justify-content: flex-start;
+  }
+}
+
+/* ---------- Alerts ---------- */
+.app-shell :is(.form-error, .care-inline-error),
+.mq-modal .form-error {
+  padding: 10px 14px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: var(--mq-danger-soft);
+  color: var(--mq-danger) !important;
+  font-weight: 550;
+  animation: mq-pop var(--mq-base) var(--mq-ease) both;
+}
+.resource-permission-note {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--mq-info-soft);
+  color: var(--mq-info);
+  font-size: 13px;
+}
+
+/* ---------- Overlays ---------- */
+.mq-modal {
+  border: 1px solid var(--mq-line) !important;
+  border-radius: var(--mq-radius-lg) !important;
+  background: var(--mq-surface) !important;
+  color: var(--mq-text);
+  box-shadow: var(--mq-shadow-lg) !important;
+  overflow: hidden;
+  animation: mq-pop var(--mq-base) var(--mq-ease) both;
+}
+.mq-modal::backdrop {
+  background: rgba(8, 15, 18, 0.45);
+  backdrop-filter: blur(6px);
+  animation: mq-fade var(--mq-base) var(--mq-ease) both;
+}
+.mq-modal:has(> .resource-edit-dialog) {
+  width: min(66.666vw, 1100px);
+  max-width: calc(100vw - 32px);
+}
+.mq-modal > .resource-edit-dialog {
+  border: 0 !important;
+  border-radius: var(--mq-radius-lg) !important;
+  max-width: none;
+  background: var(--mq-surface) !important;
+  box-shadow: none !important;
+}
+.mq-modal .resource-edit-dialog > div:first-child {
+  background: linear-gradient(180deg, var(--mq-surface-2), var(--mq-surface)) !important;
+  border-color: var(--mq-line) !important;
+}
+.mq-modal .resource-edit-form {
+  padding: 24px 28px;
+  gap: 20px 24px;
+}
+.mq-modal .resource-edit-form > :is(.branch-location-picker, .form-error, p, button) {
+  grid-column: 1 / -1;
+}
+.mq-modal .resource-edit-form :is(input, textarea),
+.mq-modal .resource-edit-form .mq-select-trigger {
+  min-height: 44px;
+}
+.mq-modal .resource-edit-form .branch-location-map {
+  height: 260px;
+  border-radius: 14px !important;
+}
+.mq-modal .resource-edit-dialog > div {
+  padding-inline: 28px;
+}
+.mq-modal .appointment-confirm {
+  display: grid;
+  gap: 14px;
+  padding: 24px;
+}
+.mq-modal .appointment-confirm h2 {
+  margin: 0;
+  font-size: 20px;
+}
+.mq-modal .appointment-confirm label {
+  display: grid;
+  gap: 8px;
+}
+.mq-modal .appointment-confirm .appointment-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+@media (max-width: 640px) {
+  .mq-modal:has(> .resource-edit-dialog) {
+    width: calc(100vw - 16px);
+  }
+  .mq-modal .resource-edit-form {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 18px;
+  }
+  .mq-modal .resource-edit-dialog > div {
+    padding-inline: 18px;
+  }
+}
+.app-shell [role="dialog"]:not(.mq-modal),
+.app-shell .leaflet-popup-content-wrapper {
+  border-radius: var(--mq-radius) !important;
+  box-shadow: var(--mq-shadow-lg) !important;
+}
+
+/* ---------- Navigation ---------- */
+.app-shell [data-slot="sidebar"] > div,
+.app-shell [data-sidebar="sidebar"] {
+  background: var(--mq-glass) !important;
+  backdrop-filter: blur(18px) saturate(1.4);
+  border-color: var(--mq-line) !important;
+}
+.app-shell span.sidebar-active-motion {
+  background: var(--mq-accent-soft) !important;
+  border: 1px solid var(--mq-accent-soft-2) !important;
+  border-radius: 12px !important;
+  box-shadow: inset 3px 0 0 var(--mq-accent);
+}
+.site-header {
+  background: color-mix(in srgb, var(--mq-bg) 72%, transparent) !important;
+  backdrop-filter: blur(16px) saturate(1.3);
+  border-bottom: 1px solid var(--mq-line);
+}
+.site-header-nav a {
+  position: relative;
+  transition: color var(--mq-fast);
+}
+.site-header-nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--mq-accent);
+  transform: scaleX(0);
+  transition: transform var(--mq-base) var(--mq-ease);
+}
+.site-header-nav a:hover::after {
+  transform: scaleX(1);
+}
+.brand-dot {
+  color: var(--mq-mint) !important;
+}
+
+/* ---------- Landing, auth and patient spaces ---------- */
+.hero h1 > span,
+.auth-visual-side h2 > span {
+  background: linear-gradient(100deg, var(--mq-accent-strong), var(--mq-accent) 45%, var(--mq-mint));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+}
+.app-shell :is(.eyebrow-pill, .status-pill) {
+  border: 1px solid var(--mq-accent-soft-2);
+  border-radius: 999px;
+  background: var(--mq-accent-soft);
+  color: var(--mq-accent-strong);
+}
+.app-shell :is(.benefit, .step-card, .feature-card, .auth-feature, .queue-summary-card, .booking-session, .hospital-result) {
+  border-radius: var(--mq-radius);
+  transition:
+    transform var(--mq-base) var(--mq-ease),
+    box-shadow var(--mq-base) var(--mq-ease),
+    border-color var(--mq-fast);
+}
+.app-shell :is(.step-card, .feature-card, .queue-summary-card, .booking-session, .hospital-result) {
+  border: 1px solid var(--mq-line);
+  background: var(--mq-surface);
+  box-shadow: var(--mq-shadow-sm);
+}
+.app-shell :is(.step-card, .feature-card, .queue-summary-card, .booking-session, .hospital-result):hover {
+  transform: translateY(-3px);
+  border-color: var(--mq-accent-soft-2);
+  box-shadow: var(--mq-shadow);
+}
+.app-shell .auth-form-wrap {
+  padding: 32px;
+  border: 1px solid var(--mq-line);
+  border-radius: var(--mq-radius-xl);
+  background: var(--mq-surface);
+  box-shadow: var(--mq-shadow-lg);
+  animation: mq-pop var(--mq-slow) var(--mq-ease) both;
+}
+.app-shell .auth-form-wrap .input-wrap {
+  height: 46px;
+  min-height: 46px;
+  margin-top: 8px;
+}
+.app-shell .auth-form-wrap .form-field {
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.app-shell .auth-form-wrap h1 {
+  font-size: 28px;
+  line-height: 1.25;
+}
+.app-shell .auth-form-wrap .submit-button {
+  min-height: 46px;
+  margin-top: 10px;
+}
+.app-shell .auth-layout .auth-visual-side {
+  border-radius: var(--mq-radius-xl);
+}
+@media (max-width: 760px) {
+  .app-shell .auth-form-wrap {
+    padding: 22px 18px;
+    border-radius: var(--mq-radius-lg);
+  }
+  .app-shell .auth-visual-side > :not(.back-link) {
+    display: none;
+  }
+}
+.app-shell :is(.care-sidebar nav a, .care-mobile-nav a, .auth-audience-option) {
+  border-radius: 12px;
+  transition: background-color var(--mq-fast), color var(--mq-fast);
+}
+.app-shell :is(.care-sidebar nav a, .care-mobile-nav a):hover {
+  background: var(--mq-surface-3);
+}
+.app-shell :is(.care-sidebar nav a[aria-current], .care-mobile-nav a[aria-current]) {
+  background: var(--mq-accent-soft) !important;
+  color: var(--mq-accent-strong) !important;
+  text-decoration: none !important;
+}
+.app-shell .ward-bed {
+  border-radius: var(--mq-radius) !important;
+  transition:
+    transform var(--mq-base) var(--mq-ease),
+    box-shadow var(--mq-base) var(--mq-ease),
+    border-color var(--mq-fast);
+}
+.app-shell .ward-bed:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--mq-shadow);
+}
+.app-shell .ward-bed[aria-pressed="true"] {
+  border-color: var(--mq-accent) !important;
+  box-shadow: var(--mq-ring), var(--mq-shadow);
+}
+.app-shell .leaflet-container {
+  border-radius: var(--mq-radius-lg);
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+  .mq-stat-card:hover,
+  .app-shell .appointment-row:hover,
+  .app-shell .button:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* ---------- Meters ---------- */
+.mq-meter {
+  display: block;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--mq-surface-3);
+}
+.mq-meter > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--mq-accent), var(--mq-mint));
+  transform-origin: left;
+  animation: mq-grow var(--mq-slow) var(--mq-ease) both;
+}
+.mq-meter.warning > span {
+  background: linear-gradient(90deg, var(--mq-warning), #f59e0b);
+}
+@keyframes mq-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ---------- Phone refinements ---------- */
+.app-shell .appointment-tabs button {
+  width: 100%;
+  min-width: 0;
+  gap: 10px;
+  text-align: left;
+}
+.app-shell .appointment-tabs button strong {
+  flex-shrink: 0;
+}
+@media (max-width: 560px) {
+  .mq-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .mq-stat-card {
+    padding: 14px;
+  }
+  .mq-stat-value {
+    margin-top: 10px;
+    font-size: 24px;
+  }
+  .mq-stat-icon {
+    width: 30px;
+    height: 30px;
+  }
+  .app-shell .appointment-inbox {
+    padding: 14px;
+  }
+  .app-shell .appointment-tabs {
+    gap: 6px;
+  }
+  .app-shell .appointment-tabs button {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
+
+/* ---------- Compact authentication layout (fits a 900px-tall desktop) ---------- */
+.app-shell .auth-layout.container {
+  min-height: 0;
+  padding-block: 6px;
+  align-items: start;
+  gap: 48px;
+}
+.app-shell .auth-form-side {
+  margin-block: 0;
+}
+.app-shell .auth-form-wrap {
+  margin-top: 0;
+  padding: 20px 28px;
+}
+.app-shell .auth-form-wrap .auth-mark {
+  display: inline-flex;
+  margin: 0 8px 10px 0;
+  vertical-align: middle;
+}
+.app-shell .auth-form-wrap > .eyebrow {
+  display: inline-block;
+  margin: 0 0 10px;
+  vertical-align: middle;
+}
+.app-shell .auth-form-wrap .auth-audience {
+  margin-bottom: 14px;
+}
+.app-shell .auth-form-wrap h1 {
+  margin-bottom: 6px;
+  font-size: 26px;
+}
+.app-shell .auth-form-wrap .auth-subtitle {
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.app-shell .auth-form-wrap .auth-divider {
+  margin-block: 14px;
+}
+.app-shell .auth-form-wrap .form-field {
+  margin-bottom: 12px;
+}
+.app-shell .auth-form-wrap .input-wrap {
+  height: 44px;
+  min-height: 44px;
+  margin-top: 6px;
+}
+.app-shell .auth-form-wrap .submit-button {
+  min-height: 44px;
+  margin-top: 8px;
+}
+.app-shell .auth-form-wrap .auth-switch {
+  margin-top: 16px;
+}
+.app-shell .auth-form-wrap .auth-privacy {
+  margin-top: 14px;
+  padding-top: 12px;
+}
+.app-shell .auth-layout .auth-visual-side {
+  min-height: 0;
+  padding: 32px 24px 20px;
+}
+.app-shell .auth-layout .auth-care-preview {
+  margin-top: 20px;
+  gap: 12px;
+}
+.app-shell .auth-layout .auth-feature {
+  padding: 12px 16px;
+}
+.app-shell .auth-layout .auth-visual-caption {
+  margin-top: 18px;
+}
+.app-shell .auth-visual-side .back-link {
+  margin-top: 14px;
+  justify-content: center;
+}
+@media (max-width: 760px) {
+  .app-shell .auth-layout.container {
+    gap: 12px;
+    padding-block: 12px;
+  }
+  .app-shell .auth-layout .auth-visual-side {
+    display: flex;
+    padding: 0;
+    flex-direction: column;
+    align-items: center;
+    border: 0;
+    background: transparent;
+  }
+}

@@ -5,16 +5,16 @@
   --ui-text: #000000;
   --ui-muted: #6a6a6a;
   --ui-border: #ffffff;
-  --ui-accent: #00CAFF;
+  --ui-accent: var(--mq-accent);
   --ui-tint: #ffffff;
 }
 html[data-theme="dark"] {
   --ui-surface: #000000;
   --ui-canvas: #000000;
   --ui-text: #ffffff;
-  --ui-muted: #0065F8;
-  --ui-border: #0065F8;
-  --ui-accent: #00CAFF;
+  --ui-muted: var(--mq-accent-strong);
+  --ui-border: var(--mq-accent-strong);
+  --ui-accent: var(--mq-accent);
   --ui-tint: #000000;
 }
 body {
@@ -110,8 +110,8 @@ body::-webkit-scrollbar,
 .staff-workspace .button.primary,
 .mq-modal .button.primary,
 .care-shell .button.primary {
-  background: #00CAFF;
-  border-color: #00CAFF;
+  background: var(--mq-accent);
+  border-color: var(--mq-accent);
   color: #ffffff;
   box-shadow: 0 3px 8px #00CAFF15;
 }
@@ -799,21 +799,21 @@ html[lang="si"] .appointment-summary span {
 }
 .status-pending {
   background: #ffffff;
-  color: #00CAFF;
+  color: var(--mq-accent);
 }
 .status-booked,
 .status-completed {
   background: #ffffff;
-  color: #00CAFF;
+  color: var(--mq-accent);
 }
 .status-rejected,
 .status-no_show {
   background: #ffffff;
-  color: #00CAFF;
+  color: var(--mq-accent);
 }
 .status-checked_in {
   background: #ffffff;
-  color: #0065F8;
+  color: var(--mq-accent-strong);
 }
 .appointment-payment {
   display: flex;
@@ -828,7 +828,7 @@ html[lang="si"] .appointment-summary span {
 }
 .payment-paid,
 .payment-refunded {
-  color: #0065f8;
+  color: var(--mq-accent-strong);
 }
 .payment-review_required,
 .payment-refund_required {

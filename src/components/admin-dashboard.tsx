@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { statusLabel, statusTone } from "@/lib/status-tone";
 import { useRouter } from "next/navigation";
 import { Check, X, Search, ShieldCheck } from "lucide-react";
 import { useLanguage } from "./providers";
@@ -106,7 +107,7 @@ export function AdminDashboard() {
           <div className="dashboard-topbar">
             <div>
               <span className="eyebrow-pill">
-                <ShieldCheck size={14} />
+                <ShieldCheck size={14} aria-hidden="true" />
                 System Admin
               </span>
               <h1>Application Management</h1>
@@ -137,22 +138,25 @@ export function AdminDashboard() {
                   <p>{error}</p>
                 </div>
               ) : (
-                <div className="data-table-wrap">
-                  <table className="data-table">
+                <div className="data-table-wrap mq-table-wrap">
+                  <table className="data-table mq-table mq-responsive">
+                    <caption>Organization applications</caption>
                     <thead>
                       <tr>
-                        <th>Organization</th>
-                        <th>Type</th>
-                        <th>Email / Phone</th>
-                        <th>Administrator</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th scope="col">Organization</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Email / Phone</th>
+                        <th scope="col">Administrator</th>
+                        <th scope="col">Status</th>
+                        <th scope="col" className="mq-num">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {loading ? (
                         <tr>
-                          <td colSpan={6}>Loading applications...</td>
+                          <td colSpan={6}>
+                            <span className="mq-skeleton block h-10 w-full" role="status" aria-label="Loading applications" />
+                          </td>
                         </tr>
                       ) : filteredApps.length === 0 ? (
                         <tr>
@@ -161,45 +165,56 @@ export function AdminDashboard() {
                       ) : (
                         filteredApps.map((app) => (
                           <tr key={app.id}>
-                            <td>
-                              <strong>{app.official_name}</strong>
-                              <br />
-                              <small>{app.registration_number}</small>
-                            </td>
-                            <td>{app.organization_type}</td>
-                            <td>
-                              {app.official_email}
-                              <br />
-                              <small>{app.phone}</small>
-                            </td>
-                            <td>
-                              {app.administrator_name}
-                              <br />
-                              <small>{app.administrator_role}</small>
-                            </td>
-                            <td>
-                              <span className={`status-badge ${app.status}`}>
-                                {app.status}
+                            <td data-label="Organization">
+                              <span className="flex flex-col">
+                                <strong>{app.official_name}</strong>
+                                <small className="font-normal text-[var(--mq-subtle)]">{app.registration_number}</small>
                               </span>
                             </td>
-                            <td>
+                            <td data-label="Type">
+                              <span className="mq-badge accent">
+                                {app.organization_type === "medical_center" ? "Medical center" : "Hospital"}
+                              </span>
+                            </td>
+                            <td data-label="Email / Phone">
+                              <span className="flex flex-col">
+                                <a className="mq-link" href={`mailto:${app.official_email}`}>{app.official_email}</a>
+                                <small>{app.phone}</small>
+                              </span>
+                            </td>
+                            <td data-label="Administrator">
+                              <span className="flex flex-col">
+                                <span className="text-[var(--mq-text)]">{app.administrator_name}</span>
+                                <small>{app.administrator_role}</small>
+                              </span>
+                            </td>
+                            <td data-label="Status">
+                              <span className={`mq-badge ${statusTone(app.status)}`}>
+                                {app.status === "pending_review" ? "Pending review" : statusLabel(app.status)}
+                              </span>
+                            </td>
+                            <td data-label="Actions" className="mq-num">
                               {app.status === "pending_review" && (
-                                <div style={{ display: "flex", gap: "0.5rem" }}>
+                                <div className="inline-flex gap-2">
                                   <button
+                                    type="button"
                                     onClick={() => updateStatus(app.id, "verified")}
                                     className="button primary"
-                                    style={{ padding: "0.25rem 0.5rem" }}
+                                    aria-label={`Approve ${app.official_name}`}
                                     title="Approve"
                                   >
-                                    <Check size={16} />
+                                    <Check size={16} aria-hidden="true" />
+                                    Approve
                                   </button>
                                   <button
+                                    type="button"
                                     onClick={() => updateStatus(app.id, "rejected")}
                                     className="button secondary"
-                                    style={{ padding: "0.25rem 0.5rem" }}
+                                    aria-label={`Reject ${app.official_name}`}
                                     title="Reject"
                                   >
-                                    <X size={16} />
+                                    <X size={16} aria-hidden="true" />
+                                    Reject
                                   </button>
                                 </div>
                               )}

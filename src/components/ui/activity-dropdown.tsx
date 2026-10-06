@@ -85,8 +85,8 @@ export function ActivityDropdown({
     <div
       className={cn(
         "w-full max-w-md overflow-hidden select-none",
-        "bg-white dark:bg-neutral-900",
-        "shadow-xl shadow-black/10 dark:shadow-black/50",
+        "border border-[var(--mq-line)] bg-[var(--mq-surface)]",
+        "shadow-[var(--mq-shadow)] hover:shadow-[var(--mq-shadow-lg)]",
         `transition-all duration-500 ${ease}`,
         isOpen ? "rounded-3xl" : "rounded-2xl",
         className,
@@ -100,16 +100,16 @@ export function ActivityDropdown({
         aria-controls={listId}
         onClick={() => setIsOpen((open) => !open)}
       >
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-neutral-100 transition-colors duration-300 dark:bg-neutral-800">
-          <Bell className="h-5 w-5 text-neutral-600 dark:text-neutral-300" />
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--mq-accent-soft)] transition-colors duration-300">
+          <Bell className="h-5 w-5 text-[var(--mq-accent)]" aria-hidden="true" />
         </div>
         <div className="flex-1 overflow-hidden">
-          <h3 className="text-base font-semibold text-neutral-900 dark:text-white">
+          <h3 className="text-base font-semibold text-[var(--mq-text)]">
             {title ?? `${activities.length} New Activities`}
           </h3>
           <p
             className={cn(
-              "text-sm text-neutral-500 dark:text-neutral-400",
+              "text-sm text-[var(--mq-muted)]",
               `transition-all duration-500 ${ease}`,
               isOpen ? "mt-0 max-h-0 opacity-0" : "mt-0.5 max-h-6 opacity-100",
             )}
@@ -119,8 +119,9 @@ export function ActivityDropdown({
         </div>
         <div className="flex h-8 w-8 items-center justify-center">
           <ChevronUp
+            aria-hidden="true"
             className={cn(
-              `h-5 w-5 text-neutral-400 transition-transform duration-500 ${ease}`,
+              `h-5 w-5 text-[var(--mq-subtle)] transition-transform duration-500 ${ease}`,
               isOpen ? "rotate-0" : "rotate-180",
             )}
           />
@@ -140,7 +141,7 @@ export function ActivityDropdown({
         <div className="overflow-hidden">
           <div className="px-2 pb-4">
             {activities.length === 0 ? (
-              <p className="px-3 py-4 text-sm text-neutral-500 dark:text-neutral-400">
+              <p className="px-3 py-4 text-sm text-[var(--mq-muted)]">
                 {emptyLabel}
               </p>
             ) : (
@@ -152,21 +153,21 @@ export function ActivityDropdown({
                         className={cn(
                           "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors duration-300",
                           activity.tone === "attention"
-                            ? "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300"
-                            : "bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300",
+                            ? "bg-[var(--mq-warning-soft)] text-[var(--mq-warning)]"
+                            : "bg-[var(--mq-accent-soft)] text-[var(--mq-accent-strong)]",
                         )}
                       >
                         {activity.icon}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h4 className="text-sm font-semibold text-neutral-900 dark:text-white">
+                        <h4 className="text-sm font-semibold text-[var(--mq-text)]">
                           {activity.title}
                         </h4>
-                        <p className="truncate text-sm text-neutral-500 dark:text-neutral-400">
+                        <p className="truncate text-sm text-[var(--mq-muted)]">
                           {activity.description}
                         </p>
                       </div>
-                      <span className="shrink-0 pt-0.5 text-xs text-neutral-400 dark:text-neutral-500">
+                      <span className="shrink-0 pt-0.5 text-xs text-[var(--mq-subtle)]">
                         {activity.time}
                       </span>
                     </>
@@ -174,7 +175,7 @@ export function ActivityDropdown({
                   const rowClass = cn(
                     "flex w-full items-start gap-3 rounded-xl p-3 text-left",
                     `transition-all duration-500 ${ease}`,
-                    "hover:bg-neutral-100 dark:hover:bg-neutral-800/50",
+                    "hover:bg-[var(--mq-surface-2)]",
                     isOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0",
                   );
                   const style = {
