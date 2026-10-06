@@ -27,7 +27,7 @@ html[data-theme="light"] {
   --mq-line-strong: #d0d4de;
   --mq-accent: #0065f8;
   --mq-accent-strong: #4300ff;
-  --mq-accent-hover: #1f74ff;
+  --mq-accent-hover: #0052cc;
   --mq-accent-soft: #ebf2ff;
   --mq-accent-soft-2: #d6e5ff;
   --mq-accent-contrast: #ffffff;
@@ -535,19 +535,17 @@ html[lang="si"] body {
 .app-shell .ward-filters button[aria-pressed="true"],
 .app-shell .appointment-summary button[aria-pressed="true"] {
   border-color: transparent !important;
-  background: linear-gradient(135deg, var(--mq-accent), var(--mq-accent-strong)) !important;
+  background: var(--mq-accent) !important;
   color: var(--mq-accent-contrast) !important;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.18) inset,
-    0 8px 20px -10px var(--mq-accent) !important;
+  text-shadow: none !important;
+  /* A soft neutral shadow: a coloured glow blurs the label. */
+  box-shadow: 0 1px 2px rgba(10, 10, 15, 0.12) !important;
 }
 .app-shell .button.primary:hover:not(:disabled),
 .mq-modal .button.primary:hover:not(:disabled) {
   border-color: transparent !important;
-  background: linear-gradient(135deg, var(--mq-accent-hover), var(--mq-accent-strong)) !important;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.18) inset,
-    0 12px 26px -10px var(--mq-accent) !important;
+  background: var(--mq-accent-hover) !important;
+  box-shadow: 0 2px 6px rgba(10, 10, 15, 0.14) !important;
 }
 .app-shell .button.primary :is(span, strong, svg),
 .mq-modal .button.primary :is(span, strong, svg),
@@ -1582,4 +1580,147 @@ html[lang="si"] body {
 .staff-workspace > div > header {
   position: relative;
   z-index: 40;
+}
+
+/* Sinhala glyphs need a larger size than Latin text to stay legible in buttons. */
+html[lang="si"] .app-shell .button,
+html[lang="si"] .mq-modal .button {
+  font-size: 15px !important;
+  line-height: 1.35;
+}
+
+/* ---------- Authentication: open layout (no card boxes) ---------- */
+.app-shell .auth-layout.container {
+  padding-top: 40px;
+  padding-bottom: 40px;
+  gap: 72px;
+}
+.app-shell .auth-form-wrap,
+.app-shell .auth-layout .auth-visual-side {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.app-shell .auth-form-wrap {
+  padding: 0;
+}
+.app-shell .auth-layout .auth-visual-side {
+  padding: 4px 0 0;
+}
+.app-shell .auth-form-wrap .auth-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: 0 10px 18px 0;
+  border: 1px solid var(--mq-accent-soft-2) !important;
+  border-radius: 14px;
+  background: var(--mq-accent-soft) !important;
+  color: var(--mq-accent) !important;
+}
+.app-shell .auth-form-wrap .auth-mark svg {
+  color: inherit;
+}
+.app-shell .auth-form-wrap > .eyebrow {
+  margin: 0 0 18px;
+  letter-spacing: 0.14em;
+}
+.app-shell .auth-form-wrap .auth-audience {
+  margin-bottom: 22px;
+}
+.app-shell .auth-form-wrap h1 {
+  margin-bottom: 8px;
+}
+.app-shell .auth-form-wrap .auth-subtitle {
+  margin-bottom: 22px;
+}
+.app-shell .auth-form-wrap .auth-divider {
+  margin-block: 18px;
+}
+.app-shell .auth-form-wrap .form-field {
+  margin-bottom: 16px;
+}
+.app-shell .auth-form-wrap .input-wrap {
+  margin-top: 8px;
+}
+.app-shell .auth-form-wrap .submit-button {
+  margin-top: 12px;
+}
+.app-shell .auth-form-wrap .auth-switch {
+  margin-top: 18px;
+}
+.app-shell .auth-form-wrap .auth-privacy {
+  margin-top: 18px;
+  padding-top: 14px;
+}
+/* Feature list: open rows with an icon chip instead of boxed cards. */
+.app-shell .auth-layout .auth-care-preview {
+  gap: 4px;
+}
+.app-shell .auth-layout .auth-feature {
+  padding: 12px 4px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.app-shell .auth-layout .auth-feature:hover {
+  transform: none;
+}
+.app-shell .auth-layout .auth-feature > span {
+  border-radius: 12px;
+  background: var(--mq-accent-soft) !important;
+  color: var(--mq-accent) !important;
+}
+@media (max-width: 760px) {
+  .app-shell .auth-layout.container {
+    padding-top: 24px;
+    gap: 16px;
+  }
+}
+
+/* Compact rhythm so the longest form (Sinhala patient registration) fits 900px. */
+.app-shell .auth-layout.container {
+  padding-top: 24px;
+  padding-bottom: 8px;
+}
+.app-shell .auth-form-wrap .auth-mark {
+  margin-bottom: 12px;
+}
+.app-shell .auth-form-wrap > .eyebrow {
+  margin-bottom: 12px;
+}
+.app-shell .auth-form-wrap .auth-audience {
+  margin-bottom: 16px;
+}
+.app-shell .auth-form-wrap h1 {
+  margin-bottom: 6px;
+}
+.app-shell .auth-form-wrap .auth-subtitle {
+  margin-bottom: 16px;
+}
+.app-shell .auth-form-wrap .auth-divider {
+  margin-block: 14px;
+}
+.app-shell .auth-form-wrap .form-field {
+  margin-bottom: 12px;
+}
+.app-shell .auth-form-wrap .input-wrap {
+  margin-top: 6px;
+}
+.app-shell .auth-form-wrap .submit-button {
+  margin-top: 8px;
+}
+.app-shell .auth-form-wrap .auth-switch {
+  margin-top: 14px;
+}
+.app-shell .auth-form-wrap .auth-privacy {
+  margin-top: 14px;
+  padding-top: 12px;
+}
+html[lang="si"] .app-shell .button,
+html[lang="si"] .mq-modal .button,
+html[lang="si"] .app-shell .google-button {
+  font-size: 16px !important;
 }

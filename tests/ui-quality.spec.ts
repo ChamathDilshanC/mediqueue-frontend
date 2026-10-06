@@ -128,15 +128,13 @@ test("authentication layouts fit mobile in both languages and themes", async ({
             panelBackground: style.backgroundColor,
           };
         });
-        // Brand design: pure white/black canvas with a bordered, opaque form card.
+        // Brand design: pure white/black canvas with an open, unboxed form.
         expect(appearance.background).toBe(
           theme === "light" ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)",
         );
-        expect(appearance.shadow).not.toBe("none");
-        expect(appearance.border).toBe("1px");
-        expect(appearance.panelBackground).toBe(
-          theme === "light" ? "rgb(255, 255, 255)" : "rgb(11, 11, 16)",
-        );
+        expect(appearance.shadow).toBe("none");
+        expect(appearance.border).toBe("0px");
+        expect(appearance.panelBackground).toBe("rgba(0, 0, 0, 0)");
         expect(
           await page.evaluate(
             () => document.documentElement.scrollWidth <= innerWidth,

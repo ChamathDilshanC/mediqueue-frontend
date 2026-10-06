@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   CalendarDays,
+  HeartPulse,
   FileText,
   Ticket,
   ArrowLeft,
@@ -427,19 +428,7 @@ export function AuthForm({
   );
 }
 function HeartMark() {
-  return (
-    <svg
-      width="25"
-      height="25"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-    >
-      <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z" />
-      <path d="M3 12h4l2-4 4 8 2-4h6" />
-    </svg>
-  );
+  return <HeartPulse size={24} strokeWidth={1.75} aria-hidden="true" />;
 }
 function ArrowUpRightMini() {
   return <ArrowRight size={12} style={{ transform: "rotate(-40deg)" }} />;
