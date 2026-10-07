@@ -228,10 +228,6 @@ html[lang="si"] body {
   box-shadow: var(--mq-ring);
   border-radius: 8px;
 }
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--mq-line-strong) transparent;
-}
 
 /* ---------- Motion ---------- */
 @keyframes mq-rise {
