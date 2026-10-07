@@ -16,9 +16,10 @@ import { gooeyToast } from "goey-toast";
 import { useLanguage } from "./providers";
 import { SiteHeader } from "./site-header";
 import { Loader } from "./loader";
+import { TextSizeSetting } from "./text-size-setting";
 import { profileSchema, type Profile } from "@/lib/auth-contract";
 export function Account() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [error, setError] = useState(false);
@@ -173,6 +174,12 @@ export function Account() {
                 )}
               </section>
             </div>
+            <section className="account-settings" aria-labelledby="account-settings-title">
+              <h2 id="account-settings-title">
+                {language === "si" ? "සැකසුම්" : "Settings"}
+              </h2>
+              <TextSizeSetting />
+            </section>
             <div className="account-next">
               <HeartPulse size={30} />
               <div>

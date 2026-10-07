@@ -13,6 +13,7 @@ import "./modern-ui.css";
 import "./clinical-theme.css";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { textSizeBootScript } from "@/lib/text-size";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
 
@@ -50,6 +51,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <script dangerouslySetInnerHTML={{ __html: textSizeBootScript }} />
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){var s;try{s=localStorage.getItem('mq_theme')}catch(e){}var t=s==='light'||s==='dark'?s:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';var r=document.documentElement;r.dataset.theme=t;r.classList.toggle('dark',t==='dark');r.style.colorScheme=t})()`,

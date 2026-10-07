@@ -81,7 +81,7 @@
   height: 350px;
   width: 100%;
   z-index: 0;
-  background: #ffffff;
+  background: var(--mq-surface);
   font-family: inherit;
 }
 .hospital-map .leaflet-popup-content {
@@ -125,7 +125,7 @@
   left: 10px;
   right: 10px;
   padding: 12px;
-  background: #ffffff;
+  background: var(--mq-surface);
   color: var(--mq-accent);
   z-index: 1;
   font-size: 12px;
@@ -171,7 +171,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #ffffff;
+  background: var(--mq-surface);
   color: var(--mq-accent);
   border-radius: 13px;
   flex-shrink: 0;
@@ -192,7 +192,7 @@
   white-space: nowrap;
   padding: 6px 9px;
   border-radius: 20px;
-  background: #ffffff;
+  background: var(--mq-surface);
   color: var(--mq-accent);
 }
 .hospital-result p {
@@ -245,7 +245,7 @@
   color: #838383;
 }
 .booking-steps li.done {
-  background: #ffffff;
+  background: var(--mq-surface);
   color: var(--mq-accent);
 }
 .booking-enrolled {
@@ -298,14 +298,14 @@
   display: inline-flex;
   font-size: 11px;
   color: var(--mq-accent);
-  background: #ffffff;
+  background: var(--mq-surface);
   padding: 5px 9px;
   border-radius: 7px;
   margin: 6px 10px 6px 0;
 }
 .session-availability.full {
   color: var(--mq-accent);
-  background: #ffffff;
+  background: var(--mq-surface);
 }
 .care-booking-notice {
   display: flex;
@@ -313,7 +313,7 @@
   align-items: center;
   padding: 16px 20px;
   border-radius: 13px;
-  background: #ffffff;
+  background: var(--mq-surface);
   border: 1px solid var(--mq-accent);
   color: var(--mq-accent);
   font-size: 13px;
@@ -427,7 +427,7 @@
   padding: 18px;
   border: 1px solid #e8e8e8;
   border-radius: 15px;
-  background: #ffffff;
+  background: var(--mq-surface);
 }
 .queue-summary-card h3 {
   font-size: 14px;

@@ -798,21 +798,21 @@ html[lang="si"] .appointment-summary span {
   color: var(--ui-text);
 }
 .status-pending {
-  background: #ffffff;
+  background: var(--mq-surface);
   color: var(--mq-accent);
 }
 .status-booked,
 .status-completed {
-  background: #ffffff;
+  background: var(--mq-surface);
   color: var(--mq-accent);
 }
 .status-rejected,
 .status-no_show {
-  background: #ffffff;
+  background: var(--mq-surface);
   color: var(--mq-accent);
 }
 .status-checked_in {
-  background: #ffffff;
+  background: var(--mq-surface);
   color: var(--mq-accent-strong);
 }
 .appointment-payment {

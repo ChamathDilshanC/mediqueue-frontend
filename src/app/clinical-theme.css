@@ -661,7 +661,7 @@ html[lang="si"] body {
   accent-color: var(--mq-accent);
 }
 /* Search fields: the wrapper is the control, the inner input is borderless. */
-.app-shell :is(.input-wrap, .table-search, .finder-search, .appointment-search) {
+.app-shell :is(.input-wrap, .table-search, .finder-search, .appointment-search, .ward-search) {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -672,16 +672,16 @@ html[lang="si"] body {
   background: var(--mq-surface) !important;
   transition: border-color var(--mq-fast), box-shadow var(--mq-base) var(--mq-ease);
 }
-.app-shell :is(.input-wrap, .table-search, .finder-search, .appointment-search):focus-within {
+.app-shell :is(.input-wrap, .table-search, .finder-search, .appointment-search, .ward-search):focus-within {
   border-color: var(--mq-accent) !important;
   box-shadow: var(--mq-ring);
 }
-.app-shell :is(.input-wrap, .finder-search, .appointment-search) > svg {
+.app-shell :is(.input-wrap, .finder-search, .appointment-search, .ward-search) > svg {
   color: var(--mq-subtle);
   flex-shrink: 0;
 }
 .app-shell
-  :is(.input-wrap, .table-search, .finder-search, .appointment-search)
+  :is(.input-wrap, .table-search, .finder-search, .appointment-search, .ward-search)
   input:not([type="checkbox"]):not([type="radio"]):not([type="range"]) {
   border: 0 !important;
   border-radius: 0 !important;
@@ -1723,4 +1723,192 @@ html[lang="si"] .app-shell .button,
 html[lang="si"] .mq-modal .button,
 html[lang="si"] .app-shell .google-button {
   font-size: 16px !important;
+}
+
+/* Fill the viewport below the header and centre the form and the welcome panel
+   in that space; equal padding keeps the content off both edges. */
+@media (min-width: 761px) {
+  .app-shell .auth-layout.container {
+    min-height: calc(100dvh - 87px);
+    align-items: center;
+    align-content: center;
+    padding-block: 16px;
+  }
+}
+
+/* Page-level boxes need inner spacing so their content never touches the border. */
+.app-shell .ward-board {
+  padding: 24px;
+}
+@media (max-width: 760px) {
+  .app-shell .ward-board {
+    padding: 16px;
+  }
+}
+
+/* Supporting copy stays muted in both themes (a legacy dark rule tinted it cyan). */
+.app-shell .care-hero p:not(.eyebrow) {
+  color: var(--mq-muted);
+}
+
+/* The sticky top bar (language and theme menus) always stacks above page content,
+   including the page header that holds the activity dropdown (z-index 40). */
+.site-header {
+  z-index: 50;
+}
+
+/* ---------- Text size preference (applied as page zoom) ---------- */
+html[data-text-size="small"] {
+  --mq-zoom: 0.9;
+  zoom: 0.9;
+}
+html[data-text-size="large"] {
+  --mq-zoom: 1.12;
+  zoom: 1.12;
+}
+html[data-text-size="xlarge"] {
+  --mq-zoom: 1.25;
+  zoom: 1.25;
+}
+.account-settings {
+  margin: 28px 0;
+}
+.account-settings > h2 {
+  margin: 0 0 14px;
+  font-size: 20px;
+  font-weight: 700;
+}
+.app-shell .text-size-setting {
+  display: grid;
+  gap: 10px;
+}
+.app-shell .text-size-setting > p {
+  margin: 0;
+  color: var(--mq-muted);
+}
+.text-size-options {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 6px;
+}
+.text-size-option {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 14px 10px;
+  border: 1px solid var(--mq-line-strong);
+  border-radius: 14px;
+  background: var(--mq-surface);
+  color: var(--mq-text);
+  cursor: pointer;
+  transition:
+    border-color var(--mq-fast),
+    background-color var(--mq-fast),
+    transform var(--mq-fast) var(--mq-ease),
+    box-shadow var(--mq-base) var(--mq-ease);
+}
+.text-size-option:hover {
+  border-color: var(--mq-accent);
+  transform: translateY(-1px);
+}
+.text-size-option:active {
+  transform: scale(0.98);
+}
+.text-size-option[aria-checked="true"] {
+  border-color: var(--mq-accent);
+  background: var(--mq-accent-soft);
+  box-shadow: var(--mq-ring);
+}
+.text-size-sample {
+  font-weight: 700;
+  line-height: 1.2;
+}
+.text-size-label {
+  font-size: 13px;
+  font-weight: 600;
+}
+.text-size-percent {
+  font-size: 12px;
+  color: var(--mq-subtle);
+  font-variant-numeric: tabular-nums;
+}
+.text-size-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: var(--mq-accent);
+}
+.app-shell .text-size-status {
+  font-size: 13px;
+}
+@media (max-width: 560px) {
+  .text-size-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Authentication: centred below the navigation bar at any text size ---------- */
+@media (min-width: 761px) {
+  .app-shell .auth-layout.container {
+    /* Zoom scales viewport units too; dividing keeps the area exactly one screen. */
+    min-height: calc(100dvh / var(--mq-zoom, 1) - 87px);
+    /* A generous gap below the navigation bar; the content stays centred below it. */
+    padding-top: 64px;
+    padding-bottom: 8px;
+  }
+}
+.app-shell .auth-form-wrap .auth-mark {
+  width: 38px;
+  height: 38px;
+  margin-bottom: 10px;
+}
+.app-shell .auth-form-wrap > .eyebrow {
+  margin-bottom: 10px;
+}
+.app-shell .auth-form-wrap .auth-audience {
+  margin-bottom: 14px;
+}
+.app-shell .auth-form-wrap .auth-subtitle {
+  margin-bottom: 14px;
+}
+.app-shell .auth-form-wrap .auth-divider {
+  margin-block: 12px;
+}
+.app-shell .auth-form-wrap .form-field {
+  margin-bottom: 10px;
+}
+.app-shell .auth-form-wrap .auth-switch {
+  margin-top: 12px;
+}
+.app-shell .auth-form-wrap .auth-privacy {
+  margin-top: 12px;
+  padding-top: 10px;
+}
+
+/* The settings wrapper is a plain section; only the cards inside it are boxed. */
+.app-shell .account-page .account-settings {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.app-shell .text-size-setting > h2 {
+  margin: 0;
+}
+
+/* Slightly tighter inner rhythm so the larger top gap still fits a 900px screen. */
+.app-shell .auth-form-wrap .form-field {
+  margin-bottom: 8px;
+}
+.app-shell .auth-form-wrap .auth-audience {
+  margin-bottom: 12px;
+}
+.app-shell .auth-form-wrap .auth-subtitle {
+  margin-bottom: 12px;
+}
+.app-shell .auth-form-wrap .auth-divider {
+  margin-block: 10px;
 }
