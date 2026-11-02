@@ -407,7 +407,8 @@ export function Dashboard() {
           profileSchema.parse(await response.json()),
         );
         if (!member) {
-          router.replace("/patient");
+          // The account page sends patients on to the portal and keeps new staff.
+          router.replace("/account");
           return;
         }
         document.cookie = `active_tenant_id=${member.tenant_id}; path=/; SameSite=Lax`;

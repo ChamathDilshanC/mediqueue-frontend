@@ -1,7 +1,13 @@
 import { createHash, randomBytes } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { authResultSchema } from "./auth-contract";
-import { json, startSession, requestOrigin } from "./auth-server";
+import {
+  audienceParam,
+  json,
+  setAudience,
+  startSession,
+  requestOrigin,
+} from "./auth-server";
 
 export const OAUTH_COOKIE = "mq_google_verifier";
 const cookieOptions = {
@@ -37,9 +43,7 @@ export function startGoogle(request: NextRequest) {
     response.cookies.set(OAUTH_COOKIE, verifier, cookieOptions);
     response.cookies.set(
       "mq_google_audience",
-      request.nextUrl.searchParams.get("audience") === "patient"
-        ? "patient"
-        : "staff",
+      audienceParam(request),
       cookieOptions,
     );
     return response;
@@ -97,6 +101,7 @@ export async function finishGoogle(request: NextRequest) {
       return redirect("/login?auth_error=googleFailed");
     const response = redirect(patient ? "/patient" : "/account");
     startSession(response, session);
+    setAudience(response, patient ? "patient" : "staff");
     return response;
   } catch {
     return redirect("/login?auth_error=googleFailed");

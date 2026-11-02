@@ -18,7 +18,7 @@ import { SiteHeader } from "./site-header";
 import { Loader } from "./loader";
 import { TextSizeSetting } from "./text-size-setting";
 import { profileSchema, type Profile } from "@/lib/auth-contract";
-export function Account() {
+export function Account({ staff = false }: { staff?: boolean }) {
   const { t, language } = useLanguage();
   const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -39,7 +39,9 @@ export function Account() {
         }
         if (!response.ok) throw new Error("Profile unavailable");
         const data = profileSchema.parse(await response.json());
-        if (!data.memberships.some((m) => m.active)) {
+        // Staff sign-ins stay here until a hospital grants access; only patients
+        // without a membership belong in the patient portal.
+        if (!staff && !data.memberships.some((m) => m.active)) {
           router.replace("/patient");
           return;
         }
@@ -50,7 +52,7 @@ export function Account() {
     }
     void load();
     return () => controller.abort();
-  }, [router, attempt]);
+  }, [router, attempt, staff]);
   async function logout() {
     setBusy(true);
     try {
@@ -76,22 +78,23 @@ export function Account() {
     reception: t.roleReception,
     doctor: t.roleDoctor,
   };
+  const member = profile?.memberships.some((m) => m.active) ?? false;
   return (
     <>
       <SiteHeader simple />
       <main className="account-page container">
         <div className="account-toolbar">
-          <Link
-            href={
-              profile?.memberships.some((m) => m.active)
-                ? "/dashboard"
-                : "/patient"
-            }
-            className="button primary"
-          >
-            <LayoutGrid size={16} />
-            {t.backToDashboard}
-          </Link>
+          {member || !profile ? (
+            <Link href="/dashboard" className="button primary">
+              <LayoutGrid size={16} />
+              {t.backToDashboard}
+            </Link>
+          ) : (
+            <Link href="/organization/register" className="button primary">
+              <Building2 size={16} />
+              {t.registerOrganization}
+            </Link>
+          )}
           <button onClick={logout} disabled={busy} className="button secondary">
             <LogOut size={16} />
             {busy ? t.submitting : t.logout}
@@ -186,7 +189,12 @@ export function Account() {
                 <h2>{t.nextTitle}</h2>
                 <p>{t.nextBody}</p>
               </div>
-              <Link href="/dashboard" aria-label="Open operations dashboard">
+              <Link
+                href={member ? "/dashboard" : "/organization/register"}
+                aria-label={
+                  member ? "Open operations dashboard" : t.registerOrganization
+                }
+              >
                 <ArrowUpRight size={24} />
               </Link>
             </div>

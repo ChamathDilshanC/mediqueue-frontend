@@ -12,10 +12,12 @@ import {
   ACCESS_COOKIE,
   REFRESH_COOKIE,
   apiError,
+  audienceParam,
   backend,
   clearBranchSelection,
   clearSession,
   json,
+  setAudience,
   setSession,
   startSession,
   requestOrigin,
@@ -138,6 +140,7 @@ export async function POST(request: NextRequest, context: Context) {
       confirmationRequired: !session.access_token,
     });
     startSession(response, session);
+    setAudience(response, audienceParam(request));
     return response;
   } catch {
     return apiError(503);

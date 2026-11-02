@@ -68,7 +68,7 @@ export function AuthForm({
     setBusy(true);
     setError(null);
     try {
-      const response = await fetch(`/api/auth/${mode}`, {
+      const response = await fetch(`/api/auth/${mode}?audience=${audience}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

@@ -2,6 +2,15 @@ import { NextResponse, type NextRequest } from "next/server";
 import { authResultSchema } from "./auth-contract";
 export const ACCESS_COOKIE = "mq_access";
 export const REFRESH_COOKIE = "mq_refresh";
+// Which sign-in the user chose (patient or staff). A new staff account has no hospital
+// membership yet, so memberships alone cannot tell it apart from a patient account.
+export const AUDIENCE_COOKIE = "mq_audience";
+export type Audience = "patient" | "staff";
+export function audienceParam(request: NextRequest): Audience {
+  return request.nextUrl.searchParams.get("audience") === "patient"
+    ? "patient"
+    : "staff";
+}
 export function requestOrigin(request: NextRequest) {
   const protocol =
     request.headers.get("x-forwarded-proto")?.split(",")[0].trim() ??
@@ -30,9 +39,15 @@ export function clearBranchSelection(response: NextResponse) {
     response.cookies.set(cookie, "", { path: "/", sameSite: "lax", maxAge: 0 });
 }
 export function clearSession(response: NextResponse) {
-  for (const cookie of [ACCESS_COOKIE, REFRESH_COOKIE])
+  for (const cookie of [ACCESS_COOKIE, REFRESH_COOKIE, AUDIENCE_COOKIE])
     response.cookies.set(cookie, "", { ...options, maxAge: 0 });
   clearBranchSelection(response);
+}
+export function setAudience(response: NextResponse, audience: Audience) {
+  response.cookies.set(AUDIENCE_COOKIE, audience, {
+    ...options,
+    maxAge: 60 * 60 * 24 * 7,
+  });
 }
 /** A new sign-in (password, OAuth, recovery): store tokens and drop any previous user's selection. */
 export function startSession(

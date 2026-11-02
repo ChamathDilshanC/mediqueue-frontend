@@ -29,6 +29,42 @@ for (const route of ["/login", "/register"]) {
   });
 }
 
+test("a new staff Google account without hospital access stays out of the patient portal", async ({
+  page,
+}) => {
+  await page.route("**/api/auth/me", (route) =>
+    route.fulfill({
+      json: {
+        id: "00000000-0000-4000-8000-000000000001",
+        display_name: "New Administrator",
+        memberships: [],
+      },
+    }),
+  );
+  await page.goto("/login");
+  await selectLanguage(page, "en");
+  await page.getByRole("button", { name: "Continue with Google" }).click();
+  await expect(page).toHaveURL("/account");
+  await expect(
+    page.getByText("New Administrator", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Register hospital / medical center" }),
+  ).toHaveCount(2);
+  await page.goto("/dashboard");
+  await expect(page).toHaveURL("/account");
+  await expect(page).not.toHaveURL("/patient");
+});
+
+test("a new patient Google account opens the patient portal", async ({
+  page,
+}) => {
+  await page.goto("/patient/login");
+  await selectLanguage(page, "en");
+  await page.getByRole("button", { name: "Continue with Google" }).click();
+  await expect(page).toHaveURL("/patient");
+});
+
 test("OAuth cancellation, missing verifier and failed exchanges return helpful errors", async ({
   page,
   context,
